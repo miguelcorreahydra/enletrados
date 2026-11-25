@@ -8,6 +8,7 @@
     "generar": "node herramientas/generar.js",
     "construir": "node herramientas/construir.js",
     "start": "node herramientas/servidor.js",
+    "dev": "node herramientas/servidor.js --vigilar",
     "capturas": "node herramientas/pruebas/capturas.js"
   }
 }

@@ -67,6 +67,9 @@ Responder siempre en español.
 - `npm run generar`: genera `fuente/contenido/niveles.json`.
 - `npm run construir`: arma `dist/` y muestra el peso con gzip.
 - `npm start`: servidor en `http://localhost:8080`, y también en la wifi para el celular.
+- `npm run dev`: igual que `npm start`, pero cada cambio en `fuente/` rearma `dist/` y recarga solas las páginas
+  abiertas. El script de recarga se agrega al servir y nunca queda en `dist/`. Para verlo dentro de VS Code:
+  Cmd+Shift+P → «Simple Browser: Show» → `http://localhost:8080`.
 - `npm run capturas`, con `npm install` hecho antes en `herramientas/pruebas/`:
   - capturas a 360, 390, 768 y 1280 px, y en modo oscuro;
   - revisa errores de JavaScript y desplazamiento lateral;
