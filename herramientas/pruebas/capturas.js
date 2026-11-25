@@ -43,7 +43,7 @@ async function formar(p, palabra) {
     if (oscuro && ancho !== 390) continue; // modo oscuro: solo en el tamaño de celular más común
     const { ctx, p } = await nuevaPagina(nav, ancho, alto, oscuro), sufijo = `${ancho}${oscuro ? "-oscuro" : ""}`;
     for (const [nombre, ruta] of PAGINAS) {
-      await p.goto(BASE + ruta, { waitUntil: "networkidle0" }); await espera(1400);
+      await p.goto(BASE + ruta, { waitUntil: "load" }); await espera(1400);
       await lateral(p, nombre, ancho);
       await p.screenshot({ path: path.join(SALIDA, `${nombre}-${sufijo}.png`) });
     }
@@ -52,7 +52,7 @@ async function formar(p, palabra) {
   // partida automática del nivel 1 al 2, a 390 px: animaciones, hoja de nivel completado y progreso
   const { ctx, p } = await nuevaPagina(nav, 390, 844);
   for (const n of [1, 2]) {
-    await p.goto(`${BASE}/nivel/${n}/`, { waitUntil: "networkidle0" }); await espera(1700);
+    await p.goto(`${BASE}/nivel/${n}/`, { waitUntil: "load" }); await espera(1700);
     if (n === 1) await p.screenshot({ path: path.join(SALIDA, "partida-demo.png") });
     const palabras = await p.evaluate(() => JSON.parse(document.getElementById("datos-nivel").textContent).palabras.map(w => w.p));
     for (const [i, w] of palabras.entries()) {
@@ -65,7 +65,7 @@ async function formar(p, palabra) {
     const ok = await p.evaluate(() => document.getElementById("velo").classList.contains("ver"));
     if (!ok) problemas.push(`Nivel ${n}: no apareció la pantalla de nivel completado`);
   }
-  await p.goto(BASE + "/", { waitUntil: "networkidle0" }); await espera(1200);
+  await p.goto(BASE + "/", { waitUntil: "load" }); await espera(1200);
   await p.screenshot({ path: path.join(SALIDA, "portada-con-progreso.png") });
   const progreso = await p.evaluate(() => localStorage.getItem("enl_progreso"));
   console.log("Progreso guardado:", progreso);

@@ -27,7 +27,13 @@ Responder siempre en español.
   `pistas.js` con 572 pistas, `niveles.js` con 30 niveles, `index.html`, `juego.js`). **Se copia aquí, no se edita allá.**
 - Propuesta presentada al jefe: `Hydra SAS/Blogs Hydra/juego-palabra/propuesta/propuesta_letras_cruzadas.html`.
   En ella el juego todavía se llama «Letras Cruzadas».
-- Siguiente paso: que el usuario pruebe la base visual en su celular; después, fase 2 (vocabulario, pistas y niveles).
+- **Fase 2 en curso** (24 nov 2026):
+  - lista de bloqueo, pistas por tandas con estado, revisión automática, generador con la curva de dificultad, desafío
+    diario y prueba de niveles, todo hecho;
+  - tandas escritas: 0 (572 del prototipo, con correcciones propuestas) y 1 (326 nuevas);
+  - el usuario las revisa en `/revisar/`.
+- Siguiente paso: que el usuario revise las tandas 0 y 1 y decida las dudosas; después, la tanda 2 (sobre todo
+  palabras de 4 letras para el lugar 2, y más palabras para el diario).
 
 ## Historia y diseño (decididos el 24 nov 2026)
 - **Historia: «El pueblo que perdió sus palabras».** Una noche de viento se llevó las palabras del pueblo; el jugador,
@@ -75,6 +81,16 @@ Responder siempre en español.
   - revisa errores de JavaScript y desplazamiento lateral;
   - juega una partida automática;
   - usa el Chrome instalado y bloquea todo lo externo.
+- **Pistas:**
+  - van en `fuente/contenido/tandas/tanda-NN.json`, cada una con su estado: pendiente, aprobada o descartada;
+  - al juego publicado solo entran las aprobadas;
+  - el usuario las revisa en `http://localhost:8080/revisar/` (solo con `npm run dev`, y solo desde este computador);
+  - si Claude corrige una pista, guarda la original en `original` y el motivo en `nota`.
+- **Bloqueo:** `fuente/contenido/bloqueo.json` también bloquea los plurales. Las «dudosas» quedan fuera hasta que el
+  usuario las permita en `/revisar/`. Se aplica también a las palabras extra.
+- `npm run generar` genera los niveles y el diario solo con pistas aprobadas. `npm run generar:vigentes` usa también
+  las pendientes, solo para verlos en local. `npm run revisar` y `npm run probar` son las revisiones automáticas.
+  `construir.js --estricto` (antes de publicar) exige que todas las pistas estén aprobadas.
 - Los datos de cada nivel van dentro de su propia página, no en un JSON por mundo. Es más rápido y tampoco carga los
   300 niveles de una vez.
 

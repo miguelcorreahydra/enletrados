@@ -6,6 +6,9 @@
   "scripts": {
     "datos": "sh herramientas/descargar_datos.sh",
     "generar": "node herramientas/generar.js",
+    "generar:vigentes": "node herramientas/generar.js --vigentes",
+    "revisar": "node herramientas/revisar_pistas.js",
+    "probar": "node herramientas/probar_niveles.js",
     "construir": "node herramientas/construir.js",
     "start": "node herramientas/servidor.js",
     "dev": "node herramientas/servidor.js --vigilar",

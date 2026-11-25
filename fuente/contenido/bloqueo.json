@@ -1,0 +1,46 @@
+{
+  "nota": "Palabras que nunca salen en el crucigrama ni como palabra extra. Se bloquean también sus plurales (+s, +es). Las «dudosas» quedan fuera hasta que el usuario decida en /revisar/.",
+  "bloqueadas": {
+    "vulgar u ofensiva en algún país": [
+      "coger", "concha", "conchudo", "pija", "polla", "cajeta", "bicho", "chucha", "pico", "picha", "paja", "pajero", "pajear",
+      "puta", "puto", "puti", "mierda", "joder", "jodes", "jodas", "jodido", "coño", "culo", "culear", "culero", "verga", "pene",
+      "follar", "cabron", "pendejo", "pendeja", "maricon", "marica", "joto", "idiota", "estupido", "imbecil", "perra", "zorra",
+      "teta", "pedo", "caca", "cagar", "caga", "mear", "orina", "orinar", "ano", "anal", "porno", "mamar", "mama", "mamon",
+      "chupa", "chupar", "carajo", "cachar", "pinga", "chimba", "panocha", "cuca", "chocha", "chocho", "pichula", "poto",
+      "raja", "nalga", "monda", "cojon", "cojones", "huevon", "guevon", "weon", "boludo", "pelotudo", "pinche", "chingar",
+      "chingada", "ojete", "orto", "garcha", "choto", "poronga", "naco", "maldito", "maldita", "gonorrea", "malparido"
+    ],
+    "regional o de sentido distinto entre países": [
+      "guagua", "torta", "pibe", "chamba", "palta", "choclo", "poroto", "frutilla", "pololo", "polola", "cabro", "chela",
+      "chamo", "cuate", "chavo", "morro", "wawa", "guata", "lapicera", "birome", "taita", "chevere", "bacan", "pucho"
+    ],
+    "temas delicados: violencia, muerte, drogas, sexo, religión y política": [
+      "droga", "matar", "mato", "mata", "maten", "muerte", "muerto", "muerta", "morir", "muere", "murio", "sexo", "sexy",
+      "desnudo", "desnuda", "violar", "viola", "odio", "asesino", "suicida", "bomba", "bala", "arma", "sangre", "tumba",
+      "cadaver", "nazi", "diablo", "infierno", "guerra", "fusil", "pistola", "crimen", "carcel", "preso", "robar", "ladron",
+      "cocaina", "marihuana", "porro", "funeral", "entierro", "velorio", "luto", "dios", "dioses", "iglesia", "misa", "biblia",
+      "rezar", "pecado", "santo", "santa", "gobierno", "politica", "presidente", "votar", "ejercito", "veneno", "herida", "golpe"
+    ]
+  },
+  "dudosas": {
+    "huevo": "comida básica, pero «huevos» es vulgar en varios países",
+    "bollo": "pan dulce; vulgar en Venezuela y Cuba",
+    "papaya": "fruta; vulgar en Cuba",
+    "cola": "de animal y fila; en varios países también es «trasero»",
+    "polvo": "tierra fina; tiene un sentido sexual en el habla popular",
+    "pito": "silbato; vulgar en varios países",
+    "chaqueta": "prenda; vulgar en México",
+    "pajaro": "ave; con sentido vulgar en Cuba y Chile",
+    "maraca": "instrumento; insulto en Chile",
+    "nabo": "verdura; insulto o vulgar en algunos países",
+    "coche": "auto en algunos países; cerdo en Guatemala",
+    "negro": "color; puede leerse como alusión racial",
+    "gil": "tonto; insulto suave",
+    "pana": "tela; «amigo» en Venezuela",
+    "cura": "remedio; también sacerdote (religión)",
+    "coca": "planta y bebida; asociada a la droga",
+    "angel": "ser celestial (religión)",
+    "pucha": "exclamación regional"
+  },
+  "decisiones": {}
+}

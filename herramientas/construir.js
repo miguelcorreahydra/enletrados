@@ -1,7 +1,7 @@
 // Arma el sitio completo en dist/ a partir de fuente/. Sin dependencias.
 // Uso: node herramientas/construir.js
 "use strict";
-const fs = require("fs"), path = require("path"), crypto = require("crypto"), zlib = require("zlib"), vm = require("vm");
+const fs = require("fs"), path = require("path"), crypto = require("crypto"), zlib = require("zlib");
 const RAIZ = path.join(__dirname, ".."), F = p => path.join(RAIZ, "fuente", p), DIST = path.join(RAIZ, "dist");
 const DOMINIO = "https://enletrados.com";
 const leer = p => fs.readFileSync(F(p), "utf8");
@@ -9,10 +9,14 @@ const leer = p => fs.readFileSync(F(p), "utf8");
 // ---------- contenido ----------
 const mundos = JSON.parse(leer("contenido/mundos.json"));
 const niveles = JSON.parse(leer("contenido/niveles.json"));
-const caja = { window: {} }; vm.runInNewContext(leer("contenido/pistas.js"), caja); const PISTAS = caja.window.PISTAS;
+// En local se usan las pistas vigentes (aprobadas y pendientes). Con --estricto (antes de publicar) solo las aprobadas.
+const ESTRICTO = process.argv.includes("--estricto"), L = require("./lib/contenido");
+const PISTAS = L.pistas(ESTRICTO ? "aprobadas" : "vigentes"), APROBADAS = L.pistas("aprobadas");
 const TOTAL = niveles.length;
-const faltan = [...new Set(niveles.flatMap(l => l.palabras.map(w => w.p)))].filter(w => !PISTAS[w]);
-if (faltan.length) { console.error("Palabras sin pista:", faltan.join(", ")); process.exit(1); }
+const enUso = [...new Set(niveles.flatMap(l => l.palabras.map(w => w.p)))];
+const faltan = enUso.filter(w => !PISTAS[w]);
+if (faltan.length) { console.error(`Palabras sin pista ${ESTRICTO ? "aprobada" : "vigente"}:`, faltan.join(", ")); process.exit(1); }
+const sinAprobar = enUso.filter(w => !APROBADAS[w]).length;
 
 // ---------- archivos con nombre versionado ----------
 const minCss = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").replace(/\s*([{}:;,>])\s*/g, "$1").replace(/;}/g, "}").trim();
@@ -88,4 +92,5 @@ const kb = b => (b / 1024).toFixed(1) + " KB";
 const portadaGz = gz("index.html"), nivelGz = gz("nivel/5/index.html"), cssGz = gz(CSS), jsGz = gz(JS);
 console.log(`dist/ listo: ${paginas.length} páginas (${TOTAL} niveles), ${CSS}, ${JS}`);
 console.log(`Peso transferido (gzip): CSS ${kb(cssGz)} · JS ${kb(jsGz)} · portada ${kb(portadaGz)} · nivel ${kb(nivelGz)}`);
+if (sinAprobar) console.log(`Ojo: ${sinAprobar} de ${enUso.length} palabras en uso tienen la pista sin aprobar todavía (solo sirve en local).`);
 console.log(`Primera carga: portada ${kb(portadaGz + cssGz + jsGz)} · nivel ${kb(nivelGz + cssGz + jsGz)} (límite: 100 KB)`);

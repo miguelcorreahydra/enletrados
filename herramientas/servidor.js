@@ -18,6 +18,7 @@ http.createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-store", Connection: "keep-alive" });
     res.write(": conectado\n\n"); oyentes.add(res); req.on("close", () => oyentes.delete(res)); return;
   }
+  if (VIGILAR && (ruta === "/revisar/" || ruta === "/revisar" || ruta.startsWith("/__api/"))) return revision(req, res, ruta);
   let archivo = path.normalize(path.join(DIST, ruta));
   if (!archivo.startsWith(DIST)) { res.writeHead(403); return res.end(); }
   if (fs.existsSync(archivo) && fs.statSync(archivo).isDirectory()) {
@@ -37,6 +38,53 @@ http.createServer((req, res) => {
     if (i.family === "IPv4" && !i.internal) console.log(`En el celular (misma wifi): http://${i.address}:${PUERTO}`);
   if (VIGILAR) vigilar();
 });
+
+// ---------- página local de revisión de pistas (/revisar/): solo en modo desarrollo y solo desde este computador ----------
+function revision(req, res, ruta) {
+  const L = require("./lib/contenido");
+  const local = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress);
+  const enviar = (estado, cuerpo, tipo = "application/json; charset=utf-8") => { res.writeHead(estado, { "Content-Type": tipo, "Cache-Control": "no-store" }); res.end(typeof cuerpo === "string" ? cuerpo : JSON.stringify(cuerpo)); };
+  if (!local) return enviar(403, "La revisión solo se abre desde este computador (http://localhost).", "text/plain; charset=utf-8");
+  if (!ruta.startsWith("/__api/")) return enviar(200, fs.readFileSync(path.join(__dirname, "revisar.html"), "utf8"), "text/html; charset=utf-8");
+  const conAlertas = () => { const t = L.cargarTandas(), ctx = L.contexto(t); return { t, ctx }; };
+  if (req.method === "GET" && ruta === "/__api/revision") {
+    const { t, ctx } = conAlertas(), b = ctx.bloqueo;
+    return enviar(200, { tandas: t.map(x => ({ tanda: x.tanda, titulo: x.titulo, items: x.items.map(i => Object.assign({}, i, { alertas: i.estado === "descartada" ? [] : L.alertas(i, ctx) })) })),
+      dudosas: Object.entries(b.dudosas).map(([palabra, motivo]) => ({ palabra, motivo, decision: b.decisiones[palabra] || null })) });
+  }
+  if (req.method !== "POST") return enviar(405, { error: "método no permitido" });
+  let cuerpo = "";
+  req.on("data", c => { cuerpo += c; if (cuerpo.length > 1e6) req.destroy(); });
+  req.on("end", () => {
+    let d; try { d = JSON.parse(cuerpo); } catch (e) { return enviar(400, { error: "JSON inválido" }); }
+    const ESTADOS = ["pendiente", "aprobada", "descartada"];
+    if (ruta === "/__api/dudosa") {
+      const b = L.cargarBloqueo();
+      if (!b.dudosas[d.palabra] || !["permitir", "bloquear"].includes(d.decision)) return enviar(400, { error: "datos inválidos" });
+      L.guardarDecision(d.palabra, d.decision); return enviar(200, { ok: true });
+    }
+    const tandas = L.cargarTandas(), t = tandas.find(x => x.tanda === d.tanda);
+    if (!t) return enviar(404, { error: "no existe la tanda" });
+    if (ruta === "/__api/lote") {
+      if (!Array.isArray(d.palabras) || !ESTADOS.includes(d.estado)) return enviar(400, { error: "datos inválidos" });
+      t.items.forEach(i => { if (d.palabras.includes(i.palabra)) i.estado = d.estado; });
+      L.guardarTanda(t); return enviar(200, { ok: true, cambiadas: d.palabras.length });
+    }
+    if (ruta === "/__api/pista") {
+      const i = t.items.find(x => x.palabra === d.palabra);
+      if (!i) return enviar(404, { error: "no existe la palabra" });
+      if (d.estado != null) { if (!ESTADOS.includes(d.estado)) return enviar(400, { error: "estado inválido" }); i.estado = d.estado; }
+      if (d.pista != null) {
+        const nueva = String(d.pista).trim().slice(0, 120);
+        if (nueva && nueva !== i.pista) { if (!i.original) i.original = i.pista; i.pista = nueva; if (i.estado === "descartada") i.estado = "pendiente"; }
+      }
+      L.guardarTanda(t);
+      const ctx = L.contexto(L.cargarTandas());
+      return enviar(200, Object.assign({}, i, { alertas: i.estado === "descartada" ? [] : L.alertas(i, ctx) }));
+    }
+    enviar(404, { error: "ruta desconocida" });
+  });
+}
 
 function construir() {
   const inicio = Date.now();

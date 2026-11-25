@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisión de pistas · Enletrados</title>
+<meta name="robots" content="noindex">
+<style>
+:root {
+  --papel: #F7F0E4; --crema: #FFFCF6; --tinta: #2E241B; --tinta-2: #6B5D4F; --linea: #E3D6C2; --hundida: #EFE5D4;
+  --terracota: #C0603A; --dorado: #C9973B; --dorado-claro: #F3DFAE; --verde: #4F7A45; --verde-claro: #DDEBD3; --rojo: #B23A48; --rojo-claro: #F5DADD;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --redonda: ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root { --papel: #1B1712; --crema: #2A241D; --tinta: #F3EADB; --tinta-2: #BFAF98; --linea: #3B3228; --hundida: #2F2820;
+  --dorado-claro: #5A4724; --verde-claro: #2C3B27; --rojo-claro: #4A2A2E; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--papel); color: var(--tinta); font-family: var(--sans); }
+header { position: sticky; top: 0; z-index: 5; background: var(--papel); border-bottom: 1px solid var(--linea); padding: 12px 16px 10px; }
+.fila { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+h1 { font-family: var(--serif); font-size: 22px; margin: 0 12px 0 0; }
+h1 span { color: var(--terracota); }
+.pestana, .chip { border: 1px solid var(--linea); background: var(--crema); border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--tinta); }
+.pestana.on, .chip.on { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.resumen { max-width: 900px; margin: 10px auto 0; display: flex; gap: 14px; align-items: center; font-size: 13px; color: var(--tinta-2); font-weight: 600; flex-wrap: wrap; }
+.barra { flex: 1; min-width: 160px; height: 8px; border-radius: 99px; background: var(--hundida); overflow: hidden; display: flex; }
+.barra i { display: block; height: 100%; } .barra .a { background: var(--verde); } .barra .d { background: var(--rojo); opacity: .6; }
+.filtros { max-width: 900px; margin: 10px auto 0; }
+input[type=search] { flex: 1; min-width: 160px; border: 1px solid var(--linea); background: var(--crema); color: var(--tinta); border-radius: 10px; padding: 7px 10px; font: inherit; }
+main { max-width: 900px; margin: 0 auto; padding: 14px 16px 80px; }
+.ayuda { font-size: 13px; color: var(--tinta-2); margin: 0 0 12px; line-height: 1.5; }
+kbd { font-family: var(--redonda); background: var(--crema); border: 1px solid var(--linea); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; font-size: 12px; }
+.tarjeta { display: grid; grid-template-columns: 150px 1fr auto; gap: 12px; align-items: start; background: var(--crema); border: 1px solid var(--linea); border-left: 5px solid var(--linea);
+  border-radius: 14px; padding: 12px; margin-bottom: 10px; outline: none; }
+.tarjeta.aprobada { border-left-color: var(--verde); } .tarjeta.descartada { border-left-color: var(--rojo); opacity: .6; } .tarjeta.pendiente { border-left-color: var(--dorado); }
+.tarjeta:focus { box-shadow: 0 0 0 3px var(--dorado-claro); }
+.palabra { font-family: var(--redonda); font-weight: 800; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; word-break: break-all; }
+.palabra small { display: block; font-size: 11px; letter-spacing: .3px; color: var(--tinta-2); text-transform: none; font-weight: 700; margin-top: 2px; }
+.pista input { width: 100%; font-family: var(--serif); font-size: 17px; color: var(--tinta); background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 5px 6px; }
+.pista input:hover, .pista input:focus { border-color: var(--linea); background: var(--papel); outline: none; }
+.meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; font-size: 12px; align-items: center; }
+.cuenta { color: var(--tinta-2); font-weight: 700; } .cuenta.pasa { color: var(--rojo); }
+.alerta { background: var(--rojo-claro); color: var(--rojo); border-radius: 6px; padding: 2px 7px; font-weight: 700; }
+.nota { color: var(--tinta-2); font-style: italic; }
+.antes { color: var(--tinta-2); } .antes s { opacity: .8; }
+.botones { display: flex; gap: 6px; }
+.b { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--linea); background: var(--papel); font-size: 18px; cursor: pointer; color: var(--tinta); }
+.b.si { background: var(--verde-claro); border-color: var(--verde); color: var(--verde); } .b.no { background: var(--rojo-claro); border-color: var(--rojo); color: var(--rojo); }
+.vacio { text-align: center; color: var(--tinta-2); padding: 40px; }
+.lote { margin-left: auto; }
+.lote button { border: 0; background: var(--verde); color: #fff; border-radius: 10px; padding: 8px 12px; font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--tinta); color: var(--papel); padding: 9px 14px; border-radius: 10px; font-weight: 700;
+  opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.ver { opacity: 1; }
+@media (max-width: 640px) { .tarjeta { grid-template-columns: 1fr; } .botones { justify-content: flex-end; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="fila"><h1>Revisión de <span>pistas</span></h1><div id="pestanas" class="fila"></div></div>
+  <div class="resumen" id="resumen"></div>
+  <div class="fila filtros" id="filtros"></div>
+</header>
+<main>
+  <p class="ayuda" id="ayuda"></p>
+  <div id="lista"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+(function () {
+  "use strict";
+  var datos = null, vista = { tanda: 0, filtro: "pendiente", buscar: "" }, $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); };
+  function toast(t) { var e = $("toast"); e.textContent = t; e.classList.add("ver"); clearTimeout(e._t); e._t = setTimeout(function () { e.classList.remove("ver"); }, 1400); }
+  function api(ruta, cuerpo) {
+    return fetch("/__api/" + ruta, cuerpo ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) } : {})
+      .then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error(t); }); return r.json(); })
+      .catch(function (e) { toast("No se pudo guardar: " + e.message); throw e; });
+  }
+  function cargar() { return api("revision").then(function (d) { datos = d; pintar(); }); }
+  function tandaActual() { return datos.tandas.filter(function (t) { return t.tanda === vista.tanda; })[0]; }
+
+  function pintar() {
+    var pest = datos.tandas.map(function (t) {
+      var p = t.items.filter(function (i) { return i.estado === "pendiente"; }).length;
+      return '<button class="pestana' + (vista.tanda === t.tanda ? " on" : "") + '" data-tanda="' + t.tanda + '">Tanda ' + t.tanda + (p ? " · " + p + " por revisar" : " ✓") + "</button>";
+    }).join("");
+    var sinDecidir = datos.dudosas.filter(function (d) { return !d.decision; }).length;
+    pest += '<button class="pestana' + (vista.tanda === "dudosas" ? " on" : "") + '" data-tanda="dudosas">Dudosas' + (sinDecidir ? " · " + sinDecidir : " ✓") + "</button>";
+    $("pestanas").innerHTML = pest;
+    if (vista.tanda === "dudosas") return pintarDudosas();
+    var t = tandaActual(), c = { aprobada: 0, pendiente: 0, descartada: 0 };
+    t.items.forEach(function (i) { c[i.estado]++; });
+    var n = t.items.length;
+    $("resumen").innerHTML = "<span>" + esc(t.titulo) + " · " + n + " palabras</span><span style=\"color:var(--verde)\">" + c.aprobada + " aprobadas</span><span>" + c.pendiente +
+      " pendientes</span><span style=\"color:var(--rojo)\">" + c.descartada + ' descartadas</span><div class="barra"><i class="a" style="width:' + (c.aprobada / n * 100) + '%"></i><i class="d" style="width:' +
+      (c.descartada / n * 100) + '%"></i></div>';
+    var filtros = [["pendiente", "Pendientes"], ["alertas", "Con alertas"], ["aprobada", "Aprobadas"], ["descartada", "Descartadas"], ["todas", "Todas"]];
+    $("filtros").innerHTML = filtros.map(function (f) { return '<button class="chip' + (vista.filtro === f[0] ? " on" : "") + '" data-filtro="' + f[0] + '">' + f[1] + "</button>"; }).join("") +
+      '<input type="search" id="buscar" placeholder="Buscar palabra o pista" value="' + esc(vista.buscar) + '">' +
+      '<span class="lote"><button id="lote">Aprobar las pendientes sin alertas de esta vista</button></span>';
+    $("ayuda").innerHTML = "Revisa que cada pista sea clara, corta y tenga una sola respuesta razonable. Para corregir, escribe sobre la pista: se guarda al salir del campo. " +
+      "Atajos: <kbd>A</kbd> aprobar · <kbd>D</kbd> descartar · <kbd>P</kbd> volver a pendiente · <kbd>J</kbd>/<kbd>K</kbd> siguiente/anterior · <kbd>E</kbd> editar.";
+    var items = visibles();
+    $("lista").innerHTML = items.length ? items.map(tarjeta).join("") : '<div class="vacio">Nada por aquí. ' + (vista.filtro === "pendiente" ? "¡Esta tanda ya está revisada!" : "") + "</div>";
+    var b = $("buscar"); b.oninput = function () { vista.buscar = b.value; var p = b.selectionStart; pintar(); var nb = $("buscar"); nb.focus(); nb.setSelectionRange(p, p); };
+  }
+  function visibles() {
+    var q = vista.buscar.toLowerCase();
+    return tandaActual().items.filter(function (i) {
+      if (q && (i.palabra + " " + i.pista).toLowerCase().indexOf(q) < 0) return false;
+      if (vista.filtro === "todas") return true;
+      if (vista.filtro === "alertas") return i.alertas.length && i.estado !== "descartada";
+      return i.estado === vista.filtro;
+    });
+  }
+  function tarjeta(i) {
+    var largo = (i.pista || "").length;
+    return '<div class="tarjeta ' + i.estado + '" tabindex="0" data-palabra="' + esc(i.palabra) + '">' +
+      '<div class="palabra">' + esc(i.palabra) + "<small>" + i.palabra.length + " letras · " + i.estado + "</small></div>" +
+      '<div class="pista"><input value="' + esc(i.pista) + '" maxlength="120" aria-label="Pista de ' + esc(i.palabra) + '">' +
+      '<div class="meta"><span class="cuenta' + (largo > 45 ? " pasa" : "") + '">' + largo + "/45</span>" +
+      i.alertas.map(function (a) { return '<span class="alerta">' + esc(a) + "</span>"; }).join("") +
+      (i.original ? '<span class="antes">Antes: <s>' + esc(i.original) + "</s></span>" : "") + (i.nota ? '<span class="nota">' + esc(i.nota) + "</span>" : "") + "</div></div>" +
+      '<div class="botones"><button class="b' + (i.estado === "aprobada" ? " si" : "") + '" data-estado="aprobada" title="Aprobar (A)">✓</button>' +
+      '<button class="b' + (i.estado === "descartada" ? " no" : "") + '" data-estado="descartada" title="Descartar (D)">✗</button>' +
+      '<button class="b" data-estado="pendiente" title="Volver a pendiente (P)">↺</button></div></div>';
+  }
+  function pintarDudosas() {
+    $("resumen").innerHTML = "<span>Palabras con un sentido distinto o vulgar en algún país. Quedan fuera del juego hasta que decidas.</span>";
+    $("filtros").innerHTML = ""; $("ayuda").innerHTML = "";
+    $("lista").innerHTML = datos.dudosas.map(function (d) {
+      return '<div class="tarjeta ' + (d.decision === "permitir" ? "aprobada" : d.decision === "bloquear" ? "descartada" : "pendiente") + '" data-dudosa="' + esc(d.palabra) + '">' +
+        '<div class="palabra">' + esc(d.palabra) + "<small>" + (d.decision ? (d.decision === "permitir" ? "permitida" : "bloqueada") : "sin decidir") + '</small></div><div class="pista" style="padding-top:6px">' + esc(d.motivo) + "</div>" +
+        '<div class="botones"><button class="b' + (d.decision === "permitir" ? " si" : "") + '" data-decision="permitir" title="Permitir">✓</button>' +
+        '<button class="b' + (d.decision === "bloquear" ? " no" : "") + '" data-decision="bloquear" title="Bloquear">✗</button></div></div>';
+    }).join("");
+  }
+
+  function actualizar(palabra, cambio, siguiente) {
+    var t = tandaActual(), i = t.items.filter(function (x) { return x.palabra === palabra; })[0];
+    return api("pista", Object.assign({ tanda: t.tanda, palabra: palabra }, cambio)).then(function (nuevo) {
+      Object.assign(i, nuevo);
+      var enfocada = document.querySelector('.tarjeta[data-palabra="' + palabra + '"]'), sig = siguiente && enfocada && enfocada.nextElementSibling;
+      pintar(); toast(cambio.estado ? palabra + ": " + cambio.estado : palabra + ": pista guardada");
+      var foco = sig && document.querySelector('.tarjeta[data-palabra="' + sig.dataset.palabra + '"]');
+      if (!foco && siguiente) foco = document.querySelector(".tarjeta"); // si el filtro la sacó de la vista, la primera
+      if (foco) foco.focus();
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    var p = e.target.closest("[data-tanda]"); if (p) { vista.tanda = p.dataset.tanda === "dudosas" ? "dudosas" : +p.dataset.tanda; return pintar(); }
+    var f = e.target.closest("[data-filtro]"); if (f) { vista.filtro = f.dataset.filtro; return pintar(); }
+    var b = e.target.closest("[data-estado]"); if (b) return actualizar(b.closest(".tarjeta").dataset.palabra, { estado: b.dataset.estado }, true);
+    var d = e.target.closest("[data-decision]");
+    if (d) { var w = d.closest(".tarjeta").dataset.dudosa; return api("dudosa", { palabra: w, decision: d.dataset.decision }).then(cargar).then(function () { toast(w + ": " + d.dataset.decision); }); }
+    if (e.target.id === "lote") {
+      var ok = visibles().filter(function (i) { return i.estado === "pendiente" && !i.alertas.length; });
+      if (!ok.length) return toast("No hay pendientes sin alertas en esta vista");
+      if (!confirm("¿Aprobar " + ok.length + " pistas pendientes sin alertas? Solo hazlo si ya las leíste.")) return;
+      api("lote", { tanda: tandaActual().tanda, palabras: ok.map(function (i) { return i.palabra; }), estado: "aprobada" }).then(cargar).then(function () { toast(ok.length + " aprobadas"); });
+    }
+  });
+  document.addEventListener("change", function (e) {
+    var t = e.target.closest(".tarjeta"); if (!t || e.target.tagName !== "INPUT") return;
+    actualizar(t.dataset.palabra, { pista: e.target.value.trim() }, false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "INPUT") { if (e.key === "Enter" || e.key === "Escape") { var t0 = e.target.closest(".tarjeta"); e.target.blur(); if (t0) t0.focus(); } return; }
+    var t = document.activeElement && document.activeElement.closest && document.activeElement.closest(".tarjeta[data-palabra]");
+    var k = e.key.toLowerCase();
+    if (k === "j" || k === "k") { var dest = t ? (k === "j" ? t.nextElementSibling : t.previousElementSibling) : document.querySelector(".tarjeta"); if (dest) dest.focus(); e.preventDefault(); return; }
+    if (!t) return;
+    if (k === "a") actualizar(t.dataset.palabra, { estado: "aprobada" }, true);
+    else if (k === "d") actualizar(t.dataset.palabra, { estado: "descartada" }, true);
+    else if (k === "p") actualizar(t.dataset.palabra, { estado: "pendiente" }, false);
+    else if (k === "e") { var inp = t.querySelector("input"); inp.focus(); inp.select(); e.preventDefault(); }
+  });
+  cargar().then(function () { var u = datos.tandas.filter(function (t) { return t.items.some(function (i) { return i.estado === "pendiente"; }); })[0]; if (u) { vista.tanda = u.tanda; pintar(); } });
+})();
+</script>
+</body>
+</html>
