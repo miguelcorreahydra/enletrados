@@ -1,0 +1,257 @@
+# Enletrados (sitio de juegos de palabras en español)
+
+Proyecto propio, separado de los blogs. Un sitio de juegos de palabras en español neutro para toda Latinoamérica, con
+anuncios de Groone (Google Ad Manager) y tráfico de Meta. Empieza con un solo juego completo: un crucigrama que se arma
+deslizando el dedo por una rueda de letras, con una pista para cada palabra. Plan escrito el 24 nov 2026, en la
+conversación de Tu Bono Hoy (`Hydra SAS/Blogs Hydra/chile-subsidios`); el trabajo sigue en una ventana de VS Code
+abierta en esta carpeta.
+
+Responder siempre en español.
+
+## Estado (24 nov 2026)
+- El jefe del usuario aprobó la prueba con sitio y dominio propios. Hasta ahora **solo hay planeación**: nada construido
+  en esta carpeta, nada publicado y nada comprado.
+- Nombre: **Enletrados** (elegido por el usuario). `enletrados.com` estaba libre el 24 nov 2026 (registro de Verisign).
+  La compra la hace el usuario; mejor en Cloudflare, donde va alojado.
+- Decisiones del usuario:
+  - mercado: toda Latinoamérica, en español neutro, sin chilenismos;
+  - primero un juego completo; los otros juegos se suman solo si la prueba funciona.
+- Base existente, solo como referencia: el prototipo en `Hydra SAS/Blogs Hydra/juego-palabra/letras/` (`generar.js`,
+  `pistas.js` con 572 pistas, `niveles.js` con 30 niveles, `index.html`, `juego.js`). **Se copia aquí, no se edita allá.**
+- Propuesta presentada al jefe: `Hydra SAS/Blogs Hydra/juego-palabra/propuesta/propuesta_letras_cruzadas.html`.
+  En ella el juego todavía se llama «Letras Cruzadas».
+- Siguiente paso: fase 0 (dominio y consulta a Groone).
+
+## Reglas de trabajo
+1. Antes de cambiar algo, mostrar la lista de cambios y esperar la aprobación del usuario. Esto incluye publicar, tocar
+   DNS, Cloudflare, Groone, el píxel o la campaña.
+2. Guardar en `respaldos/` el estado anterior de todo lo que se cambie en línea, y registrarlo en `respaldos/cambios.jsonl`
+   con fecha, recurso, qué cambió y respaldo.
+3. Ningún secreto en el chat ni fuera del `.env`: tokens de Cloudflare, claves y contraseñas. El `.env` nunca se sube al sitio.
+4. **Separación total de los blogs.** Nunca usar el `.env`, los ID (píxel, cuenta publicitaria, página, data-key de Groone,
+   snippets) ni las herramientas de las carpetas de `Blogs Hydra/`. No editar sus archivos. Lo que sirva se copia y se adapta.
+5. No borrar nada publicado sin aprobación expresa.
+6. Toda imagen del sitio pesa menos de 100 KB (regla del jefe del usuario), en WebP salvo el ícono (PNG).
+7. Sin fuentes de Google ni externas: letra del sistema. Si alguna vez se quiere una letra propia, va alojada en el sitio
+   y con aprobación.
+8. En las pruebas con navegador automático sobre el sitio real, bloquear anuncios, píxeles y analítica para no generar
+   impresiones ni eventos falsos. Para probar los anuncios, usar un simulador del GPT de Google, como en los blogs.
+9. Nunca anuncios disfrazados de botones ni ubicaciones que provoquen clics: arriesgan la cuenta de Groone, que es de la
+   empresa y la comparten todos los blogs.
+10. No leer ni comentar el texto ni la parte visual de los anuncios con recompensa (prohibición expresa del usuario).
+11. Cada propuesta para el jefe se presenta como «una idea más que puede funcionar», con datos, pros y contras. Nunca
+    como salvación ni mencionando la situación de la empresa.
+12. Antes de mandar tráfico pagado, comprobar varias veces seguidas que el sitio carga rápido en el celular.
+
+## El juego
+**Cómo se juega**
+- Arriba, un crucigrama. Abajo, una rueda de 3 a 7 letras.
+- Se desliza el dedo por las letras para formar una palabra. Si es del crucigrama, se coloca sola.
+- Cada palabra del crucigrama tiene su pista. La pista de la palabra elegida se ve arriba, con flechas ‹ › para cambiar.
+- Las palabras válidas que no están en el crucigrama cuentan como «palabras extra» y dan monedas.
+- El nivel 1 trae una demostración animada del gesto. El juego tiene que entenderse sin leer instrucciones: el usuario
+  rechazó el primer prototipo, un Wordle de chilenismos, por difícil y poco intuitivo.
+
+**Contenido de la versión 1**
+- **300 niveles en 10 mundos de 30 niveles.** Cada mundo tiene su color, su fondo ilustrado (WebP de menos de 100 KB) y
+  su nombre: Cocina, Jardín, Ciudad, Mar, Montaña, Viajes, Música, Hogar, Bosque y Cielo (por confirmar).
+- **Dificultad progresiva:** nivel 1 con 3 letras y 2 palabras, después 4, 5, 6 y 7 letras.
+  - Un nivel nunca debe trabar al jugador: palabras comunes y pistas claras.
+  - Cada cierto número de niveles va un nivel «de respiro», más fácil.
+- **Desafío diario** (`/diario/`):
+  - el mismo tablero para todos ese día, según la fecha local del jugador;
+  - racha de días seguidos;
+  - resultado para compartir por WhatsApp sin revelar las palabras.
+  - Es la herramienta principal para que la gente vuelva.
+- **Monedas.** Propuesta inicial, que se ajusta con los datos:
+  - se empieza con 100;
+  - +10 por nivel, +2 por palabra extra y +25 por el desafío diario;
+  - revelar una letra cuesta 30 y revelar una palabra cuesta 80;
+  - mezclar es gratis.
+  - Sin monedas, se puede ver un anuncio con recompensa para recibir una letra. Siempre es opcional y siempre se puede decir
+    «No, gracias».
+  - Las monedas nunca se compran, nunca se canjean por dinero ni premios y no se transfieren.
+- **Logros y estadísticas:** niveles, rachas, palabras extra y días jugados.
+- **Ajustes:** sonido, vibración, modo oscuro y tamaño de letra. También «Borrar progreso», con confirmación.
+- **Repaso al terminar cada nivel:** las palabras con su definición. Aporta valor real para Google y para el jugador.
+- **App instalable (PWA):**
+  - manifiesto, ícono y service worker;
+  - funciona sin conexión en los niveles ya descargados;
+  - se ofrece instalarla después del nivel 5, nunca al entrar.
+- **Sin cuentas:** el progreso queda en el navegador, en `localStorage` con prefijo `enl_`. Sincronizar entre dispositivos
+  queda para más adelante.
+
+## Contenido: vocabulario y pistas
+- **Palabras:** español neutro de uso común en toda Latinoamérica.
+  - Se excluyen las que tienen un sentido vulgar u ofensivo en algún país, como coger, concha, pija, polla, cajeta, bicho,
+    chucha, pico o paja. La lista de bloqueo de `generar.js` se amplía con estas.
+  - También se excluyen las regionales de sentido distinto: guagua, torta, pibe, chamba, etc.
+  - Sin temas delicados: violencia, drogas, sexo, muerte, religión ni política.
+- **Fuentes de las palabras:**
+  - lista de frecuencias hermitdave/FrequencyWords: el código tiene licencia MIT y el contenido sale de OpenSubtitles, con
+    CC BY-SA 4.0 según el repositorio. Verificar la licencia y dar el crédito en la página «Créditos»;
+  - el diccionario `an-array-of-spanish-words` 2.0.0 (MIT) para validar palabras;
+  - ante una duda de significado, el Diccionario de la lengua española (dle.rae.es) y el de americanismos de ASALE.
+- **Pistas:** hacen falta unas 2.500 para 300 niveles más el desafío diario de un año.
+  - Cortas: 45 caracteres como máximo. Claras, con una sola respuesta razonable.
+  - Nunca contienen la palabra ni su raíz: «pie» no se define con «pies».
+  - Se escriben en tandas de unas 300, que el usuario revisa antes de entrar al juego.
+  - Una revisión automática comprueba que cada palabra del crucigrama tenga pista, que la pista no contenga la respuesta y
+    que no haya palabras bloqueadas.
+- **Niveles:**
+  - los genera `generar.js` con una semilla fija, para que siempre salgan iguales;
+  - una prueba automática resuelve cada nivel: todas las palabras se forman con sus letras, el crucigrama es válido y
+    ninguna palabra se repite en niveles cercanos;
+  - el desafío diario sale de un grupo aparte de tableros, para no repetir los niveles normales.
+
+## Cómo se arma por dentro
+- **Sitio estático, sin WordPress ni base de datos.**
+  - Un script de Node arma la carpeta `dist/` con todas las páginas.
+  - Se publica en **Cloudflare Pages** con `wrangler`. El token va en el `.env`.
+  - Dominio `enletrados.com` en Cloudflare, con certificado automático.
+- **JavaScript propio, sin frameworks.** Primera carga: menos de 100 KB transferidos sin contar los anuncios.
+  - Los datos de cada mundo van en su propio JSON, para no cargar los 300 niveles de una vez.
+- **Direcciones:**
+  - `/`: portada con «Jugar», «Desafío diario» y los mundos;
+  - `/nivel/N/`: una página por nivel. La viñeta de Google solo sale al cambiar de página, por eso «Siguiente nivel» es un
+    enlace real a `/nivel/N+1/`;
+  - `/diario/`, `/mundos/`, `/como-jugar/`, `/logros/`, `/ajustes/`;
+  - páginas legales: `/privacidad/`, `/terminos/`, `/cookies/`, `/quienes-somos/`, `/contacto/`, `/creditos/`;
+  - `404` propia.
+- **Google:**
+  - en el índice: portada, cómo jugar, mundos y páginas legales;
+  - fuera del índice (`noindex`): las páginas de nivel, para no parecer cientos de páginas de poco contenido, y las de
+    logros y ajustes;
+  - `sitemap.xml` y `robots.txt` propios.
+- `_headers` de Cloudflare: caché larga para JS, CSS, imágenes y JSON con nombre versionado; corta para el HTML.
+- **Herramientas previstas en `herramientas/`:**
+  - `generar.js`: niveles;
+  - `construir.js`: arma `dist/`;
+  - `revisar_pistas.js`: revisión automática de las pistas;
+  - `publicar.sh`: `wrangler pages deploy`, con aprobación;
+  - `pruebas/`: puppeteer con el GPT simulado, capturas a 360, 390, 768 y 1280 px, y velocidad en 4G simulada.
+    Se instala con `npm install` dentro de la carpeta.
+
+## Anuncios (Groone)
+**Regla principal:** ningún anuncio mientras se juega ni cerca del crucigrama, la rueda o los botones del juego.
+
+| Lugar | Formato | Cuándo |
+|---|---|---|
+| Botón de ayuda sin monedas | Anuncio con recompensa | Solo si el jugador lo pide; uno a la vez. La recompensa es una letra. |
+| Paso al nivel siguiente | Viñeta | Al navegar a `/nivel/N+1/`, desde el nivel 3 y con límite de frecuencia. Nunca al abrir el sitio. |
+| Pantalla «nivel completado» | Display | Debajo del botón «Siguiente nivel», con 32 px de margen o más. |
+| Portada, mundos, cómo jugar | Display y anchor | Fuera de la partida. |
+| Durante la partida | Ninguno | El anchor tampoco va en las páginas de nivel: quedaría junto a la rueda. |
+
+- **Muro de ofertas** (Offerwall de Google): apagado en todo el sitio. Se bloquea por código con
+  `googlefc.controlledMessagingFunction`, definida antes del tag.
+- **Viñeta en los primeros niveles:** los enlaces de los niveles 1 y 2 llevan `data-google-interstitial="false"`.
+- **Consultas a Groone por escrito antes de construir la versión pública:**
+  - si aceptan el sitio, qué formatos dan y si hay intersticial para juegos (`GAME_MANUAL_INTERSTITIAL`, de acceso limitado);
+  - el eCPM esperado en Latinoamérica;
+  - si hace falta un aviso de consentimiento (CMP) para visitas de Europa.
+  - Se les muestra el prototipo.
+- **Alternativa en paralelo** (opcional, con aprobación): postular a AdSense para juegos (H5 Games Ads, beta cerrada).
+  Así no se concentra todo en una sola cuenta.
+- `ads.txt` en la raíz del dominio con la línea que dé Groone.
+- **Alarmas, que pausan la campaña de inmediato y se avisan:**
+  - un CTR de los anuncios muy por encima de lo normal del display. En los blogs, el reward llegó a 45–48 % y eso ya
+    obligó a poner un aviso;
+  - descuentos por tráfico inválido;
+  - cualquier aviso de Groone, Google o Meta.
+
+## Medición
+- Píxel de Meta y propiedad de Analytics **propios de Enletrados**: nunca los de los blogs.
+  - Si se usa la misma cuenta publicitaria de los blogs: conversiones con prefijo «ENL - …» y campañas con prefijo `enl_`.
+- Eventos:
+  - `enl_inicio`;
+  - `enl_nivel_1`, `enl_nivel_3`, `enl_nivel_5` y `enl_nivel_10`;
+  - `enl_diario`, `enl_ayuda` (con tipo: moneda o anuncio), `enl_instalar` y `enl_regreso`.
+  - `enl_regreso` es la primera visita de un día distinto al de la llegada. Se calcula con `localStorage`.
+- **Números que deciden:**
+  - ingreso por jugador = ingresos de Groone ÷ jugadores que llegan desde Meta;
+  - costo por jugador;
+  - niveles por visita;
+  - regreso al día siguiente y a los 7 días;
+  - RPM por sesión, que importa más que el eCPM.
+- Seguimiento diario en `informes/campana/` (`datos_diarios.csv` y `seguimiento.md`), con las capturas que manda el usuario.
+
+## Campaña de Meta (prueba)
+- **Presupuesto:** 50 USD como máximo durante 7 días, unos 1.000 jugadores. Solo después del visto bueno de Groone.
+- **Público y lugares:**
+  - Chile primero, por su CPM barato, y después otros países;
+  - de 35 a 65 años, con intereses en crucigramas, sopas de letras y juegos de palabras;
+  - solo móviles, en Feeds, Stories y Reels de Facebook e Instagram, sin Audience Network.
+- **Objetivo y conversión:** Clientes potenciales, con conversión en el sitio.
+  - Optimiza por **«ENL - Nivel 3»**, el evento estándar «Cliente potencial» sobre `enl_nivel_3`: es alguien que de verdad
+    jugó, no solo que abrió la página.
+  - Advantage+ y las mejoras de contenido apagadas.
+- **Creativos:**
+  - video vertical de la partida real, hecho con puppeteer y ffmpeg;
+  - sin premios en dinero, sin cifras inventadas y sin botones falsos;
+  - lo que muestra el anuncio es lo que se encuentra al entrar: se juega al instante, sin anuncio de entrada.
+- Parámetros de URL: `utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}`.
+
+## Ruta
+0. **Permisos y consultas** (sin costo):
+   - el usuario compra `enletrados.com`;
+   - consulta por escrito a Groone con el prototipo;
+   - opcional: postular a AdSense para juegos.
+1. **Base técnica:**
+   - copiar el prototipo a esta carpeta;
+   - el script de construcción, una página por nivel, el sistema de mundos y la portada;
+   - todo en local.
+2. **Contenido:**
+   - vocabulario neutro y lista de bloqueo;
+   - unas 2.500 pistas en tandas revisadas por el usuario;
+   - 300 niveles y los tableros del desafío diario, con sus pruebas automáticas.
+3. **Juego completo:**
+   - desafío diario, monedas, logros, sonidos, ajustes y PWA;
+   - páginas legales, con las leyes de datos de los países de la región sin plazos fijos, y créditos;
+   - anuncios simulados en los lugares acordados.
+4. **Pruebas locales:**
+   - capturas a 360, 390, 768 y 1280 px, sin errores de JavaScript y sin desplazamiento lateral;
+   - velocidad en 4G simulada;
+   - el usuario lo juega en su celular con un servidor local.
+5. **Publicación** (con aprobación):
+   - Cloudflare Pages con el dominio;
+   - tag de Groone, `ads.txt`, píxel y Analytics;
+   - revisión de Groone antes de recibir tráfico.
+6. **Prueba pagada:** 7 días, máximo 50 USD.
+7. **Decisión:**
+   - **Seguir:** al día siguiente vuelve el 25 % o más y el ingreso de 7 días se acerca al costo del jugador. Se sube el
+     presupuesto de a poco y se planean los otros juegos: sopa de letras, crucigrama del día, adivina la palabra.
+   - **Ajustar una vez:** vuelve entre el 15 % y el 25 %. Se mejora el juego o el desafío diario y se repite una prueba
+     igual de chica.
+   - **Parar:** vuelve menos del 15 % y la primera visita deja menos del 30 % de su costo, o hay cualquier alarma.
+
+## Proyección (de la propuesta al jefe, 24 nov 2026)
+Son escenarios con supuestos, no promesas.
+- **Costo por jugador:** unos 0,05 USD, sacado de la campaña de Tu Bono Hoy. Cada visita a la landing costó unos 190 COP,
+  con el dólar a 3.000 COP.
+- **Ingreso de la primera visita:** unos 0,03 USD con todos los anuncios llenos. Supone 6 niveles, 2 viñetas, 6 bloques de
+  display y medio reward.
+
+| Por jugador (30 días) | Prudente | Medio | Bueno |
+|---|---|---|---|
+| Ingreso de la primera visita | 0,010 USD | 0,020 USD | 0,030 USD |
+| Visitas de regreso | 0,5 | 2 | 4 |
+| Ingreso total | 0,015 USD | 0,060 USD | 0,150 USD |
+| Ingreso ÷ costo | 30 % | 120 % | 300 % |
+
+- **eCPM de referencia de los blogs:**
+  - reward: 15,6–18,4 USD;
+  - viñeta: unos 6,7 USD;
+  - display: 1,6–2,6 USD;
+  - anchor: unos 0,9 USD.
+  - En un sitio de juegos pueden ser distintos: los anunciantes de juegos pagan menos que los de finanzas.
+- **Lo que decide el resultado** es cuánta gente vuelve, no el anuncio. La primera visita sola no se paga.
+
+## Riesgos
+- **Clics accidentales** en un juego táctil. Por eso no hay anuncios cerca de los controles y se vigila el CTR.
+- **Que la cuenta de Groone se vea afectada:** es compartida con los blogs. Por eso va la revisión previa por escrito y
+  ninguna fuente de tráfico dudosa.
+- **Mucha competencia** en juegos de palabras, sobre todo en apps. El fuerte de Enletrados es jugar al instante, sin
+  instalar nada, en español neutro y con pistas.
+- **Trabajo constante:** pistas, tableros diarios y revisión de palabras.
+- **Formatos especiales para juegos** con acceso limitado: el intersticial de juegos y H5 Games Ads.
