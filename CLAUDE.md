@@ -9,10 +9,17 @@ abierta en esta carpeta.
 Responder siempre en español.
 
 ## Estado (24 nov 2026)
-- El jefe del usuario aprobó la prueba con sitio y dominio propios. Hasta ahora **solo hay planeación**: nada construido
-  en esta carpeta, nada publicado y nada comprado.
+- El jefe del usuario aprobó la prueba con sitio y dominio propios. **Fase 1 hecha en local**: estructura, `construir.js`,
+  una página por nivel, mundos, portada con el pueblo y base visual. Nada publicado y nada comprado.
+- **Orden acordado:** se trabaja todo en local primero; el dominio se compra cuando el usuario se lo pida al jefe.
 - Nombre: **Enletrados** (elegido por el usuario). `enletrados.com` estaba libre el 24 nov 2026 (registro de Verisign).
   La compra la hace el usuario; mejor en Cloudflare, donde va alojado.
+- **Repositorio:** privado en GitHub, `miguelcorreahydra/enletrados` (cuenta personal del usuario). Este repositorio
+  tiene su propio ayudante de credenciales para usar esa cuenta, aunque la cuenta activa de `gh` sea otra. Los commits
+  van con el correo `noreply` de GitHub de esa cuenta.
+- **Medición, más adelante:** Analytics, píxel de Meta, **Clarity y Hotjar** (los dos, decidido por el usuario). En las
+  grabaciones se ocultan los espacios de anuncio (`data-clarity-mask`, `data-hj-suppress`). Se cargan después de que se
+  vea el juego.
 - Decisiones del usuario:
   - mercado: toda Latinoamérica, en español neutro, sin chilenismos;
   - primero un juego completo; los otros juegos se suman solo si la prueba funciona.
@@ -20,7 +27,53 @@ Responder siempre en español.
   `pistas.js` con 572 pistas, `niveles.js` con 30 niveles, `index.html`, `juego.js`). **Se copia aquí, no se edita allá.**
 - Propuesta presentada al jefe: `Hydra SAS/Blogs Hydra/juego-palabra/propuesta/propuesta_letras_cruzadas.html`.
   En ella el juego todavía se llama «Letras Cruzadas».
-- Siguiente paso: fase 0 (dominio y consulta a Groone).
+- Siguiente paso: que el usuario pruebe la base visual en su celular; después, fase 2 (vocabulario, pistas y niveles).
+
+## Historia y diseño (decididos el 24 nov 2026)
+- **Historia: «El pueblo que perdió sus palabras».** Una noche de viento se llevó las palabras del pueblo; el jugador,
+  con **Tilde** (una golondrina con alas en forma de virgulilla), las devuelve lugar por lugar.
+- Cada mundo es un lugar: Cocina → la panadería, Jardín → la plaza de las flores, Ciudad → la calle principal,
+  Mar → el puerto, Montaña → el mirador, Viajes → la estación de tren, Música → el kiosco de música,
+  Hogar → las casas del barrio, Bosque → el sendero del bosque, Cielo → el faro y el observatorio
+  (`fuente/contenido/mundos.json`).
+- El mapa del pueblo (SVG) empieza apagado. El lugar actual se ve en color, y cada lugar terminado se enciende. Cada
+  lugar tiene una escena propia con 6 detalles, que aparecen en los niveles 1, 4, 8, 13, 20 y 30 del mundo.
+  Por ahora solo está la escena de la panadería.
+- **Estilo: cálido y elegante.** Tonos papel y crema, terracota y dorado, títulos con serif del sistema y modo oscuro
+  como «el pueblo de noche».
+- **El usuario quiere un aspecto premium que no pese:**
+  - animaciones solo con `transform` y `opacity`;
+  - transiciones entre páginas con View Transitions;
+  - sonidos sintetizados con Web Audio, sin archivos;
+  - confeti en `canvas`;
+  - con «reducir movimiento», las animaciones se apagan.
+- **Mecánicas de regreso** (fase 3), con el límite de que generen ganas y no presión:
+  - nada se pierde por no entrar, nada se compra y no hay cuentas regresivas falsas;
+  - cofre cada 5 niveles, palabra dorada y frasco de palabras extra;
+  - el cartero de Tilde: un regalo cada 4 horas, hasta 3 por día;
+  - «El Diario del Pueblo»: el desafío diario;
+  - racha con protector que se gana jugando;
+  - postales y vecinos para coleccionar, y estrellas por nivel.
+- **Dificultad en serrucho:** de 3–4 letras en los mundos 1–2 a 7 letras en los mundos 9–10. Cada 5 niveles va uno de
+  respiro, el nivel 30 de cada mundo es más grande, y cada mundo suma una novedad. Si alguien se atasca mucho, Tilde
+  ofrece una pista gratis de vez en cuando.
+- Los fondos ilustrados de los mundos los genera el usuario con una herramienta de imágenes; Claude los optimiza a
+  menos de 100 KB. Otra opción es hacerlos en SVG.
+- Tipografía: por ahora, letras del sistema. Una letra propia alojada en el sitio (unos 20–30 KB) se propone más
+  adelante, con aprobación (regla 7).
+
+## Cómo se trabaja en local
+- `npm run datos`: baja las listas de palabras a `datos/`, en versiones fijas (esa carpeta no va a GitHub).
+- `npm run generar`: genera `fuente/contenido/niveles.json`.
+- `npm run construir`: arma `dist/` y muestra el peso con gzip.
+- `npm start`: servidor en `http://localhost:8080`, y también en la wifi para el celular.
+- `npm run capturas`, con `npm install` hecho antes en `herramientas/pruebas/`:
+  - capturas a 360, 390, 768 y 1280 px, y en modo oscuro;
+  - revisa errores de JavaScript y desplazamiento lateral;
+  - juega una partida automática;
+  - usa el Chrome instalado y bloquea todo lo externo.
+- Los datos de cada nivel van dentro de su propia página, no en un JSON por mundo. Es más rápido y tampoco carga los
+  300 niveles de una vez.
 
 ## Reglas de trabajo
 1. Antes de cambiar algo, mostrar la lista de cambios y esperar la aprobación del usuario. Esto incluye publicar, tocar

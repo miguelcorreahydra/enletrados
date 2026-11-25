@@ -1,0 +1,8 @@
+{
+  "name": "enletrados-pruebas",
+  "private": true,
+  "description": "Pruebas con navegador automático: capturas, errores de JavaScript y velocidad. Usa el Chrome instalado.",
+  "dependencies": {
+    "puppeteer-core": "^24.43.1"
+  }
+}

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{titulo}}</title>
+<meta name="description" content="{{descripcion}}">
+<meta name="robots" content="{{robots}}">
+{{canonica}}
+<meta name="theme-color" content="#F7F0E4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1712" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/icono.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/{{css}}">
+<script>try{var t=localStorage.getItem("enl_tema");if(t)document.documentElement.dataset.tema=JSON.parse(t)}catch(e){}</script>
+</head>
+<body data-pagina="{{pagina}}" class="{{clase}}">
+{{iconos}}
+{{contenido}}
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+<script src="/{{js}}" defer></script>
+</body>
+</html>

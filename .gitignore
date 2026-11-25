@@ -3,8 +3,9 @@
 .env.*
 !.env.ejemplo
 
-# Dependencias y salida de construcción
+# Dependencias, listas de palabras descargadas (npm run datos) y salida de construcción
 node_modules/
+datos/
 dist/
 
 # Pruebas: capturas, videos e informes generados

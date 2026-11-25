@@ -1,0 +1,22 @@
+[
+  { "id": 1, "tema": "Cocina", "lugar": "La panadería", "color": "#C0603A", "desde": 1, "hasta": 30,
+    "frase": "Cada mañana olía a pan recién hecho. Hoy el recetario está en blanco." },
+  { "id": 2, "tema": "Jardín", "lugar": "La plaza de las flores", "color": "#6E8B57", "desde": 31, "hasta": 60,
+    "frase": "Las flores ya no recuerdan sus nombres." },
+  { "id": 3, "tema": "Ciudad", "lugar": "La calle principal", "color": "#B7793E", "desde": 61, "hasta": 90,
+    "frase": "Los letreros de las tiendas quedaron mudos." },
+  { "id": 4, "tema": "Mar", "lugar": "El puerto", "color": "#2F6E8A", "desde": 91, "hasta": 120,
+    "frase": "Los barcos no saben a qué puerto volver." },
+  { "id": 5, "tema": "Montaña", "lugar": "El mirador", "color": "#6C6A8E", "desde": 121, "hasta": 150,
+    "frase": "Desde arriba se ve todo, pero nadie sabe cómo se llama." },
+  { "id": 6, "tema": "Viajes", "lugar": "La estación de tren", "color": "#8E3B46", "desde": 151, "hasta": 180,
+    "frase": "Los boletos no dicen adónde van." },
+  { "id": 7, "tema": "Música", "lugar": "El kiosco de música", "color": "#B98A2E", "desde": 181, "hasta": 210,
+    "frase": "La banda toca, pero las canciones perdieron la letra." },
+  { "id": 8, "tema": "Hogar", "lugar": "Las casas del barrio", "color": "#B8676B", "desde": 211, "hasta": 240,
+    "frase": "En las casas nadie encuentra nada: todo perdió su nombre." },
+  { "id": 9, "tema": "Bosque", "lugar": "El sendero del bosque", "color": "#3F6B4B", "desde": 241, "hasta": 270,
+    "frase": "Los árboles susurran, pero sin palabras." },
+  { "id": 10, "tema": "Cielo", "lugar": "El faro y el observatorio", "color": "#34507A", "desde": 271, "hasta": 300,
+    "frase": "Las estrellas esperan que alguien vuelva a nombrarlas." }
+]

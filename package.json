@@ -1,0 +1,13 @@
+{
+  "name": "enletrados",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Juegos de palabras en español neutro para Latinoamérica",
+  "scripts": {
+    "datos": "sh herramientas/descargar_datos.sh",
+    "generar": "node herramientas/generar.js",
+    "construir": "node herramientas/construir.js",
+    "start": "node herramientas/servidor.js",
+    "capturas": "node herramientas/pruebas/capturas.js"
+  }
+}

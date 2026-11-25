@@ -1,0 +1,59 @@
+<svg class="escena" viewBox="0 0 240 150" aria-hidden="true">
+<defs>
+  <linearGradient id="e-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--cielo-a)"/><stop offset="1" style="stop-color:var(--cielo-b)"/></linearGradient>
+  <radialGradient id="e-luz"><stop offset="0" stop-color="#FFE3A3"/><stop offset="1" stop-color="#FFE3A3" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="240" height="150" fill="url(#e-cielo)"/>
+<circle class="sol" cx="200" cy="34" r="14" fill="#F2C27B" opacity=".8"/>
+<path d="M0 104q40-22 90-8t80-6 70 4v56H0z" fill="#CDBBA6" opacity=".7"/>
+<path d="M0 116q50-14 110-4t130-6v44H0z" fill="#B7C29A"/>
+<path d="M0 128q60-8 120-2t120-4v28H0z" fill="#D8C7A3"/>
+<circle cx="24" cy="98" r="15" fill="#6E8B57"/><circle cx="34" cy="106" r="11" fill="#7C9A62"/><path d="M27 108v22" stroke="#6E5644" stroke-width="3"/>
+<!-- base: el edificio -->
+<rect x="150" y="34" width="14" height="30" fill="#8E5A4A"/>
+<path d="M52 72 120 28l68 44z" fill="#C0603A"/><path d="M52 72 120 28l68 44" fill="none" stroke="#9C4A2C" stroke-width="2.5" stroke-linejoin="round"/>
+<rect x="60" y="72" width="120" height="60" fill="#F3E6D1"/>
+<rect x="60" y="128" width="120" height="4" fill="#D9C6A8"/>
+<rect x="128" y="92" width="30" height="40" rx="2" fill="#7A4A35"/><circle cx="152" cy="114" r="1.8" fill="#E9B866"/>
+<g class="tilde-posada"><use href="#tilde" x="98" y="14" width="30" height="19"/></g>
+<rect class="vent-apagada" x="72" y="92" width="42" height="28" rx="2" fill="#6B5A4B"/>
+<path d="M72 106h42M93 92v28" stroke="#F3E6D1" stroke-width="2"/>
+
+<!-- 1: ventanas con luz -->
+<g class="d d1">
+  <rect x="72" y="92" width="42" height="28" rx="2" fill="#FFD98A"/>
+  <circle cx="93" cy="106" r="26" fill="url(#e-luz)" opacity=".5"/>
+  <path d="M72 106h42M93 92v28" stroke="#F3E6D1" stroke-width="2"/>
+  <rect x="133" y="97" width="20" height="12" rx="1.5" fill="#FFD98A"/>
+</g>
+<!-- 2: el letrero -->
+<g class="d d2">
+  <rect x="78" y="76" width="84" height="13" rx="3" fill="#6E3B2A"/>
+  <text x="120" y="85.8" text-anchor="middle" font-size="8.4" font-weight="700" fill="#FBEBD0" font-family="Georgia,serif" letter-spacing="1.4">PANADERÍA</text>
+</g>
+<!-- 3: el toldo -->
+<g class="d d3">
+  <path d="M66 90h108l-6 10H72z" fill="#FBF6EC"/>
+  <path d="M66 90h12l-1 10h-5zM90 90h12v10H90zM114 90h12v10h-12zM138 90h12l1 10h-12zM162 90h12l-6 10h-5z" fill="#C0603A"/>
+  <path d="M72 100q3 3 6 0t6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0" fill="none" stroke="#C0603A" stroke-width="1.6"/>
+</g>
+<!-- 4: macetas con flores -->
+<g class="d d4">
+  <path d="M70 122h14l-2 8H72zM100 122h14l-2 8h-10z" fill="#B0573A"/>
+  <g fill="#6E8B57"><circle cx="74" cy="119" r="3"/><circle cx="80" cy="118" r="3"/><circle cx="104" cy="119" r="3"/><circle cx="110" cy="118" r="3"/></g>
+  <g fill="#E58B6B"><circle cx="73" cy="116" r="2"/><circle cx="81" cy="115" r="2"/><circle cx="105" cy="115" r="2"/></g>
+  <g fill="#F0C75E"><circle cx="77" cy="114" r="1.8"/><circle cx="109" cy="114" r="1.8"/></g>
+</g>
+<!-- 5: humo de la chimenea -->
+<g class="d d5"><g class="humo" fill="#FFFFFF" opacity=".75">
+  <circle cx="157" cy="27" r="6"/><circle cx="162" cy="16" r="4.6"/><circle cx="157" cy="7" r="3.4"/>
+</g></g>
+<!-- 6: farol y pan en la vitrina -->
+<g class="d d6">
+  <path d="M200 132V82" stroke="#3A2E25" stroke-width="2.4"/><path d="M200 84h-10" stroke="#3A2E25" stroke-width="2"/>
+  <circle cx="190" cy="90" r="16" fill="url(#e-luz)" opacity=".7"/>
+  <path d="M185 86h10l-2 9h-6z" fill="#FFD98A" stroke="#3A2E25" stroke-width="1.4"/>
+  <g fill="#C98A45"><ellipse cx="83" cy="111" rx="7" ry="3"/><ellipse cx="103" cy="111" rx="6" ry="3.2"/></g>
+  <path d="M79 110l2-1M83 110l2-1M87 110l2-1" stroke="#F3D7A8" stroke-width=".9"/>
+</g>
+</svg>

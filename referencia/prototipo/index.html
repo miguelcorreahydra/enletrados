@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Letras Cruzadas</title>
+<meta name="description" content="Une las letras para formar palabras y completa el crucigrama. Cada palabra tiene su pista.">
+<meta name="theme-color" content="#1D5FA8">
+<style>
+:root{
+  --fondo:#FBF7F0; --tinta:#1E2A38; --suave:#5B6675; --borde:#D5CFC4; --casilla:#FFFFFF;
+  --azul:#1D5FA8; --azul-claro:#DCE8F6; --naranja:#D9891E; --tecla:#E7E1D6; --acento:#B23A48;
+  --letra:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --fondo:#12171E; --tinta:#EEF1F4; --suave:#A3ADB9; --borde:#38414D; --casilla:#1A212A; --tecla:#2B333E; --azul-claro:#22364F; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--letra);display:flex;flex-direction:column;align-items:center;
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+header{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--borde)}
+header h1{font-size:19px;margin:0}
+header h1 span{color:var(--acento)}
+.nivel{font-size:14px;color:var(--suave);font-weight:600}
+.icono{width:36px;height:36px;border-radius:50%;border:1px solid var(--borde);background:transparent;color:var(--tinta);font-size:17px;font-weight:700;cursor:pointer}
+main{flex:1;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;padding:6px 16px 0;min-height:0}
+.zona-grilla{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
+.grilla{display:grid;gap:4px}
+.celda{border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;text-transform:uppercase;cursor:pointer}
+.celda.on{background:var(--casilla);border:2px solid var(--borde)}
+.celda.marcada{background:var(--azul-claro);border-color:var(--azul)}
+.celda.llena{background:var(--azul);border-color:var(--azul);color:#fff}
+.celda.revelada{color:var(--naranja);background:var(--casilla)}
+.celda.marcada.revelada{background:var(--azul-claro)}
+.celda.nueva{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.18)}}
+.pista{width:100%;display:flex;align-items:center;gap:6px;background:var(--casilla);border:1px solid var(--borde);border-radius:12px;padding:6px;margin:8px 0 4px;min-height:52px}
+.pista button{width:34px;height:34px;flex:none;border:none;border-radius:8px;background:var(--tecla);color:var(--tinta);font-size:18px;font-weight:700;cursor:pointer}
+.pista-texto{flex:1;text-align:center;font-size:15px;line-height:1.3}
+.pista-texto b{color:var(--azul);font-size:13px;display:block;letter-spacing:.3px}
+.actual{height:40px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;letter-spacing:3px;text-transform:uppercase}
+.actual span{background:var(--azul);color:#fff;border-radius:10px;padding:2px 14px}
+.actual.mal span{background:var(--suave);animation:temblor .35s}
+.actual.extra span{background:var(--naranja)}
+@keyframes temblor{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.abajo{position:relative;width:100%;display:flex;justify-content:center;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.rueda{position:relative;border-radius:50%;background:var(--tecla);touch-action:none}
+.rueda svg{position:absolute;inset:0;pointer-events:none}
+.letra{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:800;text-transform:uppercase;color:var(--tinta);pointer-events:none;transition:background .1s}
+.letra.sel{background:var(--azul);color:#fff}
+.letra.demo{background:var(--azul-claro)}
+.lateral{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--suave)}
+.lateral.izq{left:0}.lateral.der{right:0}
+.lateral button{width:58px;height:58px;border-radius:50%;border:1px solid var(--borde);background:var(--casilla);color:var(--tinta);font-size:12px;font-weight:700;cursor:pointer}
+.lateral .cupo{position:absolute;top:-4px;right:-4px;background:var(--naranja);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;font-weight:700}
+.guia{font-size:14px;color:var(--suave);text-align:center;margin:0 0 4px;min-height:18px}
+.aviso{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--tinta);color:var(--fondo);padding:9px 16px;border-radius:8px;
+  font-weight:600;font-size:15px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
+.aviso.ver{opacity:1}
+.velo{position:fixed;inset:0;background:rgba(10,14,20,.55);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.velo.ver{display:flex}
+.hoja{background:var(--fondo);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));position:relative;user-select:text}
+@media (min-width:600px){.velo{align-items:center}.hoja{border-radius:16px}}
+.cerrar{position:absolute;top:10px;right:12px;width:36px;height:36px;border:none;background:transparent;color:var(--tinta);font-size:24px;cursor:pointer}
+.hoja h2{margin:0 0 10px;font-size:20px}
+.hoja p{line-height:1.45;margin:8px 0}
+.repaso{list-style:none;padding:0;margin:10px 0}
+.repaso li{padding:7px 0;border-bottom:1px solid var(--borde);font-size:15px}
+.repaso b{text-transform:uppercase;color:var(--azul);margin-right:6px}
+.acciones{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.btn{border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--letra)}
+.btn.prin{background:var(--azul);color:#fff}
+.btn.sec{background:var(--tecla);color:var(--tinta)}
+.espacio-anuncio{border:2px dashed var(--acento);color:var(--acento);border-radius:10px;padding:14px;text-align:center;font-size:13px;margin:32px 0 4px}
+.sim{position:fixed;inset:0;background:#000;color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:40;text-align:center;padding:24px;font-size:17px}
+.sim.ver{display:flex}
+.sim small{opacity:.7;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Letras <span>Cruzadas</span></h1><div class="nivel" id="nivel"></div></div>
+  <button class="icono" id="b-ayuda" aria-label="Cómo jugar">?</button>
+</header>
+<main>
+  <div class="zona-grilla" id="zona-grilla"><div class="grilla" id="grilla"></div></div>
+  <div class="pista" id="pista">
+    <button id="b-ant" aria-label="Pista anterior">‹</button>
+    <div class="pista-texto" id="pista-texto"></div>
+    <button id="b-sig" aria-label="Pista siguiente">›</button>
+  </div>
+  <div class="guia" id="guia"></div>
+  <div class="actual" id="actual"></div>
+  <div class="abajo">
+    <div class="lateral izq"><button id="b-mezclar" aria-label="Mezclar letras">Mezclar</button></div>
+    <div class="rueda" id="rueda"><svg id="trazo"></svg></div>
+    <div class="lateral der"><button id="b-letra" aria-label="Revelar una letra">Letra</button><span class="cupo" id="cupo" hidden></span></div>
+  </div>
+</main>
+<div class="aviso" id="aviso"></div>
+<div class="velo" id="velo"><div class="hoja" role="dialog" aria-modal="true"><button class="cerrar" id="cerrar" aria-label="Cerrar">×</button><div id="hoja-contenido"></div></div></div>
+<div class="sim" id="sim"></div>
+<script src="pistas.js"></script>
+<script src="niveles.js"></script>
+<script src="juego.js"></script>
+</body>
+</html>

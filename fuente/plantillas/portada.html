@@ -1,0 +1,33 @@
+<header class="cabecera">
+  <a class="marca" href="/"><svg viewBox="0 0 64 40" aria-hidden="true"><use href="#tilde"/></svg><b>En<span>letrados</span></b></a>
+  <a class="redondo" href="/mundos/" aria-label="Los lugares del pueblo"><svg class="i"><use href="#i-casa"/></svg></a>
+</header>
+<main class="portada">
+  <div class="escenario">
+    {{pueblo}}
+    <div class="pin" id="pin" hidden><span>Aquí vas</span></div>
+  </div>
+  <div class="lema">
+    <h1>Devuélvele las palabras al pueblo</h1>
+    <p id="saludo">Una noche de viento se llevó todas las palabras. Tilde, la golondrina del pueblo, necesita tu ayuda.</p>
+  </div>
+  <div class="botones">
+    <a class="boton prin" id="b-jugar" href="/nivel/1/"><span id="b-jugar-t">Empezar a jugar</span><small id="b-jugar-n">Nivel 1</small></a>
+    <span class="boton sec" aria-disabled="true">Desafío diario <span class="pronto">Pronto</span></span>
+  </div>
+  <section class="tarjeta-lugar" id="lugar-actual" aria-label="Lugar actual">
+    <div class="medalla" id="lugar-num">1</div>
+    <div style="flex:1;min-width:0">
+      <h2 id="lugar-nombre">La panadería</h2>
+      <p id="lugar-frase">{{frase1}}</p>
+      <div class="barra"><i id="lugar-barra"></i></div>
+      <p style="margin:6px 0 0;font-size:12px;font-weight:700" id="lugar-cuenta">0 de 30 niveles</p>
+    </div>
+  </section>
+  <h2 class="seccion-t">Cómo se juega</h2>
+  <div class="paso"><b>1</b><p>Desliza el dedo por las letras de la rueda para formar palabras.</p></div>
+  <div class="paso"><b>2</b><p>Cada palabra del crucigrama tiene su pista. Si aciertas, vuela sola a su lugar.</p></div>
+  <div class="paso"><b>3</b><p>Con cada nivel, un rincón del pueblo recupera su luz. Juega gratis, sin instalar nada.</p></div>
+</main>
+<footer class="pie">Enletrados · Juegos de palabras en español · <a href="/mundos/">Los lugares del pueblo</a></footer>
+<script type="application/json" id="datos-sitio">{{datos}}</script>
