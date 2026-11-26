@@ -21,3 +21,6 @@ herramientas/pruebas/informes/
 *.log
 .vscode/*
 !.vscode/settings.json
+
+# videos e imágenes de las demostraciones de diseño
+herramientas/demos/salida/

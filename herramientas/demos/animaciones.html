@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opciones de animación · Enletrados</title>
+<style>
+@font-face { font-family: "Fraunces"; font-weight: 600; src: url(/demos/letras/fraunces-600.woff2) format("woff2"); }
+@font-face { font-family: "Nunito"; font-weight: 800; src: url(/demos/letras/nunito-800.woff2) format("woff2"); }
+:root { --papel: #F7F0E4; --crema: #FFFCF6; --tinta: #2E241B; --tinta-2: #6B5D4F; --linea: #E3D6C2; --terracota: #C0603A; --terracota-osc: #9C4A2C;
+  --dorado: #C9973B; --dorado-claro: #F3DFAE; --hundida: #EFE5D4; --ficha-borde: #E8DCC8; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #EDE3D3; color: var(--tinta); font-family: "Nunito", system-ui, sans-serif; }
+h1 { font: 600 26px "Fraunces", Georgia, serif; text-align: center; margin: 18px 0 2px; }
+.sub { text-align: center; color: var(--tinta-2); margin: 0 0 14px; font-size: 14px; }
+.tabla { display: grid; grid-template-columns: 120px repeat(3, 300px); gap: 12px; justify-content: center; padding: 0 12px 20px; }
+.col { text-align: center; font: 600 20px "Fraunces", Georgia, serif; }
+.col small { display: block; font: 800 12px "Nunito", system-ui; color: var(--tinta-2); letter-spacing: .3px; }
+.fila { font: 600 16px "Fraunces", Georgia, serif; display: flex; align-items: center; justify-content: flex-end; text-align: right; padding-right: 4px; }
+.escenario { position: relative; width: 300px; height: 250px; border-radius: 18px; overflow: hidden; background: var(--papel);
+  background-image: radial-gradient(120% 70% at 50% 0%, #FBF7EF, transparent 70%); box-shadow: 0 6px 20px rgb(46 36 27 / .12); }
+/* acierto */
+.celdas { position: absolute; top: 34px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
+.celda { width: 52px; height: 52px; border-radius: 12px; background: var(--hundida); box-shadow: inset 0 2px 3px rgb(46 36 27 / .14); position: relative; }
+.celda .cara { position: absolute; inset: 0; border-radius: inherit; display: grid; place-items: center; font: 800 28px "Nunito"; color: #FFF8EE; text-transform: uppercase;
+  background: linear-gradient(180deg, #D27550, var(--terracota) 60%, var(--terracota-osc)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .3), inset 0 -2px 0 rgb(0 0 0 / .14), 0 2px 4px rgb(46 36 27 / .2); opacity: 0; }
+.burbuja { position: absolute; top: 112px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; background: var(--tinta); color: var(--papel);
+  border-radius: 14px; padding: 4px 14px; font: 800 24px "Nunito"; letter-spacing: 2px; opacity: 0; }
+.burbuja i { font-style: normal; display: inline-block; }
+.fichas { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 14px; }
+.ficha { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font: 800 26px "Nunito"; color: var(--tinta);
+  background: linear-gradient(180deg, #fff, #FFFDF8); border: 1px solid var(--ficha-borde); box-shadow: 0 3px 0 var(--ficha-borde), 0 6px 12px rgb(46 36 27 / .12); }
+.vuela { position: absolute; width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; font: 800 28px "Nunito"; color: #FFF8EE;
+  background: linear-gradient(180deg, #D27550, var(--terracota)); box-shadow: 0 8px 18px rgb(192 96 58 / .35); z-index: 5; opacity: 0; }
+.chispa { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #FFE3A3; box-shadow: 0 0 8px 2px rgb(255 214 120 / .8); opacity: 0; z-index: 6; }
+.polvo { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #E9DCC6; opacity: 0; z-index: 6; }
+/* estrellas */
+.titulo { position: absolute; top: 40px; width: 100%; text-align: center; font: 600 34px "Fraunces", Georgia, serif; opacity: 0; }
+.titulo.brillo { background: linear-gradient(100deg, var(--tinta) 40%, #E2B65A 50%, var(--tinta) 60%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+.estrellas { position: absolute; top: 100px; width: 100%; display: flex; justify-content: center; gap: 10px; }
+.estrella { width: 54px; height: 54px; color: var(--dorado); opacity: 0; position: relative; }
+.estrella:nth-child(2) { width: 66px; height: 66px; margin-top: -10px; }
+.estrella svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 6px rgb(201 151 59 / .4)); position: relative; z-index: 2; }
+.rayos { position: absolute; inset: -40%; border-radius: 50%; background: repeating-conic-gradient(rgb(255 214 120 / .55) 0 8deg, transparent 8deg 24deg); opacity: 0; z-index: 1;
+  -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%); }
+.premio { position: absolute; top: 190px; width: 100%; text-align: center; font: 800 18px "Nunito"; color: var(--dorado); opacity: 0; }
+/* lugar */
+.pueblo { position: absolute; inset: 0; background: linear-gradient(#F4DDBF, #FBF1E2); }
+.pueblo img { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.pueblo .gris { filter: saturate(.2) brightness(1.05) contrast(.85); }
+.halo { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgb(255 222 140 / .9), rgb(255 222 140 / 0) 65%); opacity: 0; }
+.barrido { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / .75) 50%, transparent 65%); background-size: 300% 100%; opacity: 0; mix-blend-mode: soft-light; }
+.etiqueta { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: var(--tinta); color: var(--papel); font: 800 13px "Nunito";
+  padding: 5px 12px; border-radius: 99px; white-space: nowrap; opacity: 0; }
+.boton { display: block; margin: 0 auto 18px; font: 800 16px "Nunito"; color: #FFF8EE; border: 0; border-radius: 14px; padding: 12px 22px; cursor: pointer;
+  background: linear-gradient(180deg, #CF7048, var(--terracota) 55%, var(--terracota-osc)); box-shadow: 0 4px 0 #7E3A22; }
+</style>
+</head>
+<body>
+<h1>Opciones de animación</h1>
+<p class="sub">Cada escena se repite sola. Elige la columna que más te guste (o mezcla: por ejemplo, el acierto de B con el pueblo de C).</p>
+<button class="boton" id="otra-vez">Reproducir de nuevo</button>
+<div class="tabla" id="tabla">
+  <div></div>
+  <div class="col">A · Elegante<small>suave, sobria, curvas lentas</small></div>
+  <div class="col">B · Con resorte<small>rebotes, estirar y encoger</small></div>
+  <div class="col">C · Mágica<small>destellos y luz dorada</small></div>
+</div>
+<svg width="0" height="0" style="position:absolute"><symbol id="est" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></symbol></svg>
+<script>
+"use strict";
+const CICLO = 3600, MOMENTOS = [["acierto", "Acierto de una palabra"], ["estrellas", "Nivel completado"], ["lugar", "Un lugar del pueblo se enciende"]];
+const ESTILOS = ["A", "B", "C"];
+const tabla = document.getElementById("tabla");
+
+// resorte: simula un oscilador amortiguado y devuelve los valores (60 por segundo) hasta que se calma
+function resorte(rigidez, amortiguacion) {
+  const v = []; let x = 0, vel = 0;
+  for (let i = 0; i < 240; i++) { const f = -rigidez * (x - 1) - amortiguacion * vel; vel += f / 60; x += vel / 60; v.push(x); if (i > 20 && Math.abs(x - 1) < 0.001 && Math.abs(vel) < 0.01) break; }
+  return v;
+}
+// convierte el resorte en cuadros clave: mapa(valor) → propiedades
+function cuadrosResorte(mapa, rigidez = 220, amortiguacion = 13) { const v = resorte(rigidez, amortiguacion); return { frames: v.map(mapa), ms: v.length * 1000 / 60 }; }
+// «forwards»: antes de empezar, cada elemento conserva su estado de reposo (casi siempre, oculto)
+function animar(el, frames, op) { return el.animate(frames, Object.assign({ fill: "forwards", easing: "linear" }, op)); }
+const SUAVE = "cubic-bezier(.2,.8,.2,1)";
+
+function nuevo(tag, clase, padre, html) { const e = document.createElement(tag); e.className = clase; if (html) e.innerHTML = html; padre.appendChild(e); return e; }
+
+// ---------- acierto ----------
+function acierto(esc, estilo) {
+  const celdas = nuevo("div", "celdas", esc), caras = [];
+  for (const l of "sol") { const c = nuevo("div", "celda", celdas); caras.push(nuevo("span", "cara", c, l)); }
+  const bur = nuevo("div", "burbuja", esc, "<i>S</i><i>O</i><i>L</i>"), letrasB = [...bur.children];
+  const fichas = nuevo("div", "fichas", esc), fs = ["o", "s", "l"].map(l => nuevo("div", "ficha", fichas, l.toUpperCase()));
+  const orden = [1, 0, 2];
+  return () => {
+    // 1) se eligen las fichas (S, O, L)
+    orden.forEach((fi, k) => {
+      const f = fs[fi], t = 150 + k * 260;
+      if (estilo === "B") { const r = cuadrosResorte(x => ({ transform: `scale(${1 + 0.18 * x}, ${1 + 0.18 * x - 0.06 * Math.sin(x * 3.1)})`, background: "linear-gradient(180deg,#D27550,#C0603A)", color: "#FFF8EE" }), 420, 12);
+        animar(f, r.frames, { duration: r.ms, delay: t }); }
+      else if (estilo === "C") animar(f, [{ transform: "scale(1)", boxShadow: "0 3px 0 #E8DCC8" }, { transform: "scale(1.12)", background: "linear-gradient(180deg,#E2B65A,#C9973B)", color: "#FFF8EE", boxShadow: "0 0 0 8px rgb(226 182 90 / .25), 0 0 22px rgb(255 214 120 / .8)" }], { duration: 220, delay: t, easing: SUAVE });
+      else animar(f, [{ transform: "scale(1)" }, { transform: "scale(1.1)", background: "linear-gradient(180deg,#D27550,#C0603A)", color: "#FFF8EE" }], { duration: 240, delay: t, easing: SUAVE });
+      animar(letrasB[k], estilo === "B" ? cuadrosResorte(x => ({ transform: `translateY(${(1 - x) * 12}px) scale(${0.5 + 0.5 * x})`, opacity: Math.min(1, x * 2) })).frames : [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }],
+        { duration: estilo === "B" ? cuadrosResorte(x => ({})).ms : 220, delay: t, fill: "both" });
+    });
+    animar(bur, [{ opacity: 0, transform: "translateX(-50%) scale(.85)" }, { opacity: 1, transform: "translateX(-50%) scale(1)" }], { duration: 200, delay: 120, easing: SUAVE });
+    animar(bur, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, delay: 1000 });
+    fs.forEach(f => animar(f, [{ transform: "scale(1)", background: "linear-gradient(180deg,#fff,#FFFDF8)", color: "#2E241B" }], { duration: 1, delay: 1000 }));
+    // 2) las letras vuelan de la burbuja a las casillas
+    const caja = esc.getBoundingClientRect();
+    letrasB.forEach((lb, i) => {
+      const o = lb.getBoundingClientRect(), d = caras[i].parentNode.getBoundingClientRect(), v = nuevo("div", "vuela", esc, lb.textContent);
+      v.style.left = (d.left - caja.left) + "px"; v.style.top = (d.top - caja.top) + "px";
+      const dx = o.left + o.width / 2 - (d.left + 26), dy = o.top + o.height / 2 - (d.top + 26), t0 = 1020 + i * 80;
+      if (estilo === "B") {
+        animar(v, [{ opacity: 1, transform: `translate(${dx}px,${dy}px) scale(.55)` }, { opacity: 1, transform: `translate(${dx * .45}px,${dy * .45 - 50}px) scale(.9,1.15)`, offset: .45 },
+          { opacity: 1, transform: "translate(0,0) scale(1.18,.82)", offset: .82 }, { opacity: 1, transform: "translate(0,0) scale(1)" }], { duration: 560, delay: t0, easing: "cubic-bezier(.5,0,.3,1)" });
+      } else if (estilo === "C") {
+        animar(v, [{ opacity: 1, transform: `translate(${dx}px,${dy}px) scale(.55)` }, { opacity: 1, transform: `translate(${dx * .4}px,${dy * .4 - 60}px) scale(.9) rotate(-8deg)`, offset: .5 }, { opacity: 1, transform: "none" }],
+          { duration: 600, delay: t0, easing: "cubic-bezier(.45,0,.25,1)" });
+        for (let k = 0; k < 6; k++) { // estela de chispas
+          const c = nuevo("div", "chispa", esc), f = k / 6;
+          c.style.left = (d.left - caja.left + 23) + "px"; c.style.top = (d.top - caja.top + 23) + "px";
+          animar(c, [{ opacity: 0, transform: `translate(${dx * (1 - f) * .6}px,${dy * (1 - f) * .6 - 40 * Math.sin(f * 3.14)}px) scale(1)` }, { opacity: 1, offset: .2 }, { opacity: 0, transform: `translate(${dx * (1 - f) * .6 + (k % 2 ? 8 : -8)}px,${dy * (1 - f) * .6 - 40 * Math.sin(f * 3.14) + 14}px) scale(.2)` }], { duration: 520, delay: t0 + 120 + k * 45 });
+        }
+      } else {
+        animar(v, [{ opacity: 1, transform: `translate(${dx}px,${dy}px) scale(.55)` }, { opacity: 1, transform: `translate(${dx * .45}px,${dy * .45 - 36}px) scale(.85)`, offset: .5 }, { opacity: 1, transform: "none" }],
+          { duration: 540, delay: t0, easing: "cubic-bezier(.45,0,.25,1)" });
+      }
+      animar(v, [{ opacity: 1 }, { opacity: 0 }], { duration: 1, delay: t0 + (estilo === "C" ? 600 : 560) });
+      // 3) la casilla se llena
+      const tc = t0 + (estilo === "C" ? 600 : 540);
+      if (estilo === "B") { const r = cuadrosResorte(x => ({ opacity: 1, transform: `scale(${1 + (1 - x) * -0.35})` }), 380, 9); animar(caras[i], r.frames, { duration: r.ms, delay: tc }); }
+      else if (estilo === "C") {
+        animar(caras[i], [{ opacity: 1, boxShadow: "0 0 0 0 rgb(255 214 120 / .9), inset 0 1px 0 rgb(255 255 255 / .3)" }, { opacity: 1, boxShadow: "0 0 0 10px rgb(255 214 120 / 0), inset 0 1px 0 rgb(255 255 255 / .3)" }], { duration: 650, delay: tc, easing: "ease-out" });
+        for (let k = 0; k < 5; k++) { const c = nuevo("div", "chispa", esc), a = k / 5 * 6.28, r0 = caras[i].parentNode.getBoundingClientRect();
+          c.style.left = (r0.left - caja.left + 23) + "px"; c.style.top = (r0.top - caja.top + 23) + "px";
+          animar(c, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: `translate(${Math.cos(a) * 34}px,${Math.sin(a) * 34}px) scale(.3)` }], { duration: 600, delay: tc, easing: "cubic-bezier(.2,.8,.2,1)" }); }
+      } else animar(caras[i], [{ opacity: 0, transform: "perspective(300px) rotateX(90deg)" }, { opacity: 1, transform: "perspective(300px) rotateX(-12deg)", offset: .65 }, { opacity: 1, transform: "none" }], { duration: 520, delay: tc, easing: SUAVE });
+    });
+  };
+}
+
+// ---------- estrellas ----------
+function estrellas(esc, estilo) {
+  const tit = nuevo("div", "titulo" + (estilo === "C" ? " brillo" : ""), esc, "¡Perfecto!");
+  const fila = nuevo("div", "estrellas", esc), es = [0, 1, 2].map(() => nuevo("div", "estrella", fila, (estilo === "C" ? '<div class="rayos"></div>' : "") + '<svg><use href="#est"/></svg>'));
+  const pre = nuevo("div", "premio", esc, "+10 monedas");
+  return () => {
+    if (estilo === "B") { const r = cuadrosResorte(x => ({ opacity: Math.min(1, x * 1.5), transform: `translateY(${(1 - x) * -40}px)` }), 200, 11); animar(tit, r.frames, { duration: r.ms, delay: 100 }); }
+    else animar(tit, [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 500, delay: 100, easing: SUAVE });
+    if (estilo === "C") animar(tit, [{ backgroundPosition: "100% 0" }, { backgroundPosition: "0% 0" }], { duration: 1200, delay: 1500, easing: "ease-in-out", fill: "none" });
+    es.forEach((e, i) => {
+      const t = 450 + i * 260, base = i === 1 ? "" : "";
+      if (estilo === "B") { const r = cuadrosResorte(x => ({ opacity: Math.min(1, x * 2), transform: `scale(${x}) rotate(${(1 - x) * -90}deg)` }), 260, 10); animar(e, r.frames, { duration: r.ms, delay: t }); }
+      else if (estilo === "C") {
+        animar(e, [{ opacity: 0, transform: "translateY(60px) scale(.4)" }, { opacity: 1, transform: "translateY(-6px) scale(1.15)", offset: .7 }, { opacity: 1, transform: "none" }], { duration: 520, delay: t, easing: "cubic-bezier(.3,.7,.2,1)" });
+        animar(e.querySelector(".rayos"), [{ opacity: 0, transform: "scale(.4) rotate(0)" }, { opacity: 1, transform: "scale(1) rotate(40deg)", offset: .4 }, { opacity: 0, transform: "scale(1.2) rotate(90deg)" }], { duration: 1100, delay: t + 300 });
+        for (let k = 0; k < 6; k++) { const c = nuevo("div", "chispa", e), a = k / 6 * 6.28; c.style.left = "45%"; c.style.top = "45%";
+          animar(c, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: `translate(${Math.cos(a) * 46}px,${Math.sin(a) * 46}px) scale(.2)` }], { duration: 700, delay: t + 380, easing: "cubic-bezier(.2,.8,.2,1)" }); }
+      } else animar(e, [{ opacity: 0, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 460, delay: t, easing: SUAVE });
+    });
+    if (estilo === "B") { const r = cuadrosResorte(x => ({ opacity: Math.min(1, x * 2), transform: `scale(${0.6 + 0.4 * x})` }), 300, 9); animar(pre, r.frames, { duration: r.ms, delay: 1400 }); }
+    else animar(pre, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 400, delay: 1400, easing: SUAVE });
+  };
+}
+
+// ---------- lugar que se enciende (la panadería) ----------
+function lugar(esc, estilo) {
+  const L = { x: 292, y: 440, w: 143, h: 194 }, k = 0.95, ox = -170, oy = -400; // encuadre alrededor de la panadería
+  const pu = nuevo("div", "pueblo", esc);
+  const base = nuevo("img", "gris", pu); base.src = "/demos/img/pueblo.webp"; base.style.width = 920 * k + "px"; base.style.left = ox + "px"; base.style.top = oy + "px";
+  const halo = nuevo("div", "halo", pu); halo.style.left = (ox + (L.x + L.w / 2) * k - 120) + "px"; halo.style.top = (oy + (L.y + L.h / 2) * k - 120) + "px"; halo.style.width = halo.style.height = "240px";
+  const capa = nuevo("img", "", pu); capa.src = "/demos/img/lugar-1.webp"; capa.style.width = L.w * k + "px"; capa.style.left = (ox + L.x * k) + "px"; capa.style.top = (oy + L.y * k) + "px"; capa.style.opacity = 0;
+  capa.style.transformOrigin = "50% 100%";
+  const barrido = nuevo("div", "barrido", pu); Object.assign(barrido.style, { left: capa.style.left, top: capa.style.top, width: capa.style.width, height: L.h * k + "px", right: "auto", bottom: "auto" });
+  barrido.style.webkitMask = barrido.style.mask = "url(/demos/img/lugar-1.webp) 0 0/100% 100% no-repeat";
+  const et = nuevo("div", "etiqueta", esc, "¡La panadería volvió a brillar!");
+  return () => {
+    if (estilo === "B") {
+      const r = cuadrosResorte(x => ({ opacity: Math.min(1, x * 2.5), transform: `translateY(${(1 - x) * 16}px) scale(${0.92 + 0.08 * x}, ${0.92 + 0.08 * x + (1 - x) * 0.06})` }), 230, 10);
+      animar(capa, r.frames, { duration: r.ms, delay: 400 });
+      for (let i = 0; i < 9; i++) { const p = nuevo("div", "polvo", pu), a = Math.PI * (0.1 + 0.8 * i / 8);
+        p.style.left = (ox + (L.x + L.w / 2) * k) + "px"; p.style.top = (oy + (L.y + L.h * .9) * k) + "px";
+        animar(p, [{ opacity: .9, transform: "scale(.6)" }, { opacity: 0, transform: `translate(${-Math.cos(a) * 70}px,${-Math.sin(a) * 16}px) scale(1.8)` }], { duration: 800, delay: 480, easing: "cubic-bezier(.2,.8,.2,1)" }); }
+    } else if (estilo === "C") {
+      animar(halo, [{ opacity: 0, transform: "scale(.4)" }, { opacity: 1, transform: "scale(1)", offset: .5 }, { opacity: .55, transform: "scale(1.1)" }], { duration: 1400, delay: 300, easing: "ease-out" });
+      animar(capa, [{ opacity: 1, clipPath: "inset(100% 0 0 0)" }, { opacity: 1, clipPath: "inset(0 0 0 0)" }], { duration: 1100, delay: 500, easing: "cubic-bezier(.45,0,.25,1)" });
+      for (let i = 0; i < 12; i++) { const c = nuevo("div", "chispa", pu);
+        c.style.left = (ox + (L.x + 20 + (i * 37 % (L.w - 40))) * k) + "px"; c.style.top = (oy + (L.y + L.h * .8) * k) + "px";
+        animar(c, [{ opacity: 0, transform: "translateY(0) scale(.6)" }, { opacity: 1, offset: .3 }, { opacity: 0, transform: `translateY(${-70 - (i % 4) * 18}px) scale(.2)` }], { duration: 1300, delay: 600 + i * 70, easing: "ease-out" }); }
+    } else {
+      animar(capa, [{ opacity: 0 }, { opacity: 1 }], { duration: 1400, delay: 400, easing: "ease-in-out" });
+      animar(barrido, [{ opacity: 1, backgroundPosition: "100% 0" }, { opacity: 1, backgroundPosition: "0% 0" }], { duration: 1200, delay: 1500, easing: "ease-in-out" });
+    }
+    animar(et, [{ opacity: 0, transform: "translateX(-50%) translateY(8px)" }, { opacity: 1, transform: "translateX(-50%)" }], { duration: 400, delay: 1900, easing: SUAVE });
+  };
+}
+
+const FN = { acierto, estrellas, lugar }, inicios = [];
+for (const [m, nombre] of MOMENTOS) {
+  nuevo("div", "fila", tabla, nombre);
+  for (const e of ESTILOS) { const esc = nuevo("div", "escenario", tabla); esc.dataset.momento = m; esc.dataset.estilo = e; inicios.push(() => { esc.innerHTML = ""; FN[m](esc, e)(); }); }
+}
+function reproducir() { document.getAnimations().forEach(a => a.cancel()); inicios.forEach(f => f()); }
+// Para grabar videos: congela todas las animaciones en el instante t (ms).
+window.enInstante = t => { document.getAnimations().forEach(a => { a.pause(); a.currentTime = t; }); };
+window.reproducir = reproducir;
+document.getElementById("otra-vez").addEventListener("click", reproducir);
+Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode().catch(() => {}))]).then(() => {
+  reproducir(); if (!new URLSearchParams(location.search).has("quieto")) setInterval(reproducir, CICLO);
+});
+</script>
+</body>
+</html>

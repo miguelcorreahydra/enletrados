@@ -19,6 +19,7 @@ http.createServer((req, res) => {
     res.write(": conectado\n\n"); oyentes.add(res); req.on("close", () => oyentes.delete(res)); return;
   }
   if (VIGILAR && (ruta === "/revisar/" || ruta === "/revisar" || ruta.startsWith("/__api/"))) return revision(req, res, ruta);
+  if (VIGILAR && ruta.startsWith("/demos/")) return demos(req, res, ruta);
   let archivo = path.normalize(path.join(DIST, ruta));
   if (!archivo.startsWith(DIST)) { res.writeHead(403); return res.end(); }
   if (fs.existsSync(archivo) && fs.statSync(archivo).isDirectory()) {
@@ -84,6 +85,19 @@ function revision(req, res, ruta) {
     }
     enviar(404, { error: "ruta desconocida" });
   });
+}
+
+// ---------- demostraciones de diseño (/demos/): solo en modo desarrollo y solo desde este computador ----------
+// /demos/x.html → herramientas/demos/x.html · /demos/img/… → fuente/imagenes/ · /demos/letras/… → fuente/letras/
+function demos(req, res, ruta) {
+  const local = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress);
+  if (!local) { res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Las demostraciones solo se abren desde este computador."); }
+  const resto = ruta.slice("/demos/".length), base = resto.startsWith("img/") ? path.join(RAIZ, "fuente/imagenes") : resto.startsWith("letras/") ? path.join(RAIZ, "fuente/letras") : path.join(__dirname, "demos");
+  const archivo = path.normalize(path.join(base, resto.replace(/^(img|letras)\//, "") || "index.html"));
+  if (!archivo.startsWith(base) || !fs.existsSync(archivo) || fs.statSync(archivo).isDirectory()) { res.writeHead(404); return res.end(); }
+  const tipos = Object.assign({ ".woff2": "font/woff2" }, TIPOS);
+  res.writeHead(200, { "Content-Type": tipos[path.extname(archivo)] || "application/octet-stream", "Cache-Control": "no-store" });
+  fs.createReadStream(archivo).pipe(res);
 }
 
 function construir() {
