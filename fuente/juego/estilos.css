@@ -551,7 +551,7 @@ body.nivel .cabecera { background: transparent; }
 
 /* ---------- componentes del sistema de diseño ---------- */
 /* tarjetas: todas con la misma esquina y la misma sombra */
-.tarjeta-lugar, .mundo-item, .pista, .racha > div, .cifras div, .logros li, .ajuste, .externo, .escena-tarjeta, .dato-contacto, .cartero, .cofre-tarjeta {
+.tarjeta-lugar, .mundo-item, .pista, .racha > div, .cifras div, .logros li, .ajuste, .externo, .escena-tarjeta, .dato-contacto, .cartero, .cofre-tarjeta, .vecino-tarjeta {
   border-radius: var(--r-l); box-shadow: var(--s-2); }
 .hoja, .aviso { box-shadow: var(--s-3); }
 /* botones redondos: 44 px como mínimo para tocar cómodo */

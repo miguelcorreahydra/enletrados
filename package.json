@@ -15,6 +15,7 @@
     "capturas": "node herramientas/pruebas/capturas.js",
     "kenney": "sh herramientas/descargar_kenney.sh",
     "pueblo": "node herramientas/pueblo/armar.js && node herramientas/pueblo/escenas.js",
-    "escenas": "node herramientas/pruebas/escenas.js"
+    "escenas": "node herramientas/pruebas/escenas.js",
+    "anuncio": "node herramientas/videos/anuncio.js"
   }
 }
