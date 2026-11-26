@@ -27,13 +27,13 @@ Responder siempre en español.
   `pistas.js` con 572 pistas, `niveles.js` con 30 niveles, `index.html`, `juego.js`). **Se copia aquí, no se edita allá.**
 - Propuesta presentada al jefe: `Hydra SAS/Blogs Hydra/juego-palabra/propuesta/propuesta_letras_cruzadas.html`.
   En ella el juego todavía se llama «Letras Cruzadas».
-- **Fase 2 en curso** (24 nov 2026):
+- **Fase 2 en curso** (24–26 nov 2026):
   - lista de bloqueo, pistas por tandas con estado, revisión automática, generador con la curva de dificultad, desafío
     diario y prueba de niveles, todo hecho;
-  - tandas escritas: 0 (572 del prototipo, con correcciones propuestas) y 1 (326 nuevas);
-  - el usuario las revisa en `/revisar/`.
-- Siguiente paso: que el usuario revise las tandas 0 y 1 y decida las dudosas; después, la tanda 2 (sobre todo
-  palabras de 4 letras para el lugar 2, y más palabras para el diario).
+  - las 18 dudosas, decididas por el usuario en `/revisar/`;
+  - tandas 0, 1 y 2 revisadas por Claude y aprobadas (1.321 palabras con pista). Salen los 300 niveles y los 365
+    tableros del diario solo con pistas aprobadas.
+- Siguiente paso: más tandas hasta unas 2.500 pistas (más variedad y un segundo año de diario), o pasar a la fase 3.
 
 ## Historia y diseño (decididos el 24 nov 2026)
 - **Historia: «El pueblo que perdió sus palabras».** Una noche de viento se llevó las palabras del pueblo; el jugador,
@@ -84,7 +84,12 @@ Responder siempre en español.
 - **Pistas:**
   - van en `fuente/contenido/tandas/tanda-NN.json`, cada una con su estado: pendiente, aprobada o descartada;
   - al juego publicado solo entran las aprobadas;
-  - el usuario las revisa en `http://localhost:8080/revisar/` (solo con `npm run dev`, y solo desde este computador);
+  - **las revisa Claude, no el usuario** (decisión del 26 nov 2026: no tiene tiempo para revisarlas una por una).
+    Criterio: descartar toda palabra con doble sentido o que sea vulgar, grosera u ofensiva en algún país de
+    Latinoamérica, agregarla a `bloqueo.json` y anotar el motivo en `nota`. Al terminar, se le muestra al usuario la
+    lista de las palabras sacadas;
+  - la página `http://localhost:8080/revisar/` queda para consultas o cambios puntuales (solo con `npm run dev`, y
+    solo desde este computador);
   - si Claude corrige una pista, guarda la original en `original` y el motivo en `nota`.
 - **Bloqueo:** `fuente/contenido/bloqueo.json` también bloquea los plurales. Las «dudosas» quedan fuera hasta que el
   usuario las permita en `/revisar/`. Se aplica también a las palabras extra.
@@ -167,7 +172,7 @@ Responder siempre en español.
 - **Pistas:** hacen falta unas 2.500 para 300 niveles más el desafío diario de un año.
   - Cortas: 45 caracteres como máximo. Claras, con una sola respuesta razonable.
   - Nunca contienen la palabra ni su raíz: «pie» no se define con «pies».
-  - Se escriben en tandas de unas 300, que el usuario revisa antes de entrar al juego.
+  - Se escriben en tandas de unas 300, que Claude revisa con el criterio de arriba antes de entrar al juego.
   - Una revisión automática comprueba que cada palabra del crucigrama tenga pista, que la pista no contenga la respuesta y
     que no haya palabras bloqueadas.
 - **Niveles:**

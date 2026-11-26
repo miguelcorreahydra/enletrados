@@ -130,9 +130,10 @@ function generarSerie(cant, planDe, ventana, basesUsadas, temaDe) {
   for (let n = 1; n <= cant; n++) {
     const p = planDe(n), prohibidas = new Set(recientes.flat());
     let hecho = null, tema = false;
-    // relajar de a poco si no alcanza: más palabras candidatas y luego una palabra menos
-    for (const relajo of [0, 1, 2]) {
-      const q = Object.assign({}, p, { base: p.base * (1 + relajo), min: Math.max(2, p.min - (relajo === 2 ? 1 : 0)) });
+    // relajar de a poco si no alcanza: más palabras candidatas, luego una palabra menos y, al final, cualquier palabra
+    // con pista sin importar su frecuencia (todas las que tienen pista son de uso común)
+    for (const relajo of [0, 1, 2, 3]) {
+      const q = Object.assign({}, p, { base: relajo === 3 ? Infinity : p.base * (1 + relajo), min: Math.max(2, p.min - (relajo >= 2 ? 1 : 0)) });
       const ok = w => w.length === q.largo && !basesUsadas.has(w) && !prohibidas.has(w);
       const delTema = barajar((temaDe(p) || []).filter(w => ok(w) && RESPUESTAS.includes(w) && rangoDe(w) < q.base * 2));
       for (const w of delTema) { if ((hecho = intentar(w, q, prohibidas))) { tema = true; break; } }
