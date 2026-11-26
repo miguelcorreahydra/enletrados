@@ -49,18 +49,20 @@ function pagina(ruta, d) {
 }
 const sitio = { total: TOTAL, mundos: mundos.map(m => ({ id: m.id, lugar: m.lugar, tema: m.tema, color: m.color, desde: m.desde, hasta: m.hasta, frase: m.frase })) };
 const NOINDEX = { robots: "noindex, follow", indexar: false };
+// anuncio anchor SIMULADO: solo fuera de la partida (portada, lugares y cómo jugar); nunca en niveles ni en el diario
+const ANCHOR = '<div class="anchor-sim" data-clarity-mask="true" data-hj-suppress>Anuncio anchor (simulado)</div>';
 
 // portada
-pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina: "portada",
+pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina: "portada", clase: "con-anchor",
   descripcion: "Forma palabras deslizando el dedo por las letras y completa el crucigrama. Cada palabra tiene su pista. Gratis y sin instalar nada.",
-  contenido: plantilla("portada.html", { pueblo: leer("plantillas/pueblo.svg").trim(), frase1: esc(mundos[0].frase), datos: json(sitio) }) });
+  contenido: ANCHOR + plantilla("portada.html", { pueblo: leer("plantillas/pueblo.svg").trim(), frase1: esc(mundos[0].frase), datos: json(sitio) }) });
 
 // mundos
 const lista = mundos.map(m => `    <li><a class="mundo-item cerrado" data-mundo="${m.id}" style="--mundo:${m.color}"><span class="num">${m.id}</span><div><b>${esc(m.lugar)}</b>` +
   `<small>${esc(m.tema)} · <span class="cuenta">${m.desde <= TOTAL ? "Se abre al terminar el lugar anterior" : "Pronto"}</span></small><div class="barra"><i></i></div></div>` +
   `<svg class="i"><use href="#i-candado"/></svg></a></li>`).join("\n");
-pagina("/mundos/", { titulo: "Los lugares del pueblo · Enletrados", pagina: "mundos", descripcion: "Los diez lugares del pueblo de Enletrados: de la panadería al faro.",
-  contenido: plantilla("mundos.html", { lista, datos: json(sitio) }) });
+pagina("/mundos/", { titulo: "Los lugares del pueblo · Enletrados", pagina: "mundos", clase: "con-anchor", descripcion: "Los diez lugares del pueblo de Enletrados: de la panadería al faro.",
+  contenido: ANCHOR + plantilla("mundos.html", { lista, datos: json(sitio) }) });
 
 // Diario del Pueblo: una página y un archivo por tablero (se baja solo el del día)
 const INICIO_DIARIO = "2026-01-01";
@@ -90,6 +92,24 @@ niveles.forEach((l, i) => {
     contenido: plantilla("nivel.html", { n, lugar: esc(m.lugar), posicion: pos, totalMundo, porcentaje: (pos / totalMundo * 100).toFixed(1),
       escena: ESCENAS[m.id] ? leer(`plantillas/escenas/${ESCENAS[m.id]}.svg`).trim() : "", datos: json(datos) }) });
 });
+
+// cómo jugar, quiénes somos, contacto, créditos y páginas legales (en el índice de Google)
+const SITIO = JSON.parse(leer("contenido/sitio.json"));
+if (ESTRICTO && Object.values(SITIO).some(v => /POR CONFIRMAR/.test(v))) { console.error("Faltan datos en fuente/contenido/sitio.json (dicen POR CONFIRMAR)."); process.exit(1); }
+const ANUNCIO = '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>';
+const TEXTOS = {
+  "como-jugar": ["Cómo jugar · Enletrados", "Cómo se juega Enletrados: desliza el dedo por la rueda de letras, completa el crucigrama con las pistas, gana estrellas y juega el Diario del Pueblo.", true],
+  "quienes-somos": ["Quiénes somos · Enletrados", "Enletrados es un sitio de juegos de palabras en español neutro para toda Latinoamérica."],
+  "contacto": ["Contacto · Enletrados", "Escríbenos si encontraste un error en una pista o tienes una idea para Enletrados."],
+  "creditos": ["Créditos · Enletrados", "Las fuentes de datos abiertas que usa Enletrados y sus licencias."],
+  "privacidad": ["Política de privacidad · Enletrados", "Qué datos se usan en Enletrados, para qué y cuáles son tus derechos."],
+  "terminos": ["Términos de uso · Enletrados", "Las condiciones para usar Enletrados."],
+  "cookies": ["Política de cookies · Enletrados", "Cómo usa Enletrados las cookies y el almacenamiento del navegador."]
+};
+for (const [slug, [titulo, descripcion, conAnuncio]] of Object.entries(TEXTOS)) {
+  pagina(`/${slug}/`, { titulo, descripcion, pagina: "texto", clase: conAnuncio ? "con-anchor" : "",
+    contenido: plantilla("texto.html", { cuerpo: rellenar(leer(`paginas/${slug}.html`).trim(), SITIO), anuncio: conAnuncio ? ANUNCIO + ANCHOR : "" }) });
+}
 
 // sin conexión (la muestra el service worker cuando falta una página)
 pagina("/sin-conexion/", Object.assign({ titulo: "Sin conexión · Enletrados", pagina: "sin-conexion", descripcion: "Estás sin conexión.",

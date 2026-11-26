@@ -33,7 +33,22 @@ Responder siempre en español.
   - las 18 dudosas, decididas por el usuario en `/revisar/`;
   - tandas 0, 1 y 2 revisadas por Claude y aprobadas (1.321 palabras con pista). Salen los 300 niveles y los 365
     tableros del diario solo con pistas aprobadas.
-- Siguiente paso: más tandas hasta unas 2.500 pistas (más variedad y un segundo año de diario), o pasar a la fase 3.
+- **Fase 3 hecha en local** (26 nov 2026), con la lista aprobada por el usuario:
+  - dificultad: 8 letras en el lugar 10, más palabras por nivel desde el lugar 6 y palabras base menos frecuentes en los
+    lugares 9–10; tanda 3 con 171 palabras de 8 letras (1.492 palabras con pista aprobada);
+  - monedas, estrellas, cofre cada 5 niveles, palabra dorada, frasco, cartero de Tilde, racha con protector y letra de
+    regalo de Tilde;
+  - `/diario/` (un JSON por tablero en `/diario/dia/N.json`), `/logros/`, `/ajustes/`;
+  - escenas SVG de los 10 lugares (`fuente/plantillas/escenas/`), con los nombres de los detalles en `mundos.json`;
+  - app instalable: manifiesto, íconos PNG, `sw.js` y `/sin-conexion/`;
+  - cómo jugar, quiénes somos, contacto, créditos, privacidad, términos y cookies (`fuente/paginas/`);
+  - anuncios simulados: display en portada, cómo jugar, nivel completado y diario completado; anchor en portada,
+    lugares y cómo jugar; recompensa solo sin monedas.
+- **Pendiente:**
+  - datos de `fuente/contenido/sitio.json` (empresa, país, correo): `--estricto` no publica mientras digan POR CONFIRMAR;
+  - que el usuario pruebe en su celular;
+  - postales y vecinos para coleccionar (no entraron en la lista de la fase 3);
+  - más tandas de pistas para variedad y un segundo año de diario.
 
 ## Historia y diseño (decididos el 24 nov 2026)
 - **Historia: «El pueblo que perdió sus palabras».** Una noche de viento se llevó las palabras del pueblo; el jugador,
@@ -60,7 +75,7 @@ Responder siempre en español.
   - «El Diario del Pueblo»: el desafío diario;
   - racha con protector que se gana jugando;
   - postales y vecinos para coleccionar, y estrellas por nivel.
-- **Dificultad en serrucho:** de 3–4 letras en los mundos 1–2 a 7 letras en los mundos 9–10. Cada 5 niveles va uno de
+- **Dificultad en serrucho:** de 3–4 letras en los mundos 1–2 a 7 letras en el mundo 9 y 8 en el mundo 10. Cada 5 niveles va uno de
   respiro, el nivel 30 de cada mundo es más grande, y cada mundo suma una novedad. Si alguien se atasca mucho, Tilde
   ofrece una pista gratis de vez en cuando.
 - Los fondos ilustrados de los mundos los genera el usuario con una herramienta de imágenes; Claude los optimiza a

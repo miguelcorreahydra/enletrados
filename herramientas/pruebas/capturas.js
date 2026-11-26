@@ -7,7 +7,7 @@ const BASE = process.argv[2] || "http://localhost:8080";
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const SALIDA = path.join(__dirname, "capturas"); fs.mkdirSync(SALIDA, { recursive: true });
 const TAMANOS = [[360, 740], [390, 844], [768, 1024], [1280, 800]];
-const PAGINAS = [["portada", "/"], ["mundos", "/mundos/"], ["nivel-1", "/nivel/1/"], ["nivel-12", "/nivel/12/"], ["nivel-30", "/nivel/30/"], ["nivel-291", "/nivel/291/"], ["diario", "/diario/"], ["logros", "/logros/"], ["ajustes", "/ajustes/"], ["404", "/no-existe/"]];
+const PAGINAS = [["portada", "/"], ["mundos", "/mundos/"], ["nivel-1", "/nivel/1/"], ["nivel-12", "/nivel/12/"], ["nivel-30", "/nivel/30/"], ["nivel-291", "/nivel/291/"], ["diario", "/diario/"], ["logros", "/logros/"], ["ajustes", "/ajustes/"], ["como-jugar", "/como-jugar/"], ["privacidad", "/privacidad/"], ["404", "/no-existe/"]];
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const problemas = [];
 
