@@ -66,7 +66,10 @@ Responder siempre en español.
     (`herramientas/pueblo/efectos.js`). `npm run pueblo` regenera el pueblo y las escenas (`npm run kenney` baja las
     piezas); `npm run escenas` muestra las 10 escenas completas;
   - **animaciones en estilo «mágico»** (elegido por el usuario): chispas, halos dorados y estelas de luz;
-  - pendiente: sistema de diseño (tamaños, espaciado, sombras e íconos).
+  - **sistema de diseño** (26 nov 2026), en `:root` de `estilos.css`: letra `--t-xs` a `--t-3xl` (crece con el ajuste
+    «Tamaño de letra»; dentro de la partida solo crece la pista), espaciado `--e-1` a `--e-6` (múltiplos de 4), esquinas
+    `--r-s/m/l/xl/pill`, sombras `--s-1/2/3`. **No usar números sueltos.** Botones de 56 px de alto, redondos de 44 px,
+    foco visible con teclado, íconos de trazo de 2 px (los de color: moneda, fuego, escudo y carta).
 - **Tandas 4 y 5** (26 nov 2026): 282 palabras de la vida diaria y 296 de 5–6 letras, revisadas y aprobadas por Claude.
   Fuera por doble sentido o tema delicado: yegua, pandero, enano, nicho, cadete, alcalde (agregadas al bloqueo).
   Total: **2.070 palabras con pista aprobada**. El diario tiene **730 tableros (dos años)**: 3 días de 5 letras, 3 de
