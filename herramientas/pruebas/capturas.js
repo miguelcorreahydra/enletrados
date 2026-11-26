@@ -7,7 +7,7 @@ const BASE = process.argv[2] || "http://localhost:8080";
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const SALIDA = path.join(__dirname, "capturas"); fs.mkdirSync(SALIDA, { recursive: true });
 const TAMANOS = [[360, 740], [390, 844], [768, 1024], [1280, 800]];
-const PAGINAS = [["portada", "/"], ["mundos", "/mundos/"], ["nivel-1", "/nivel/1/"], ["nivel-12", "/nivel/12/"], ["nivel-30", "/nivel/30/"], ["nivel-291", "/nivel/291/"], ["404", "/no-existe/"]];
+const PAGINAS = [["portada", "/"], ["mundos", "/mundos/"], ["nivel-1", "/nivel/1/"], ["nivel-12", "/nivel/12/"], ["nivel-30", "/nivel/30/"], ["nivel-291", "/nivel/291/"], ["diario", "/diario/"], ["logros", "/logros/"], ["ajustes", "/ajustes/"], ["404", "/no-existe/"]];
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const problemas = [];
 
@@ -65,8 +65,26 @@ async function formar(p, palabra) {
     const ok = await p.evaluate(() => document.getElementById("velo").classList.contains("ver"));
     if (!ok) problemas.push(`Nivel ${n}: no apareció la pantalla de nivel completado`);
   }
-  await p.goto(BASE + "/", { waitUntil: "load" }); await espera(1200);
-  await p.screenshot({ path: path.join(SALIDA, "portada-con-progreso.png") });
+  // nivel 5: cofre y estrellas (se juega desde cero, sin ayudas)
+  await p.goto(`${BASE}/nivel/5/`, { waitUntil: "load" }); await espera(1500);
+  for (const w of await p.evaluate(() => JSON.parse(document.getElementById("datos-nivel").textContent).palabras.map(x => x.p))) { await formar(p, w); await espera(1200); }
+  await espera(2400); await p.screenshot({ path: path.join(SALIDA, "partida-cofre.png") });
+  if (!(await p.evaluate(() => !!document.querySelector(".hoja .cofre")))) problemas.push("Nivel 5: no apareció el cofre");
+  // Diario del Pueblo: se juega el tablero del día
+  await p.goto(`${BASE}/diario/`, { waitUntil: "load" }); await espera(1800);
+  const delDia = await p.evaluate(async () => {
+    const cfg = JSON.parse(document.getElementById("datos-diario").textContent), d = new Date();
+    const hoy = new Date(d.getFullYear(), d.getMonth(), d.getDate()), ini = new Date(...cfg.inicio.split("-").map((x, i) => i === 1 ? x - 1 : +x));
+    const idx = ((Math.round((hoy - ini) / 864e5) % cfg.dias) + cfg.dias) % cfg.dias + 1;
+    return (await (await fetch(`/diario/dia/${idx}.json`)).json()).palabras.map(x => x.p);
+  });
+  for (const w of delDia) { await formar(p, w); await espera(1200); }
+  await espera(1800); await p.screenshot({ path: path.join(SALIDA, "diario-completo.png") });
+  if (!(await p.evaluate(() => !!document.querySelector(".hoja .resultado")))) problemas.push("Diario: no apareció el resultado para compartir");
+  for (const [nombre, ruta] of [["logros-con-progreso", "/logros/"], ["portada-con-progreso", "/"]]) {
+    await p.goto(BASE + ruta, { waitUntil: "load" }); await espera(1300);
+    await p.screenshot({ path: path.join(SALIDA, nombre + ".png") });
+  }
   const progreso = await p.evaluate(() => localStorage.getItem("enl_progreso"));
   console.log("Progreso guardado:", progreso);
   await ctx.close(); await nav.close();

@@ -118,7 +118,13 @@ function intentar(base, p, prohibidas) {
   const letras = cuenta(base);
   const posibles = RESPUESTAS.filter(w => w !== base && !prohibidas.has(w) && cabe(w, letras));
   if (posibles.length < p.min - 1) return null;
-  const elegidas = [base].concat(posibles.sort((a, b) => (rangoDe(a) - rangoDe(b)) + (azar() - 0.5) * 900).slice(0, p.max + 4));
+  // nunca una palabra y su plural en el mismo nivel («ala» y «alas»)
+  const plural = (x, y) => x === y + "s" || x === y + "es" || y === x + "s" || y === x + "es";
+  const elegidas = [base];
+  for (const w of posibles.sort((a, b) => (rangoDe(a) - rangoDe(b)) + (azar() - 0.5) * 900)) {
+    if (elegidas.length >= p.max + 5) break;
+    if (!elegidas.some(x => plural(x, w))) elegidas.push(w);
+  }
   let pal = armar(elegidas, p.lado);
   if (pal.length < p.min) return null;
   pal = pal.slice(0, p.max);

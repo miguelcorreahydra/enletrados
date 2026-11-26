@@ -1,0 +1,16 @@
+  <div class="zona-grilla" id="zona-grilla"><div class="grilla" id="grilla" aria-label="Crucigrama"></div></div>
+  <div class="pista">
+    <button id="b-ant" aria-label="Pista anterior"><svg class="i"><use href="#i-flecha"/></svg></button>
+    <div class="pista-texto" id="pista-texto" aria-live="polite"></div>
+    <button id="b-sig" aria-label="Pista siguiente"><svg class="i"><use href="#i-flecha"/></svg></button>
+  </div>
+  <div class="actual" id="actual" aria-live="polite"></div>
+  <div class="guia" id="guia"></div>
+  <div class="abajo">
+    <div class="lateral izq"><button id="b-mezclar" aria-label="Mezclar letras"><svg class="i"><use href="#i-mezclar"/></svg></button>Mezclar</div>
+    <div class="rueda" id="rueda">
+      <svg class="trazo" id="trazo" aria-hidden="true"></svg>
+      <svg class="mano" id="mano" viewBox="0 0 48 48" aria-hidden="true"><path d="M18 6a4 4 0 0 1 8 0v14l9 2a5 5 0 0 1 4 6l-2 10a6 6 0 0 1-6 5H22a6 6 0 0 1-5-3l-7-11a3.5 3.5 0 0 1 5.5-4l2.5 3z" fill="#FFF6EA" stroke="#2E241B" stroke-width="2.2" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="lateral der"><button id="b-letra" aria-label="Revelar una letra"><svg class="i"><use href="#i-bombilla"/></svg><span class="cupo" id="cupo" hidden></span></button>Pista</div>
+  </div>

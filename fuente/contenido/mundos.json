@@ -1,22 +1,172 @@
 [
-  { "id": 1, "tema": "Cocina", "lugar": "La panadería", "color": "#C0603A", "desde": 1, "hasta": 30,
-    "frase": "Cada mañana olía a pan recién hecho. Hoy el recetario está en blanco." },
-  { "id": 2, "tema": "Jardín", "lugar": "La plaza de las flores", "color": "#6E8B57", "desde": 31, "hasta": 60,
-    "frase": "Las flores ya no recuerdan sus nombres." },
-  { "id": 3, "tema": "Ciudad", "lugar": "La calle principal", "color": "#B7793E", "desde": 61, "hasta": 90,
-    "frase": "Los letreros de las tiendas quedaron mudos." },
-  { "id": 4, "tema": "Mar", "lugar": "El puerto", "color": "#2F6E8A", "desde": 91, "hasta": 120,
-    "frase": "Los barcos no saben a qué puerto volver." },
-  { "id": 5, "tema": "Montaña", "lugar": "El mirador", "color": "#6C6A8E", "desde": 121, "hasta": 150,
-    "frase": "Desde arriba se ve todo, pero nadie sabe cómo se llama." },
-  { "id": 6, "tema": "Viajes", "lugar": "La estación de tren", "color": "#8E3B46", "desde": 151, "hasta": 180,
-    "frase": "Los boletos no dicen adónde van." },
-  { "id": 7, "tema": "Música", "lugar": "El kiosco de música", "color": "#B98A2E", "desde": 181, "hasta": 210,
-    "frase": "La banda toca, pero las canciones perdieron la letra." },
-  { "id": 8, "tema": "Hogar", "lugar": "Las casas del barrio", "color": "#B8676B", "desde": 211, "hasta": 240,
-    "frase": "En las casas nadie encuentra nada: todo perdió su nombre." },
-  { "id": 9, "tema": "Bosque", "lugar": "El sendero del bosque", "color": "#3F6B4B", "desde": 241, "hasta": 270,
-    "frase": "Los árboles susurran, pero sin palabras." },
-  { "id": 10, "tema": "Cielo", "lugar": "El faro y el observatorio", "color": "#34507A", "desde": 271, "hasta": 300,
-    "frase": "Las estrellas esperan que alguien vuelva a nombrarlas." }
+  {
+    "id": 1,
+    "tema": "Cocina",
+    "lugar": "La panadería",
+    "color": "#C0603A",
+    "desde": 1,
+    "hasta": 30,
+    "frase": "Cada mañana olía a pan recién hecho. Hoy el recetario está en blanco.",
+    "detalles": [
+      "las luces de la vitrina",
+      "el letrero",
+      "el toldo",
+      "las flores",
+      "el humo del horno",
+      "el farol y el pan"
+    ]
+  },
+  {
+    "id": 2,
+    "tema": "Jardín",
+    "lugar": "La plaza de las flores",
+    "color": "#6E8B57",
+    "desde": 31,
+    "hasta": 60,
+    "frase": "Las flores ya no recuerdan sus nombres.",
+    "detalles": [
+      "el agua de la fuente",
+      "los bancos",
+      "los faroles",
+      "las flores",
+      "las mariposas",
+      "las guirnaldas"
+    ]
+  },
+  {
+    "id": 3,
+    "tema": "Ciudad",
+    "lugar": "La calle principal",
+    "color": "#B7793E",
+    "desde": 61,
+    "hasta": 90,
+    "frase": "Los letreros de las tiendas quedaron mudos.",
+    "detalles": [
+      "las vitrinas encendidas",
+      "los letreros",
+      "los faroles",
+      "el reloj",
+      "los toldos",
+      "las guirnaldas de luces"
+    ]
+  },
+  {
+    "id": 4,
+    "tema": "Mar",
+    "lugar": "El puerto",
+    "color": "#2F6E8A",
+    "desde": 91,
+    "hasta": 120,
+    "frase": "Los barcos no saben a qué puerto volver.",
+    "detalles": [
+      "las luces del muelle",
+      "la barca",
+      "las gaviotas",
+      "las boyas",
+      "las banderas",
+      "el velero"
+    ]
+  },
+  {
+    "id": 5,
+    "tema": "Montaña",
+    "lugar": "El mirador",
+    "color": "#6C6A8E",
+    "desde": 121,
+    "hasta": 150,
+    "frase": "Desde arriba se ve todo, pero nadie sabe cómo se llama.",
+    "detalles": [
+      "la baranda",
+      "el catalejo",
+      "las banderas",
+      "las aves",
+      "las nubes",
+      "el arcoíris"
+    ]
+  },
+  {
+    "id": 6,
+    "tema": "Viajes",
+    "lugar": "La estación de tren",
+    "color": "#8E3B46",
+    "desde": 151,
+    "hasta": 180,
+    "frase": "Los boletos no dicen adónde van.",
+    "detalles": [
+      "las luces del andén",
+      "el reloj",
+      "los bancos",
+      "el letrero",
+      "el tren",
+      "el vapor del tren"
+    ]
+  },
+  {
+    "id": 7,
+    "tema": "Música",
+    "lugar": "El kiosco de música",
+    "color": "#B98A2E",
+    "desde": 181,
+    "hasta": 210,
+    "frase": "La banda toca, pero las canciones perdieron la letra.",
+    "detalles": [
+      "las luces del kiosco",
+      "las guirnaldas",
+      "las notas musicales",
+      "los atriles",
+      "los bancos",
+      "el banderín"
+    ]
+  },
+  {
+    "id": 8,
+    "tema": "Hogar",
+    "lugar": "Las casas del barrio",
+    "color": "#B8676B",
+    "desde": 211,
+    "hasta": 240,
+    "frase": "En las casas nadie encuentra nada: todo perdió su nombre.",
+    "detalles": [
+      "las ventanas encendidas",
+      "el humo de las chimeneas",
+      "los maceteros",
+      "la ropa tendida",
+      "el gato del tejado",
+      "las guirnaldas"
+    ]
+  },
+  {
+    "id": 9,
+    "tema": "Bosque",
+    "lugar": "El sendero del bosque",
+    "color": "#3F6B4B",
+    "desde": 241,
+    "hasta": 270,
+    "frase": "Los árboles susurran, pero sin palabras.",
+    "detalles": [
+      "los faroles del sendero",
+      "las luciérnagas",
+      "los hongos",
+      "la ardilla",
+      "el puente",
+      "la cabaña encendida"
+    ]
+  },
+  {
+    "id": 10,
+    "tema": "Cielo",
+    "lugar": "El faro y el observatorio",
+    "color": "#34507A",
+    "desde": 271,
+    "hasta": 300,
+    "frase": "Las estrellas esperan que alguien vuelva a nombrarlas.",
+    "detalles": [
+      "la luz del faro",
+      "las estrellas",
+      "la cúpula abierta",
+      "el telescopio",
+      "la luna",
+      "la estrella fugaz"
+    ]
+  }
 ]

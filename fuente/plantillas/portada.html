@@ -1,6 +1,9 @@
 <header class="cabecera">
   <a class="marca" href="/"><svg viewBox="0 0 64 40" aria-hidden="true"><use href="#tilde"/></svg><b>En<span>letrados</span></b></a>
-  <a class="redondo" href="/mundos/" aria-label="Los lugares del pueblo"><svg class="i"><use href="#i-casa"/></svg></a>
+  <div class="acciones-cab">
+    <a class="chip-monedas" id="monedas" href="/logros/" aria-label="Monedas"><svg class="i"><use href="#i-moneda"/></svg><b>100</b></a>
+    <a class="redondo" href="/ajustes/" aria-label="Ajustes"><svg class="i"><use href="#i-engranaje"/></svg></a>
+  </div>
 </header>
 <main class="portada">
   <div class="escenario">
@@ -13,8 +16,12 @@
   </div>
   <div class="botones">
     <a class="boton prin" id="b-jugar" href="/nivel/1/"><span id="b-jugar-t">Empezar a jugar</span><small id="b-jugar-n">Nivel 1</small></a>
-    <span class="boton sec" aria-disabled="true">Desafío diario <span class="pronto">Pronto</span></span>
+    <a class="boton sec" id="b-diario" href="/diario/"><svg class="i"><use href="#i-calendario"/></svg><span>El Diario del Pueblo</span><small id="b-diario-n">Tablero de hoy</small></a>
   </div>
+  <button class="cartero" id="cartero" hidden>
+    <span class="sobre"><svg class="i"><use href="#i-carta"/></svg></span>
+    <span><b>Tilde te trajo una carta</b><small>Ábrela para ver tu regalo</small></span>
+  </button>
   <section class="tarjeta-lugar" id="lugar-actual" aria-label="Lugar actual">
     <div class="medalla" id="lugar-num">1</div>
     <div style="flex:1;min-width:0">
@@ -24,10 +31,16 @@
       <p style="margin:6px 0 0;font-size:12px;font-weight:700" id="lugar-cuenta">0 de 30 niveles</p>
     </div>
   </section>
+  <div class="racha" id="racha" hidden>
+    <div><svg class="i"><use href="#i-fuego"/></svg><b id="racha-n">1</b><small id="racha-t">día seguido</small></div>
+    <div><svg class="i"><use href="#i-escudo"/></svg><b id="racha-p">0</b><small>protectores</small></div>
+    <div><svg class="i" style="color:var(--dorado)"><use href="#i-estrella"/></svg><b id="racha-e">0</b><small>estrellas</small></div>
+  </div>
   <h2 class="seccion-t">Cómo se juega</h2>
   <div class="paso"><b>1</b><p>Desliza el dedo por las letras de la rueda para formar palabras.</p></div>
   <div class="paso"><b>2</b><p>Cada palabra del crucigrama tiene su pista. Si aciertas, vuela sola a su lugar.</p></div>
   <div class="paso"><b>3</b><p>Con cada nivel, un rincón del pueblo recupera su luz. Juega gratis, sin instalar nada.</p></div>
+  <div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>
 </main>
-<footer class="pie">Enletrados · Juegos de palabras en español · <a href="/mundos/">Los lugares del pueblo</a></footer>
+{{pie}}
 <script type="application/json" id="datos-sitio">{{datos}}</script>
