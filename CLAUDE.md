@@ -55,6 +55,13 @@ Responder siempre en español.
   - que el usuario pruebe en su celular;
   - postales y vecinos para coleccionar (no entraron en la lista de la fase 3);
   - más tandas de pistas para llegar a unas 2.500 (más variedad en los niveles).
+- **Rediseño premium en curso** (aprobado el 26 nov 2026, antes de postales y vecinos):
+  - el pueblo de la portada es una maqueta isométrica con piezas de **Kenney «Sketch Town» (CC0)**. Las piezas se bajan con
+    `sh herramientas/descargar_kenney.sh` a `datos/kenney/` (no va a GitHub); `node herramientas/pueblo/armar.js` arma
+    `fuente/imagenes/pueblo.webp` (se ve apagado) y `lugar-N.webp` (cada lugar con color, recortado a su silueta; solo se
+    bajan los encendidos). El mapa está en `herramientas/pueblo/pueblo.js`;
+  - la primera carga cuenta letras e imágenes: portada ~96 KB, nivel ~47 KB;
+  - pendiente: escenas de los lugares con el mismo estilo, animaciones con resorte y sistema de diseño.
 - **Tandas 4 y 5** (26 nov 2026): 282 palabras de la vida diaria y 296 de 5–6 letras, revisadas y aprobadas por Claude.
   Fuera por doble sentido o tema delicado: yegua, pandero, enano, nicho, cadete, alcalde (agregadas al bloqueo).
   Total: **2.070 palabras con pista aprobada**. El diario tiene **730 tableros (dos años)**: 3 días de 5 letras, 3 de
@@ -139,6 +146,8 @@ Responder siempre en español.
 6. Toda imagen del sitio pesa menos de 100 KB (regla del jefe del usuario), en WebP salvo el ícono (PNG).
 7. Sin fuentes de Google ni externas: letra del sistema. Si alguna vez se quiere una letra propia, va alojada en el sitio
    y con aprobación.
+   **Aprobada el 26 nov 2026: Fraunces 600 (títulos) y Nunito 800 (botones y fichas)**, OFL, recortadas al español con
+   fonttools (`datos/venv`) y alojadas en `fuente/letras/`.
 8. En las pruebas con navegador automático sobre el sitio real, bloquear anuncios, píxeles y analítica para no generar
    impresiones ni eventos falsos. Para probar los anuncios, usar un simulador del GPT de Google, como en los blogs.
 9. Nunca anuncios disfrazados de botones ni ubicaciones que provoquen clics: arriesgan la cuenta de Groone, que es de la

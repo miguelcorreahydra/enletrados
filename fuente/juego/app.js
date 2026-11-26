@@ -184,7 +184,6 @@
     '<g class="tapa"><path d="M18 48V38a20 18 0 0 1 20-18h44a20 18 0 0 1 20 18v10z" fill="#C0603A"/><rect x="54" y="20" width="12" height="28" fill="#E2B65A"/></g></svg>';
 
   // ---------- portada ----------
-  var PUNTOS = { 1: [196, 174], 2: [56, 190], 3: [128, 138], 4: [316, 184], 5: [255, 36], 6: [156, 114], 7: [221, 130], 8: [50, 142], 9: [40, 102], 10: [332, 54] };
   function nivelActual(sitio) {
     for (var n = 1; n <= sitio.total; n++) if (p.hechos.indexOf(n) < 0) return n;
     return sitio.total;
@@ -225,14 +224,14 @@
     $("b-diario-n").textContent = p.diario[HOY] ? "Hecho hoy ✓" : "Tablero de hoy";
     // estado de cada lugar en el mapa
     sitio.mundos.forEach(function (mu) {
-      var g = document.querySelector('.pueblo .lugar[data-mundo="' + mu.id + '"]'); if (!g) return;
+      var g = document.querySelector('.pueblo .luz-lugar[data-mundo="' + mu.id + '"]'); if (!g) return;
       var completo = hechosEn(mu) >= (mu.hasta - mu.desde + 1) && mu.hasta <= sitio.total;
-      if (completo) g.classList.add("encendido");
-      else if (mu.id === m.id) g.classList.add("actual");
-      else g.setAttribute("filter", "url(#apagado)");
+      if (!completo && mu.id !== m.id) return;
+      g.addEventListener("load", function () { g.classList.add(completo ? "encendido" : "en-curso"); }, { once: true });
+      g.setAttribute("href", g.dataset.src); // la capa de color se baja solo para los lugares encendidos
     });
-    var pt = PUNTOS[m.id], pin = $("pin");
-    if (pt && pin) { pin.style.left = (pt[0] / 360 * 100) + "%"; pin.style.top = (pt[1] / 240 * 100) + "%"; pin.hidden = false; }
+    var pt = sitio.pines && sitio.pines[m.id], pin = $("pin");
+    if (pt && pin) { pin.style.left = pt[0] + "%"; pin.style.top = pt[1] + "%"; pin.hidden = false; }
     var t = $("lugar-actual");
     t.style.setProperty("--mundo", m.color);
     $("lugar-num").textContent = m.id; $("lugar-nombre").textContent = m.lugar; $("lugar-frase").textContent = m.frase;

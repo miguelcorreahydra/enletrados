@@ -23,7 +23,21 @@ const minCss = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").repl
 const minJs = s => s.split("\n").map(l => l.replace(/^\s+/, "")).filter(l => l && !l.startsWith("//")).join("\n");
 const huella = s => crypto.createHash("sha256").update(s).digest("hex").slice(0, 10);
 fs.rmSync(DIST, { recursive: true, force: true }); fs.mkdirSync(DIST, { recursive: true });
-const css = minCss(leer("juego/estilos.css")), js = minJs(leer("juego/app.js"));
+// imágenes y letras con nombre versionado (caché larga): ARCHIVO["pueblo.webp"] → "/img/pueblo.1a2b3c4d5e.webp"
+const ARCHIVO = {};
+for (const [carpeta, destino] of [["imagenes", "img"], ["letras", "letras"]]) {
+  if (!fs.existsSync(F(carpeta))) continue;
+  fs.mkdirSync(path.join(DIST, destino), { recursive: true });
+  for (const f of fs.readdirSync(F(carpeta)).filter(f => /\.(webp|png|woff2)$/.test(f))) {
+    const datos = fs.readFileSync(F(carpeta + "/" + f)), nombre = f.replace(/(\.\w+)$/, `.${crypto.createHash("sha256").update(datos).digest("hex").slice(0, 10)}$1`);
+    fs.writeFileSync(path.join(DIST, destino, nombre), datos); ARCHIVO[f] = `/${destino}/${nombre}`;
+  }
+}
+// letra propia (aprobada por el usuario el 26 nov 2026, regla 7): Fraunces para títulos y Nunito para botones y fichas, alojadas en el sitio
+const LETRAS = `@font-face{font-family:"Fraunces";font-weight:600;font-display:swap;src:url(${ARCHIVO["fraunces-600.woff2"]}) format("woff2")}` +
+  `@font-face{font-family:"Nunito";font-weight:800;font-display:swap;src:url(${ARCHIVO["nunito-800.woff2"]}) format("woff2")}`;
+const PRECARGA = ["fraunces-600.woff2", "nunito-800.woff2"].map(f => `<link rel="preload" href="${ARCHIVO[f]}" as="font" type="font/woff2" crossorigin>`).join("\n");
+const css = LETRAS + minCss(leer("juego/estilos.css")), js = minJs(leer("juego/app.js"));
 const CSS = `estilos.${huella(css)}.css`, JS = `app.${huella(js)}.js`;
 fs.writeFileSync(path.join(DIST, CSS), css); fs.writeFileSync(path.join(DIST, JS), js);
 for (const f of fs.readdirSync(F("publico"))) fs.copyFileSync(F("publico/" + f), path.join(DIST, f));
@@ -41,7 +55,7 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replac
 const sinVineta = html => html.replace(/<a\b(?![^>]*data-google-interstitial)(?![^>]*con-vineta)/g, '<a data-google-interstitial="false"');
 const paginas = [];
 function pagina(ruta, d) {
-  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow",
+  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA,
     canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">` }, d)));
   if (ruta.endsWith(".html")) fs.writeFileSync(path.join(DIST, ruta), html);
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
@@ -49,13 +63,32 @@ function pagina(ruta, d) {
 }
 const sitio = { total: TOTAL, mundos: mundos.map(m => ({ id: m.id, lugar: m.lugar, tema: m.tema, color: m.color, desde: m.desde, hasta: m.hasta, frase: m.frase })) };
 const NOINDEX = { robots: "noindex, follow", indexar: false };
+
+// ---------- el pueblo isométrico de la portada (piezas de Kenney, CC0; ver herramientas/pueblo/) ----------
+// Abajo, el pueblo completo apagado (filtro). Encima, cada lugar encendido con su capa de color recortada a su silueta.
+// Las capas no traen href: el juego se lo pone solo a los lugares encendidos, así un jugador nuevo baja una sola.
+const GEO = JSON.parse(leer("contenido/pueblo.json")), IMG = ARCHIVO["pueblo.webp"];
+const ALTO_PUEBLO = GEO.alto + 30;
+sitio.pines = Object.fromEntries(Object.entries(GEO.lugares).map(([id, l]) => [id, [+(l.pin[0] / GEO.ancho * 100).toFixed(2), +(l.pin[1] / ALTO_PUEBLO * 100).toFixed(2)]]));
+const PUEBLO = `<svg class="pueblo" viewBox="0 0 ${GEO.ancho} ${ALTO_PUEBLO}" role="img" aria-labelledby="pueblo-t">
+<title id="pueblo-t">El pueblo de Enletrados: cada lugar se ilumina al devolverle sus palabras</title>
+<defs>
+  <filter id="apagado" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values=".2"/>
+    <feComponentTransfer><feFuncR type="linear" slope=".8" intercept=".15"/><feFuncG type="linear" slope=".8" intercept=".14"/><feFuncB type="linear" slope=".8" intercept=".13"/></feComponentTransfer></filter>
+  <radialGradient id="g-mar" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#9CC3CC"/><stop offset="1" stop-color="#6F9EAD"/></radialGradient>
+</defs>
+<g class="mar"><ellipse cx="${GEO.ancho * 0.68}" cy="${GEO.alto - 30}" rx="${GEO.ancho * 0.4}" ry="${GEO.alto * 0.15}" fill="url(#g-mar)"/>
+  <path class="ola" d="M${GEO.ancho * .5} ${GEO.alto - 20}q12-6 24 0t24 0M${GEO.ancho * .8} ${GEO.alto - 60}q12-6 24 0t24 0M${GEO.ancho * .64} ${GEO.alto + 10}q12-6 24 0t24 0" fill="none" stroke="#DCEBEE" stroke-width="3" stroke-linecap="round"/></g>
+<image class="base" href="${IMG}" width="${GEO.ancho}" height="${GEO.alto}" filter="url(#apagado)"/>
+${Object.entries(GEO.lugares).map(([id, l]) => `<image class="luz-lugar" data-mundo="${id}" data-src="${ARCHIVO["lugar-" + id + ".webp"]}" x="${l.x}" y="${l.y}" width="${l.w}" height="${l.h}"/>`).join("\n")}
+</svg>`;
 // anuncio anchor SIMULADO: solo fuera de la partida (portada, lugares y cómo jugar); nunca en niveles ni en el diario
 const ANCHOR = '<div class="anchor-sim" data-clarity-mask="true" data-hj-suppress>Anuncio anchor (simulado)</div>';
 
 // portada
 pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina: "portada", clase: "con-anchor",
   descripcion: "Forma palabras deslizando el dedo por las letras y completa el crucigrama. Cada palabra tiene su pista. Gratis y sin instalar nada.",
-  contenido: ANCHOR + plantilla("portada.html", { pueblo: leer("plantillas/pueblo.svg").trim(), frase1: esc(mundos[0].frase), datos: json(sitio) }) });
+  contenido: ANCHOR + plantilla("portada.html", { pueblo: PUEBLO, frase1: esc(mundos[0].frase), datos: json(sitio) }) });
 
 // mundos
 const lista = mundos.map(m => `    <li><a class="mundo-item cerrado" data-mundo="${m.id}" style="--mundo:${m.color}"><span class="num">${m.id}</span><div><b>${esc(m.lugar)}</b>` +
@@ -123,6 +156,8 @@ fs.writeFileSync(path.join(DIST, "_headers"), [
   "# Archivos con nombre versionado: caché larga. El HTML queda con la caché corta por omisión de Cloudflare Pages.",
   "/app.*.js", "  Cache-Control: public, max-age=31536000, immutable",
   "/estilos.*.css", "  Cache-Control: public, max-age=31536000, immutable",
+  "/img/*", "  Cache-Control: public, max-age=31536000, immutable",
+  "/letras/*", "  Cache-Control: public, max-age=31536000, immutable",
   "/*", "  X-Content-Type-Options: nosniff", "  Referrer-Policy: strict-origin-when-cross-origin", ""].join("\n"));
 
 // ---------- resumen de peso (gzip, como lo transfiere Cloudflare) ----------
@@ -132,4 +167,9 @@ const portadaGz = gz("index.html"), nivelGz = gz("nivel/5/index.html"), cssGz = 
 console.log(`dist/ listo: ${paginas.length} páginas (${TOTAL} niveles), ${CSS}, ${JS}`);
 console.log(`Peso transferido (gzip): CSS ${kb(cssGz)} · JS ${kb(jsGz)} · portada ${kb(portadaGz)} · nivel ${kb(nivelGz)}`);
 if (sinAprobar) console.log(`Ojo: ${sinAprobar} de ${enUso.length} palabras en uso tienen la pista sin aprobar todavía (solo sirve en local).`);
-console.log(`Primera carga: portada ${kb(portadaGz + cssGz + jsGz)} · nivel ${kb(nivelGz + cssGz + jsGz)} (límite: 100 KB)`);
+// la primera carga cuenta también las letras y, en la portada, el pueblo y la capa del primer lugar (lo que baja un jugador nuevo)
+const bytesDe = r => fs.statSync(path.join(DIST, r.replace(/^\//, ""))).size;
+const letrasB = bytesDe(ARCHIVO["fraunces-600.woff2"]) + bytesDe(ARCHIVO["nunito-800.woff2"]), puebloB = bytesDe(ARCHIVO["pueblo.webp"]) + bytesDe(ARCHIVO["lugar-1.webp"]);
+const portadaTotal = portadaGz + cssGz + jsGz + letrasB + puebloB, nivelTotal = nivelGz + cssGz + jsGz + letrasB;
+console.log(`Primera carga: portada ${kb(portadaTotal)} (letras ${kb(letrasB)}, pueblo ${kb(puebloB)}) · nivel ${kb(nivelTotal)} (límite: 100 KB)`);
+if (portadaTotal > 100 * 1024 || nivelTotal > 100 * 1024) console.error("Ojo: la primera carga pasa de 100 KB.");
