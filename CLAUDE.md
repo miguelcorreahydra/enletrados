@@ -54,7 +54,11 @@ Responder siempre en español.
   - datos de `fuente/contenido/sitio.json` (empresa, país, correo): `--estricto` no publica mientras digan POR CONFIRMAR;
   - que el usuario pruebe en su celular;
   - postales y vecinos para coleccionar (no entraron en la lista de la fase 3);
-  - más tandas de pistas para variedad y un segundo año de diario.
+  - más tandas de pistas para llegar a unas 2.500 (más variedad en los niveles).
+- **Tandas 4 y 5** (26 nov 2026): 282 palabras de la vida diaria y 296 de 5–6 letras, revisadas y aprobadas por Claude.
+  Fuera por doble sentido o tema delicado: yegua, pandero, enano, nicho, cadete, alcalde (agregadas al bloqueo).
+  Total: **2.070 palabras con pista aprobada**. El diario tiene **730 tableros (dos años)**: 3 días de 5 letras, 3 de
+  6 y 1 de 7 por semana (`npm run generar` genera 730; `--dias N` para otro número).
 
 ## Historia y diseño (decididos el 24 nov 2026)
 - **Historia: «El pueblo que perdió sus palabras».** Una noche de viento se llevó las palabras del pueblo; el jugador,

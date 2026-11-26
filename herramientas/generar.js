@@ -10,7 +10,7 @@
 const fs = require("fs"), path = require("path");
 const L = require("./lib/contenido"), RAIZ = L.RAIZ, C = p => path.join(RAIZ, "fuente/contenido", p);
 const args = process.argv.slice(2), MODO = args.includes("--vigentes") ? "vigentes" : "aprobadas";
-const TOTAL = +(args[args.indexOf("--total") + 1] || 300) || 300, DIAS = 365, VENTANA = 15, VENTANA_DIARIO = 30;
+const TOTAL = +(args[args.indexOf("--total") + 1] || 300) || 300, DIAS = +(args[args.indexOf("--dias") + 1] || 730) || 730, VENTANA = 15, VENTANA_DIARIO = 30;
 
 // ---------- vocabulario ----------
 const bloqueo = L.cargarBloqueo(), libre = w => !bloqueo.bloqueadas.has(w);
@@ -168,7 +168,8 @@ fs.writeFileSync(C("niveles.json"), JSON.stringify(r.serie) + "\n");
 
 // ---------- desafío diario: grupo aparte (otra semilla, sin repetir las palabras principales de los niveles) ----------
 semilla = 20270101;
-const planDiario = n => ({ largo: n % 7 >= 4 ? 6 : 5, min: 4, max: 7, base: 4000, lado: 7, mundo: 0, pos: n });
+// 3 días de 5 letras, 3 de 6 y 1 de 7 (un tablero algo más grande, como el del domingo en los diarios de papel)
+const planDiario = n => (n % 7 === 6 ? { largo: 7, min: 5, max: 8, base: 8000, lado: 8 } : { largo: n % 7 >= 3 ? 6 : 5, min: 4, max: 7, base: 4000, lado: 7 });
 const d = generarSerie(DIAS, planDiario, VENTANA_DIARIO, basesUsadas, () => null);
 fs.writeFileSync(C("diario.json"), JSON.stringify(d.serie) + "\n");
 

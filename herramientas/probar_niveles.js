@@ -63,6 +63,6 @@ probar(niveles, "Nivel", 15, (n, l) => {
   if (l.respiro) return [normal - 1, normal];
   return [normal];
 });
-if (fs.existsSync(C("diario.json"))) probar(JSON.parse(fs.readFileSync(C("diario.json"), "utf8")), "Diario", 30, () => [5, 6]);
+if (fs.existsSync(C("diario.json"))) probar(JSON.parse(fs.readFileSync(C("diario.json"), "utf8")), "Diario", 30, () => [5, 6, 7]);
 console.log(errores ? `${errores} errores` : "✓ Todos los niveles se pueden resolver y son válidos");
 process.exit(errores ? 1 : 0);
