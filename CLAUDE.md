@@ -9,11 +9,12 @@ abierta en esta carpeta.
 Responder siempre en español.
 
 ## Estado (24 nov 2026)
-- El jefe del usuario aprobó la prueba con sitio y dominio propios. **Fase 1 hecha en local**: estructura, `construir.js`,
+- La empresa aprobó la prueba con sitio y dominio propios. **Fase 1 hecha en local**: estructura, `construir.js`,
   una página por nivel, mundos, portada con el pueblo y base visual. Nada publicado y nada comprado.
-- **Orden acordado:** se trabaja todo en local primero; el dominio se compra cuando el usuario se lo pida al jefe.
+- **Orden acordado:** se trabaja todo en local primero; el dominio se compra cuando el sitio esté listo para publicar.
 - Nombre: **Enletrados** (elegido por el usuario). `enletrados.com` estaba libre el 24 nov 2026 (registro de Verisign).
-  La compra la hace el usuario; mejor en Cloudflare, donde va alojado.
+  La compra se hace en la cuenta de Cloudflare de la empresa, donde va alojado (guía paso a paso:
+  https://claude.ai/artifact/Q8aErL23kQ8GmfYkWZrYGs).
 - **Repositorio:** privado en GitHub, `miguelcorreahydra/enletrados` (cuenta personal del usuario). Este repositorio
   tiene su propio ayudante de credenciales para usar esa cuenta, aunque la cuenta activa de `gh` sea otra. Los commits
   van con el correo `noreply` de GitHub de esa cuenta.
@@ -25,7 +26,7 @@ Responder siempre en español.
   - primero un juego completo; los otros juegos se suman solo si la prueba funciona.
 - Base existente, solo como referencia: el prototipo en `Hydra SAS/Blogs Hydra/juego-palabra/letras/` (`generar.js`,
   `pistas.js` con 572 pistas, `niveles.js` con 30 niveles, `index.html`, `juego.js`). **Se copia aquí, no se edita allá.**
-- Propuesta presentada al jefe: `Hydra SAS/Blogs Hydra/juego-palabra/propuesta/propuesta_letras_cruzadas.html`.
+- Propuesta presentada a la dirección: `Hydra SAS/Blogs Hydra/juego-palabra/propuesta/propuesta_letras_cruzadas.html`.
   En ella el juego todavía se llama «Letras Cruzadas».
 - **Fase 2 en curso** (24–26 nov 2026):
   - lista de bloqueo, pistas por tandas con estado, revisión automática, generador con la curva de dificultad, desafío
@@ -134,7 +135,7 @@ Responder siempre en español.
 - **Pistas:**
   - van en `fuente/contenido/tandas/tanda-NN.json`, cada una con su estado: pendiente, aprobada o descartada;
   - al juego publicado solo entran las aprobadas;
-  - **las revisa Claude, no el usuario** (decisión del 26 nov 2026: no tiene tiempo para revisarlas una por una).
+  - **las revisa Claude** (decisión del 26 nov 2026, para agilizar el trabajo).
     Criterio: descartar toda palabra con doble sentido o que sea vulgar, grosera u ofensiva en algún país de
     Latinoamérica, agregarla a `bloqueo.json` y anotar el motivo en `nota`. Al terminar, se le muestra al usuario la
     lista de las palabras sacadas;
@@ -158,7 +159,7 @@ Responder siempre en español.
 4. **Separación total de los blogs.** Nunca usar el `.env`, los ID (píxel, cuenta publicitaria, página, data-key de Groone,
    snippets) ni las herramientas de las carpetas de `Blogs Hydra/`. No editar sus archivos. Lo que sirva se copia y se adapta.
 5. No borrar nada publicado sin aprobación expresa.
-6. Toda imagen del sitio pesa menos de 100 KB (regla del jefe del usuario), en WebP salvo el ícono (PNG).
+6. Toda imagen del sitio pesa menos de 100 KB (regla de la empresa), en WebP salvo el ícono (PNG).
 7. Sin fuentes de Google ni externas: letra del sistema. Si alguna vez se quiere una letra propia, va alojada en el sitio
    y con aprobación.
    **Aprobada el 26 nov 2026: Fraunces 600 (títulos) y Nunito 800 (botones y fichas)**, OFL, recortadas al español con
@@ -168,8 +169,8 @@ Responder siempre en español.
 9. Nunca anuncios disfrazados de botones ni ubicaciones que provoquen clics: arriesgan la cuenta de Groone, que es de la
    empresa y la comparten todos los blogs.
 10. No leer ni comentar el texto ni la parte visual de los anuncios con recompensa (prohibición expresa del usuario).
-11. Cada propuesta para el jefe se presenta como «una idea más que puede funcionar», con datos, pros y contras. Nunca
-    como salvación ni mencionando la situación de la empresa.
+11. Cada propuesta se presenta con datos, pros y contras, como una opción más que se puede probar, sin exagerar
+    los resultados esperados.
 12. Antes de mandar tráfico pagado, comprobar varias veces seguidas que el sitio carga rápido en el celular.
 
 ## El juego
@@ -320,7 +321,7 @@ Responder siempre en español.
 
 ## Ruta
 0. **Permisos y consultas** (sin costo):
-   - el usuario compra `enletrados.com`;
+   - la empresa compra `enletrados.com` en Cloudflare (ver la guía);
    - consulta por escrito a Groone con el prototipo;
    - opcional: postular a AdSense para juegos.
 1. **Base técnica:**
@@ -351,7 +352,7 @@ Responder siempre en español.
      igual de chica.
    - **Parar:** vuelve menos del 15 % y la primera visita deja menos del 30 % de su costo, o hay cualquier alarma.
 
-## Proyección (de la propuesta al jefe, 24 nov 2026)
+## Proyección (de la propuesta inicial, 24 nov 2026)
 Son escenarios con supuestos, no promesas.
 - **Costo por jugador:** unos 0,05 USD, sacado de la campaña de Tu Bono Hoy. Cada visita a la landing costó unos 190 COP,
   con el dólar a 3.000 COP.
