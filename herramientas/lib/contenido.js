@@ -66,7 +66,7 @@ function alertas(item, ctx) {
   if (malas.length) r.push("La pista usa una palabra bloqueada: " + malas.join(", "));
   const otras = ctx.porPista.get(normal(p).trim()) || [];
   if (otras.length > 1) r.push("Misma pista que: " + otras.filter(x => x !== item.palabra).join(", "));
-  if (!/^[a-zñ]{3,7}$/.test(w)) r.push("La palabra debe tener de 3 a 7 letras");
+  if (!/^[a-zñ]{3,8}$/.test(w)) r.push("La palabra debe tener de 3 a 8 letras");
   if ((ctx.repetidas.get(w) || 0) > 1) r.push("La palabra está en más de una tanda");
   return r;
 }

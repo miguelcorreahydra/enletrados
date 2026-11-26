@@ -3,7 +3,7 @@
 //   - el crucigrama es válido: letras coherentes en los cruces, todo conectado, y cada tramo de 2 o más letras seguidas
 //     es una palabra del nivel (no quedan pegadas que formen «basura»);
 //   - ninguna palabra se repite dentro del nivel ni en niveles cercanos (15 niveles; 30 días en el diario);
-//   - la curva de dificultad se respeta (letras por mundo, tamaño máximo de la grilla).
+//   - la curva de dificultad se respeta (letras por mundo, grilla de 10×10 como máximo).
 // Uso: node herramientas/probar_niveles.js
 "use strict";
 const fs = require("fs"), path = require("path"), L = require("./lib/contenido");
@@ -21,7 +21,7 @@ function probar(lista, nombre, ventana, letrasEsperadas) {
     if (l.letras === base) mal("la rueda viene ordenada como la respuesta");
     const esperadas = letrasEsperadas && letrasEsperadas(n, l);
     if (esperadas && !esperadas.includes(l.letras.length)) mal(`tiene ${l.letras.length} letras; se esperaban ${esperadas.join(" o ")}`);
-    if (l.filas > 9 || l.columnas > 9) mal(`grilla de ${l.filas}×${l.columnas}: máximo 9×9`);
+    if (l.filas > 10 || l.columnas > 10) mal(`grilla de ${l.filas}×${l.columnas}: máximo 10×10`);
     const celdas = new Map(), vistas = new Set();
     for (const w of l.palabras) {
       if (!cabe(w.p, l.letras)) mal(`«${w.p}» no se forma con «${l.letras}»`);
@@ -58,7 +58,7 @@ const niveles = JSON.parse(fs.readFileSync(C("niveles.json"), "utf8"));
 probar(niveles, "Nivel", 15, (n, l) => {
   const m = Math.ceil(n / 30), pos = n - (m - 1) * 30;
   if (n <= 2) return [3];
-  const normal = m <= 2 ? 4 : m <= 5 ? 5 : m <= 8 ? 6 : 7;
+  const normal = m <= 2 ? 4 : m <= 5 ? 5 : m <= 8 ? 6 : m === 9 ? 7 : 8;
   if (l.grande) return [normal, normal + 1];
   if (l.respiro) return [normal - 1, normal];
   return [normal];

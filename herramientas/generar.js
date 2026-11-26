@@ -18,12 +18,12 @@ const dic = new Set(JSON.parse(fs.readFileSync(path.join(RAIZ, "datos/diccionari
 const comunes = [], visto = new Set();
 for (const linea of fs.readFileSync(path.join(RAIZ, "datos/es_50k.txt"), "utf8").split("\n")) {
   const w = L.normal(linea.split(" ")[0] || "");
-  if (!/^[a-zñ]{3,7}$/.test(w) || visto.has(w) || !libre(w) || !dic.has(w)) continue;
+  if (!/^[a-zñ]{3,8}$/.test(w) || visto.has(w) || !libre(w) || !dic.has(w)) continue;
   visto.add(w); comunes.push(w);
 }
 const rango = new Map(comunes.map((w, i) => [w, i])), rangoDe = w => (rango.has(w) ? rango.get(w) : 30000);
 const PISTAS = L.pistas(MODO);
-const RESPUESTAS = Object.keys(PISTAS).map(L.normal).filter(w => /^[a-zñ]{3,7}$/.test(w) && libre(w)).sort((a, b) => rangoDe(a) - rangoDe(b));
+const RESPUESTAS = Object.keys(PISTAS).map(L.normal).filter(w => /^[a-zñ]{3,8}$/.test(w) && libre(w)).sort((a, b) => rangoDe(a) - rangoDe(b));
 const EXTRAS = comunes.slice(0, 20000);
 const TEMAS = JSON.parse(fs.readFileSync(C("tematicas.json"), "utf8"));
 const MUNDOS = JSON.parse(fs.readFileSync(C("mundos.json"), "utf8"));
@@ -95,18 +95,21 @@ function medida(pal) {
 }
 
 // ---------- curva de dificultad (decidida el 24 nov 2026) ----------
-// mundos 1–2: 3–4 letras · 3–5: 5 · 6–8: 6 · 9–10: 7. Cada 5 niveles, uno de respiro. El 30 de cada mundo es el «gran nivel».
+// mundos 1–2: 3–4 letras · 3–5: 5 · 6–8: 6 · 9: 7 · 10: 8 (ajuste aprobado el 26 nov 2026). Cada 5 niveles, uno de
+// respiro. El 30 de cada mundo es el «gran nivel». Desde el mundo 6 hay más palabras por nivel, y en los mundos 9–10 la
+// palabra principal es menos frecuente (baseMin): ni las más comunes ni rebuscadas, porque todas tienen pista revisada.
 function plan(n) {
   const m = Math.ceil(n / 30), pos = n - (m - 1) * 30;
   let p = m === 1 ? { largo: pos <= 2 ? 3 : 4, min: 3, max: 4, base: 1500, lado: 5 }
     : m === 2 ? { largo: 4, min: 3, max: 5, base: 2500, lado: 6 }
     : m <= 5 ? { largo: 5, min: 4, max: 6, base: 3500, lado: 7 }
-    : m <= 8 ? { largo: 6, min: 5, max: 8, base: 5000, lado: 8 }
-    : { largo: 7, min: 6, max: 9, base: 8000, lado: 9 };
+    : m <= 8 ? { largo: 6, min: 6, max: 10, base: 5000, lado: 9 }
+    : m === 9 ? { largo: 7, min: 7, max: 12, base: 12000, baseMin: 1200, lado: 9 }
+    : { largo: 8, min: 7, max: 12, base: 20000, baseMin: 1200, lado: 10 };
   if (p.largo === 3) { p.min = 2; p.max = n === 1 ? 2 : 3; }
   const respiro = pos % 5 === 0 && pos < 30 && n > 5, grande = pos === 30;
-  if (respiro) p = Object.assign({}, p, { largo: Math.max(4, p.largo - 1), min: Math.max(3, p.min - 1), max: Math.max(3, p.max - 2), base: 1500, lado: Math.max(5, p.lado - 1) });
-  if (grande) p = Object.assign({}, p, { largo: m <= 2 ? p.largo + 1 : p.largo, min: p.min + 1, max: p.max + 2, lado: Math.min(9, p.lado + 1) });
+  if (respiro) p = Object.assign({}, p, { largo: Math.max(4, p.largo - 1), min: Math.max(3, p.min - 1), max: Math.max(3, p.max - 3), base: 1500, baseMin: 0, lado: Math.max(5, p.lado - 1) });
+  if (grande) p = Object.assign({}, p, { largo: m <= 2 ? p.largo + 1 : p.largo, min: p.min + 1, max: p.max + 2, lado: Math.min(10, p.lado + 1) });
   return Object.assign(p, { mundo: m, pos, respiro, grande });
 }
 
@@ -138,7 +141,7 @@ function generarSerie(cant, planDe, ventana, basesUsadas, temaDe) {
       const delTema = barajar((temaDe(p) || []).filter(w => ok(w) && RESPUESTAS.includes(w) && rangoDe(w) < q.base * 2));
       for (const w of delTema) { if ((hecho = intentar(w, q, prohibidas))) { tema = true; break; } }
       if (!hecho) {
-        const generales = barajar(RESPUESTAS.filter(w => ok(w) && rangoDe(w) < q.base)).slice(0, 400);
+        const generales = barajar(RESPUESTAS.filter(w => ok(w) && rangoDe(w) < q.base && (relajo === 3 || rangoDe(w) >= (q.baseMin || 0)))).slice(0, 400);
         for (const w of generales) { if ((hecho = intentar(w, q, prohibidas))) break; }
       }
       if (hecho) break;
