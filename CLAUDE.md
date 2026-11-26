@@ -40,7 +40,13 @@ Responder siempre en español.
     regalo de Tilde;
   - `/diario/` (un JSON por tablero en `/diario/dia/N.json`), `/logros/`, `/ajustes/`;
   - escenas SVG de los 10 lugares (`fuente/plantillas/escenas/`), con los nombres de los detalles en `mundos.json`;
-  - app instalable: manifiesto, íconos PNG, `sw.js` y `/sin-conexion/`;
+  - **sin app instalable y sin service worker** (decisión del usuario, 26 nov 2026): por ahora es un juego de navegador
+    y **no se promete app** en ningún texto. Se quitaron el manifiesto, la oferta de instalar y `sw.js`; el juego da de
+    baja cualquier service worker que haya quedado;
+  - navegador de Facebook o Instagram: después del nivel 3, en la pantalla de nivel completado, una tarjeta opcional
+    «Guarda tu avance» (botón con enlace `intent://` en Android, guía de «•••» en iPhone). El avance viaja en el enlace
+    (`?enl=`) y se borra de la barra al llegar. Se ofrece una vez y, como mucho, otra a los 3 días. Evento
+    `enl_navegador_externo` (ofrecido, abrir, copiar, llego);
   - cómo jugar, quiénes somos, contacto, créditos, privacidad, términos y cookies (`fuente/paginas/`);
   - anuncios simulados: display en portada, cómo jugar, nivel completado y diario completado; anchor en portada,
     lugares y cómo jugar; recompensa solo sin monedas.
@@ -166,10 +172,7 @@ Responder siempre en español.
 - **Logros y estadísticas:** niveles, rachas, palabras extra y días jugados.
 - **Ajustes:** sonido, vibración, modo oscuro y tamaño de letra. También «Borrar progreso», con confirmación.
 - **Repaso al terminar cada nivel:** las palabras con su definición. Aporta valor real para Google y para el jugador.
-- **App instalable (PWA):**
-  - manifiesto, ícono y service worker;
-  - funciona sin conexión en los niveles ya descargados;
-  - se ofrece instalarla después del nivel 5, nunca al entrar.
+- **App instalable: descartada por ahora** (26 nov 2026). Es un juego de navegador; no se promete app.
 - **Sin cuentas:** el progreso queda en el navegador, en `localStorage` con prefijo `enl_`. Sincronizar entre dispositivos
   queda para más adelante.
 
@@ -258,7 +261,7 @@ Responder siempre en español.
 - Eventos:
   - `enl_inicio`;
   - `enl_nivel_1`, `enl_nivel_3`, `enl_nivel_5` y `enl_nivel_10`;
-  - `enl_diario`, `enl_ayuda` (con tipo: moneda o anuncio), `enl_instalar` y `enl_regreso`.
+  - `enl_diario`, `enl_ayuda` (con tipo: moneda o anuncio), `enl_navegador_externo` y `enl_regreso`.
   - `enl_regreso` es la primera visita de un día distinto al de la llegada. Se calcula con `localStorage`.
 - **Números que deciden:**
   - ingreso por jugador = ingresos de Groone ÷ jugadores que llegan desde Meta;
@@ -298,7 +301,7 @@ Responder siempre en español.
    - unas 2.500 pistas en tandas revisadas por el usuario;
    - 300 niveles y los tableros del desafío diario, con sus pruebas automáticas.
 3. **Juego completo:**
-   - desafío diario, monedas, logros, sonidos, ajustes y PWA;
+   - desafío diario, monedas, logros, sonidos y ajustes;
    - páginas legales, con las leyes de datos de los países de la región sin plazos fijos, y créditos;
    - anuncios simulados en los lugares acordados.
 4. **Pruebas locales:**

@@ -1,4 +1,4 @@
-// Genera los íconos PNG de la app instalable a partir del dibujo de Tilde (se corre una vez; los PNG quedan en fuente/publico/).
+// Genera el ícono PNG para Apple (al guardar el sitio como marcador) a partir del dibujo de Tilde. Se corre una vez.
 // Uso: node herramientas/pruebas/iconos.js
 "use strict";
 const puppeteer = require("puppeteer-core"), path = require("path");
@@ -12,7 +12,7 @@ const svg = (lado, mascara) => `<svg xmlns="http://www.w3.org/2000/svg" width="$
 (async () => {
   const nav = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true });
   const p = await nav.newPage();
-  for (const [nombre, lado, mascara] of [["icono-192.png", 192, false], ["icono-512.png", 512, false], ["icono-maskable-512.png", 512, true], ["apple-touch-icon.png", 180, true]]) {
+  for (const [nombre, lado, mascara] of [["apple-touch-icon.png", 180, true]]) {
     await p.setViewport({ width: lado, height: lado, deviceScaleFactor: 1 });
     await p.setContent(`<html><body style="margin:0;background:transparent">${svg(lado, mascara)}</body></html>`);
     await p.screenshot({ path: path.join(PUB, nombre), omitBackground: !mascara, clip: { x: 0, y: 0, width: lado, height: lado } });

@@ -34,6 +34,21 @@
     return x;
   })();
   function guardarP() { guardar("progreso", p); }
+  // Avance que llega desde el navegador de Facebook o Instagram (?enl=): se usa si trae más niveles que el de aquí.
+  var avanceLlego = null;
+  (function () {
+    var m = /[?&]enl=([A-Za-z0-9_-]+)/.exec(location.search); if (!m) return;
+    try {
+      var b = m[1].replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "=";
+      var x = JSON.parse(decodeURIComponent(escape(atob(b))));
+      if (x && Array.isArray(x.hechos) && typeof x.monedas === "number") {
+        if (x.hechos.length >= p.hechos.length) { for (var k in x) p[k] = x[k]; guardarP(); avanceLlego = "Tu avance llegó. ¡Sigue donde quedaste!"; }
+        else avanceLlego = "Aquí ya tenías más avance: lo mantuvimos.";
+        evento("enl_navegador_externo", { accion: "llego" });
+      }
+    } catch (e) {}
+    try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
+  })();
   // primera visita y regreso (enl_regreso: primera visita de un día distinto al de la llegada)
   if (!p.llegada) { p.llegada = HOY; guardarP(); evento("enl_inicio"); }
   else if (p.llegada !== HOY && !p.regreso) { p.regreso = true; guardarP(); evento("enl_regreso"); }
@@ -631,7 +646,7 @@
       var sig = D.siguiente ? '<a class="boton prin' + (D.vinetaSiguiente ? " con-vineta" : "") + '" href="' + D.siguiente + '"' + (D.vinetaSiguiente ? "" : ' data-google-interstitial="false"') +
         ">Siguiente nivel <svg class=\"i\"><use href=\"#i-flecha\"/></svg></a>" : '<a class="boton prin" href="/mundos/" data-google-interstitial="false">Ver los lugares</a>';
       h += '<div class="botones">' + sig + '<a class="boton sec" href="/" data-google-interstitial="false">Volver al pueblo</a></div>';
-      h += ofertaInstalar(D.n);
+      h += ofertaNavegador(D.n, D.siguiente || location.pathname);
       h += '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)<br>Solo en esta pantalla, 36 px debajo de los botones</div>';
       abrir(h);
       var esc = document.querySelector(".hoja .escena");
@@ -639,8 +654,6 @@
         if (i < +esc.dataset.antes) g.classList.add("si"); else if (i < +esc.dataset.det) g.classList.add("nuevo");
       });
       setTimeout(function () { var b = $("barra-escena"); if (b) b.style.setProperty("--p", ahora / totalMundo * 100); }, 350);
-      // con la app instalada o el service worker activo, el siguiente nivel queda guardado para jugar sin conexión
-      if (D.siguiente && navigator.serviceWorker && navigator.serviceWorker.controller) setTimeout(function () { fetch(D.siguiente).catch(function () {}); }, 1500);
       setTimeout(function () { pintarMonedas(true); if (cofre) { suena.cofre(); var c = document.querySelector(".hoja .cofre"); if (c) c.classList.add("abre"); } }, 900);
     }
 
@@ -701,7 +714,6 @@
       else if (a === "tilde") { st.t = 1; tildeVisible = false; persistir(); revelar(false, true); aviso("Tilde te regaló una letra"); }
       else if (a === "compartir") { navigator.share({ text: compartirTexto }).catch(function () {}); }
       else if (a === "copiar") { try { navigator.clipboard.writeText(compartirTexto); aviso("Resultado copiado"); } catch (x) {} }
-      else if (a === "instalar") instalar();
     });
     var tRes; window.addEventListener("resize", function () { clearTimeout(tRes); tRes = setTimeout(function () { medir(); dibujarGrilla({ sinEntrada: true }); pararDemo(); dibujarRueda(false); iniciarDemo(); }, 120); });
 
@@ -725,28 +737,42 @@
     }).catch(function () { aviso("No se pudo cargar el tablero. Revisa tu conexión.", 4000); });
   }
 
-  // ---------- app instalable: se ofrece después del nivel 5, nunca al entrar ----------
-  var pedidoInstalar = null;
-  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); pedidoInstalar = e; });
-  function esIos() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
-  function instalada() { return (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone; }
-  function ofertaInstalar(n) {
-    if (n < 5 || instalada() || leer("instalar", null) || (!pedidoInstalar && !esIos())) return "";
-    guardar("instalar", HOY); // se ofrece una sola vez
-    return '<div class="instalar"><svg viewBox="0 0 64 40" aria-hidden="true"><use href="#tilde"/></svg><div><b>Lleva el pueblo en tu celular</b><small>' +
-      (pedidoInstalar ? "Instala Enletrados: abre al instante y funciona sin conexión." : "En Safari, toca Compartir y luego «Agregar a inicio».") + "</small></div>" +
-      (pedidoInstalar ? '<button class="boton sec" data-accion="instalar">Instalar</button>' : "") + "</div>";
+  // ---------- navegador de Facebook o Instagram: ofrecer seguir en el navegador del teléfono ----------
+  // Después del nivel 3 y nunca durante la partida. El avance viaja en el enlace (?enl=), sin cuentas ni servidor.
+  // Se ofrece una vez y, si dice «Ahora no», una sola vez más al menos 3 días después.
+  var EN_META = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger/i.test(navigator.userAgent), IOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  function enlaceConAvance(ruta) {
+    var datos = btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    return ruta + "?enl=" + datos;
   }
-  function instalar() {
-    if (!pedidoInstalar) return;
-    pedidoInstalar.prompt(); pedidoInstalar.userChoice.then(function (r) { if (r.outcome === "accepted") evento("enl_instalar"); pedidoInstalar = null; });
+  function ofertaNavegador(n, ruta) {
+    if (!EN_META || n < 3) return "";
+    var o = leer("externo", { veces: 0, ultima: null });
+    if (o.veces >= 2 || (o.ultima && diasEntre(o.ultima, HOY) < 3)) return "";
+    o.veces++; o.ultima = HOY; guardar("externo", o); evento("enl_navegador_externo", { accion: "ofrecido", ios: IOS });
+    var url = location.origin + enlaceConAvance(ruta), h = '<div class="externo"><b>Guarda tu avance</b><small>Ábrelo en el navegador de tu teléfono para volver cuando quieras y seguir donde quedaste.</small>';
+    if (IOS) {
+      try { history.replaceState(null, "", enlaceConAvance(location.pathname)); } catch (e) {} // así «Abrir en el navegador» lleva el avance
+      h += '<ol><li>Toca <b>•••</b> arriba a la derecha.</li><li>Elige <b>«Abrir en el navegador externo»</b>.</li></ol>' +
+        '<div class="botones"><button class="boton sec" data-accion="copiar-enlace" data-url="' + url + '">Copiar el enlace</button>';
+    } else {
+      var intent = "intent://" + location.host + enlaceConAvance(ruta) + "#Intent;scheme=" + location.protocol.replace(":", "") + ";end";
+      h += '<div class="botones"><a class="boton sec" data-accion="abrir-externo" data-google-interstitial="false" href="' + intent + '">Abrir en mi navegador</a>';
+    }
+    return h + '<button class="boton sec" data-accion="ocultar-externo">Ahora no</button></div></div>';
   }
-  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
-    window.addEventListener("load", function () { navigator.serviceWorker.register("/sw.js").catch(function () {}); });
-  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest('[data-accion="abrir-externo"],[data-accion="copiar-enlace"],[data-accion="ocultar-externo"]'); if (!b) return;
+    if (b.dataset.accion === "ocultar-externo") { var t = b.closest(".externo"); if (t) t.remove(); return; }
+    evento("enl_navegador_externo", { accion: b.dataset.accion === "abrir-externo" ? "abrir" : "copiar", ios: IOS });
+    if (b.dataset.accion === "copiar-enlace") { try { navigator.clipboard.writeText(b.dataset.url); aviso("Enlace copiado: pégalo en Safari"); } catch (x) {} }
+  });
+  // El juego ya no usa service worker (26 nov 2026): si quedó alguno de una versión anterior, se da de baja.
+  if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
 
   // ---------- arranque según la página ----------
   botonSonido(); prepararHojas(); pintarMonedas(false);
+  if (avanceLlego) setTimeout(function () { aviso(avanceLlego, 3200); }, 600);
   var pagina = document.body.dataset.pagina;
   if (pagina === "portada") portada(datos("datos-sitio"));
   else if (pagina === "mundos") paginaMundos(datos("datos-sitio"));

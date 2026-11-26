@@ -111,24 +111,9 @@ for (const [slug, [titulo, descripcion, conAnuncio]] of Object.entries(TEXTOS)) 
     contenido: plantilla("texto.html", { cuerpo: rellenar(leer(`paginas/${slug}.html`).trim(), SITIO), anuncio: conAnuncio ? ANUNCIO + ANCHOR : "" }) });
 }
 
-// sin conexión (la muestra el service worker cuando falta una página)
-pagina("/sin-conexion/", Object.assign({ titulo: "Sin conexión · Enletrados", pagina: "sin-conexion", descripcion: "Estás sin conexión.",
-  contenido: plantilla("sin-conexion.html", {}) }, NOINDEX));
-
 // 404
 pagina("/404.html", { titulo: "Página no encontrada · Enletrados", pagina: "404", robots: "noindex", indexar: false, descripcion: "Esta página no existe.",
   contenido: plantilla("404.html", {}) });
-
-// ---------- app instalable: manifiesto y service worker ----------
-fs.writeFileSync(path.join(DIST, "manifest.webmanifest"), JSON.stringify({
-  name: "Enletrados · Crucigrama de palabras", short_name: "Enletrados", lang: "es", dir: "ltr", start_url: "/?origen=app", scope: "/",
-  display: "standalone", orientation: "portrait", background_color: "#F7F0E4", theme_color: "#F7F0E4",
-  description: "Devuélvele las palabras al pueblo: un crucigrama que se arma deslizando el dedo por una rueda de letras.",
-  icons: [{ src: "/icono-192.png", sizes: "192x192", type: "image/png" }, { src: "/icono-512.png", sizes: "512x512", type: "image/png" },
-    { src: "/icono-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }]
-}, null, 2));
-const PRECARGA = ["/", "/diario/", "/mundos/", "/nivel/1/", "/sin-conexion/", "/" + CSS, "/" + JS, "/icono.svg", "/manifest.webmanifest"];
-fs.writeFileSync(path.join(DIST, "sw.js"), leer("juego/sw.js").replaceAll("__VERSION__", huella(CSS + JS + TOTAL)).replaceAll("__PRECARGA__", JSON.stringify(PRECARGA)));
 
 // ---------- robots, sitemap y cabeceras de Cloudflare ----------
 fs.writeFileSync(path.join(DIST, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${DOMINIO}/sitemap.xml\n`);
@@ -138,8 +123,6 @@ fs.writeFileSync(path.join(DIST, "_headers"), [
   "# Archivos con nombre versionado: caché larga. El HTML queda con la caché corta por omisión de Cloudflare Pages.",
   "/app.*.js", "  Cache-Control: public, max-age=31536000, immutable",
   "/estilos.*.css", "  Cache-Control: public, max-age=31536000, immutable",
-  "/sw.js", "  Cache-Control: no-cache",
-  "/manifest.webmanifest", "  Cache-Control: public, max-age=86400",
   "/*", "  X-Content-Type-Options: nosniff", "  Referrer-Policy: strict-origin-when-cross-origin", ""].join("\n"));
 
 // ---------- resumen de peso (gzip, como lo transfiere Cloudflare) ----------

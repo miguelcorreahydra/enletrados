@@ -81,6 +81,26 @@ async function formar(p, palabra) {
   for (const w of delDia) { await formar(p, w); await espera(1200); }
   await espera(1800); await p.screenshot({ path: path.join(SALIDA, "diario-completo.png") });
   if (!(await p.evaluate(() => !!document.querySelector(".hoja .resultado")))) problemas.push("Diario: no apareció el resultado para compartir");
+  // Navegador de Facebook (Android): después del nivel 3 se ofrece seguir en el navegador del teléfono, con el avance en el enlace
+  await p.setUserAgent("Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36 [FBAN/EMA;FBLC/es_LA;FBAV/450.0]");
+  await p.goto(`${BASE}/nivel/3/`, { waitUntil: "load" }); await espera(1500);
+  for (const w of await p.evaluate(() => JSON.parse(document.getElementById("datos-nivel").textContent).palabras.map(x => x.p))) { await formar(p, w); await espera(1200); }
+  await espera(2000);
+  const enlace = await p.evaluate(() => { const a = document.querySelector('.hoja [data-accion="abrir-externo"]'); if (a) a.scrollIntoView(); return a && a.getAttribute("href"); });
+  await espera(400); await p.screenshot({ path: path.join(SALIDA, "navegador-facebook.png") });
+  if (!enlace || !enlace.startsWith("intent://")) problemas.push("Navegador de Facebook: no apareció el botón para abrir en el navegador");
+  else {
+    // el avance viaja: se abre el enlace en un navegador «nuevo» (sin datos) y debe llegar con los mismos niveles
+    const ruta = enlace.replace(/^intent:\/\/[^/]+/, "").replace(/#Intent.*$/, "");
+    const otro = await nuevaPagina(nav, 390, 844);
+    await otro.p.goto(BASE + ruta, { waitUntil: "load" }); await espera(1200);
+    const llego = await otro.p.evaluate(() => JSON.parse(localStorage.getItem("enl_progreso") || "{}"));
+    const limpia = await otro.p.evaluate(() => !location.search);
+    if (!llego.hechos || llego.hechos.length < 4) problemas.push("El avance no llegó al otro navegador");
+    if (!limpia) problemas.push("El enlace con el avance quedó en la barra de direcciones");
+    await otro.ctx.close();
+  }
+  await p.setUserAgent((await nav.userAgent()));
   for (const [nombre, ruta] of [["logros-con-progreso", "/logros/"], ["portada-con-progreso", "/"]]) {
     await p.goto(BASE + ruta, { waitUntil: "load" }); await espera(1300);
     await p.screenshot({ path: path.join(SALIDA, nombre + ".png") });
