@@ -1,0 +1,35 @@
+<svg class="escena" viewBox="0 0 240 150" aria-hidden="true">
+<defs>
+  <linearGradient id="e-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--cielo-a)"/><stop offset="1" style="stop-color:var(--cielo-b)"/></linearGradient>
+  <radialGradient id="e-luz"><stop offset="0" stop-color="#FFE3A3"/><stop offset="1" stop-color="#FFE3A3" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="240" height="150" fill="url(#e-cielo)"/>
+<circle class="sol" cx="206" cy="28" r="13" fill="#F2C27B" opacity=".8"/>
+<path d="M0 104q40-22 90-8t80-6 70 4v56H0z" fill="#CDBBA6" opacity=".7"/>
+<path d="M0 116q50-14 110-4t130-6v44H0z" fill="#B7C29A"/>
+<path d="M0 124q60-6 120-2t120-2v30H0z" fill="#E3D2B3"/>
+<circle cx="28" cy="96" r="15" fill="#6E8B57"/><path d="M28 108v20" stroke="#6E5644" stroke-width="3"/><circle cx="214" cy="98" r="13" fill="#7C9A62"/><path d="M214 108v20" stroke="#6E5644" stroke-width="3"/>
+<rect x="72" y="116" width="96" height="12" rx="2" fill="#C9B79C"/><path d="M72 116h96" stroke="#B0A08A" stroke-width="1.5"/>
+<path d="M80 116V80M100 116V80M120 116V80M140 116V80M160 116V80" stroke="#FBF6EC" stroke-width="3"/>
+<path d="M70 82q50-44 100 0z" fill="#B98A2E"/><path d="M70 82h100" stroke="#8A6420" stroke-width="2"/>
+<path d="M80 108h80" stroke="#FBF6EC" stroke-width="1.6"/>
+<g class="tilde-posada"><use href="#tilde" x="108" y="36" width="28" height="18"/></g>
+<g class="d d1">
+  <g fill="#FFD98A"><circle class="titila" style="--i:0" cx="72" cy="84" r="2.2"/><circle class="titila" style="--i:1" cx="84" cy="84" r="2.2"/><circle class="titila" style="--i:2" cx="96" cy="84" r="2.2"/><circle class="titila" style="--i:3" cx="108" cy="84" r="2.2"/><circle class="titila" style="--i:4" cx="120" cy="84" r="2.2"/><circle class="titila" style="--i:5" cx="132" cy="84" r="2.2"/><circle class="titila" style="--i:6" cx="144" cy="84" r="2.2"/><circle class="titila" style="--i:7" cx="156" cy="84" r="2.2"/><circle class="titila" style="--i:8" cx="168" cy="84" r="2.2"/></g><circle cx="120" cy="100" r="34" fill="url(#e-luz)" opacity=".35"/>
+</g>
+<g class="d d2">
+  <path d="M20 84Q46.0 94 72 82" fill="none" stroke="#6B5A4B" stroke-width="1"/><path d="M25.7 86.7h6l-3 6z" fill="#E2B65A"/><path d="M34.3 88.2h6l-3 6z" fill="#6E8B57"/><path d="M43.0 88.5h6l-3 6z" fill="#2F6E8A"/><path d="M51.7 87.6h6l-3 6z" fill="#E58B6B"/><path d="M60.3 85.4h6l-3 6z" fill="#C0603A"/><path d="M168 82Q194.0 96 220 86" fill="none" stroke="#6B5A4B" stroke-width="1"/><path d="M173.7 86.0h6l-3 6z" fill="#E2B65A"/><path d="M182.3 88.7h6l-3 6z" fill="#6E8B57"/><path d="M191.0 90.0h6l-3 6z" fill="#2F6E8A"/><path d="M199.7 90.0h6l-3 6z" fill="#E58B6B"/><path d="M208.3 88.7h6l-3 6z" fill="#C0603A"/>
+</g>
+<g class="d d3">
+  <g class="nota-e" fill="#3A2E25"><path d="M60 64v-12l8-2v12" fill="none" stroke="#3A2E25" stroke-width="1.6"/><ellipse cx="58" cy="64" rx="3" ry="2.2"/><ellipse cx="66" cy="62" rx="3" ry="2.2"/></g><g class="nota-e" style="--i:1" fill="#3A2E25"><path d="M182 58v-12" stroke="#3A2E25" stroke-width="1.6"/><ellipse cx="180" cy="58" rx="3" ry="2.2"/><path d="M182 46q6 2 4 8" fill="none" stroke="#3A2E25" stroke-width="1.6"/></g>
+</g>
+<g class="d d4">
+  <path d="M98 116l-4-12M98 116l4-12M98 104v-4M142 116l-4-12M142 116l4-12M142 104v-4" stroke="#3A2E25" stroke-width="1.4"/><rect x="91" y="96" width="14" height="5" rx="1" fill="#3A2E25" transform="rotate(-10 98 98)"/><rect x="135" y="96" width="14" height="5" rx="1" fill="#3A2E25" transform="rotate(10 142 98)"/>
+</g>
+<g class="d d5">
+  <g><rect x="30" y="132" width="26" height="3" rx="1" fill="#8A5A3C"/><rect x="30" y="125" width="26" height="3" rx="1" fill="#8A5A3C"/><path d="M33 135v6M53 135v6" stroke="#3A2E25" stroke-width="2"/></g><g><rect x="186" y="132" width="26" height="3" rx="1" fill="#8A5A3C"/><rect x="186" y="125" width="26" height="3" rx="1" fill="#8A5A3C"/><path d="M189 135v6M209 135v6" stroke="#3A2E25" stroke-width="2"/></g>
+</g>
+<g class="d d6">
+  <path d="M120 46V24" stroke="#3A2E25" stroke-width="1.8"/><path class="bandera-e" d="M120 25l14 4-14 5z" fill="#C0603A"/>
+</g>
+</svg>

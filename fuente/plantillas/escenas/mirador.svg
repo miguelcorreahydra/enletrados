@@ -1,0 +1,32 @@
+<svg class="escena" viewBox="0 0 240 150" aria-hidden="true">
+<defs>
+  <linearGradient id="e-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--cielo-a)"/><stop offset="1" style="stop-color:var(--cielo-b)"/></linearGradient>
+  <radialGradient id="e-luz"><stop offset="0" stop-color="#FFE3A3"/><stop offset="1" stop-color="#FFE3A3" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="240" height="150" fill="url(#e-cielo)"/>
+<circle class="sol" cx="200" cy="30" r="13" fill="#F2C27B" opacity=".8"/>
+<path d="M0 112 40 76l30 18 44-40 40 34 30-22 56 46v38H0z" fill="#B9AFC6"/>
+<path d="M114 54l10 8 6-2 8 8-24-14zM184 66l8 6 6-2-14-4z" fill="#F6EEE2" opacity=".9"/>
+<path d="M0 126q60-18 130-10t110-4v38H0z" fill="#B7C29A"/>
+<path d="M150 150V112q30-10 90-8v46z" fill="#9C9384"/><path d="M150 112q30-10 90-8" fill="none" stroke="#7F776A" stroke-width="2"/>
+<rect x="160" y="104" width="70" height="5" rx="1" fill="#B8AE9E"/>
+<g class="tilde-posada"><use href="#tilde" x="176" y="80" width="28" height="18"/></g>
+<g class="d d1">
+  <path d="M160 104V92h70v12M160 96h70M174 104V92M188 104V92M202 104V92M216 104V92" fill="none" stroke="#6E5644" stroke-width="2"/>
+</g>
+<g class="d d2">
+  <path d="M212 104l-5-12M212 104l5-12M212 104v-12" stroke="#3A2E25" stroke-width="1.6"/><path d="M200 86l20-8" stroke="#4E5A6E" stroke-width="4.5" stroke-linecap="round"/><path d="M220 78l3-1" stroke="#C9973B" stroke-width="5" stroke-linecap="round"/>
+</g>
+<g class="d d3">
+  <path d="M234 104V62" stroke="#3A2E25" stroke-width="1.8"/><path class="bandera-e" d="M234 63l-16 5 16 5z" fill="#6C6A8E"/>
+</g>
+<g class="d d4">
+  <path d="M70 40q3 -3 6 0q3 -3 6 0" class="ave-e" fill="none" stroke="#3A3F4E" stroke-width="1.4" stroke-linecap="round"/><path d="M90 30q2.4000000000000004 -2.4000000000000004 4.800000000000001 0q2.4000000000000004 -2.4000000000000004 4.800000000000001 0" class="ave-e" fill="none" stroke="#3A3F4E" stroke-width="1.4" stroke-linecap="round"/><path d="M54 52q2.0999999999999996 -2.0999999999999996 4.199999999999999 0q2.0999999999999996 -2.0999999999999996 4.199999999999999 0" class="ave-e" fill="none" stroke="#3A3F4E" stroke-width="1.4" stroke-linecap="round"/><path d="M130 26q1.7999999999999998 -1.7999999999999998 3.5999999999999996 0q1.7999999999999998 -1.7999999999999998 3.5999999999999996 0" class="ave-e" fill="none" stroke="#3A3F4E" stroke-width="1.4" stroke-linecap="round"/>
+</g>
+<g class="d d5">
+  <g class="nube-e" fill="#fff" opacity=".85"><path d="M30 40h34a9 9 0 0 0-9-11 12 12 0 0 0-22 3 7 7 0 0 0-3 8z"/></g><g class="nube-e" style="animation-duration:46s" fill="#fff" opacity=".7"><path d="M140 30h26a7 7 0 0 0-7-8 9 9 0 0 0-17 2 5 5 0 0 0-2 6z"/></g>
+</g>
+<g class="d d6">
+  <g fill="none" stroke-width="3.4" opacity=".55"><path d="M10 120a64 64 0 0 1 128 0" stroke="#E58B6B"/><path d="M14 120a60 60 0 0 1 120 0" stroke="#F0C75E"/><path d="M18 120a56 56 0 0 1 112 0" stroke="#9FC28A"/><path d="M22 120a52 52 0 0 1 104 0" stroke="#7FB3C4"/><path d="M26 120a48 48 0 0 1 96 0" stroke="#A493C9"/></g>
+</g>
+</svg>

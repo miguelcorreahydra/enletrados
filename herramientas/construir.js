@@ -78,7 +78,7 @@ pagina("/ajustes/", Object.assign({ titulo: "Ajustes · Enletrados", pagina: "aj
   contenido: plantilla("ajustes.html", {}) }, NOINDEX));
 
 // niveles
-const ESCENAS = { 1: "plantillas/panaderia.svg" };
+const ESCENAS = { 1: "panaderia", 2: "plaza", 3: "calle", 4: "puerto", 5: "mirador", 6: "estacion", 7: "kiosco", 8: "casas", 9: "bosque", 10: "faro" };
 niveles.forEach((l, i) => {
   const n = i + 1, m = mundos.find(x => n >= x.desde && n <= x.hasta), totalMundo = m.hasta - m.desde + 1, pos = n - m.desde + 1;
   const datos = { n, total: TOTAL, mundo: { id: m.id, lugar: m.lugar, color: m.color, desde: m.desde, hasta: m.hasta, detalles: m.detalles },
@@ -88,7 +88,7 @@ niveles.forEach((l, i) => {
   pagina(`/nivel/${n}/`, { titulo: `Nivel ${n} · ${m.lugar} · Enletrados`, pagina: "nivel", clase: "nivel", robots: "noindex, follow", indexar: false,
     descripcion: `Nivel ${n} de Enletrados: completa el crucigrama con las letras de la rueda.`,
     contenido: plantilla("nivel.html", { n, lugar: esc(m.lugar), posicion: pos, totalMundo, porcentaje: (pos / totalMundo * 100).toFixed(1),
-      escena: ESCENAS[m.id] ? leer(ESCENAS[m.id]).trim() : "", datos: json(datos) }) });
+      escena: ESCENAS[m.id] ? leer(`plantillas/escenas/${ESCENAS[m.id]}.svg`).trim() : "", datos: json(datos) }) });
 });
 
 // 404

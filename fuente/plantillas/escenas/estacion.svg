@@ -1,0 +1,34 @@
+<svg class="escena" viewBox="0 0 240 150" aria-hidden="true">
+<defs>
+  <linearGradient id="e-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--cielo-a)"/><stop offset="1" style="stop-color:var(--cielo-b)"/></linearGradient>
+  <radialGradient id="e-luz"><stop offset="0" stop-color="#FFE3A3"/><stop offset="1" stop-color="#FFE3A3" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="240" height="150" fill="url(#e-cielo)"/>
+<circle class="sol" cx="30" cy="28" r="13" fill="#F2C27B" opacity=".8"/>
+<path d="M0 104q40-22 90-8t80-6 70 4v56H0z" fill="#CDBBA6" opacity=".7"/>
+<path d="M0 116q50-14 110-4t130-6v44H0z" fill="#B7C29A"/>
+<path d="M0 132h240v18H0z" fill="#CDBBA6"/>
+<path d="M0 136h240M0 142h240" stroke="#6E5644" stroke-width="1.6"/><path d="M6 134v10M20 134v10M34 134v10M48 134v10M62 134v10M76 134v10M90 134v10M104 134v10M118 134v10M132 134v10M146 134v10M160 134v10M174 134v10M188 134v10M202 134v10M216 134v10M230 134v10" stroke="#8A6E57" stroke-width="2"/>
+<rect x="40" y="124" width="190" height="8" fill="#B8AE9E"/>
+<rect x="110" y="70" width="104" height="54" fill="#F1E4CF"/><path d="M102 72l60-26 60 26z" fill="#8E3B46"/>
+<rect x="124" y="92" width="14" height="22" rx="1.5" fill="#6B5A4B"/><rect x="186" y="92" width="14" height="22" rx="1.5" fill="#6B5A4B"/><rect x="154" y="94" width="16" height="30" fill="#7A4A35"/>
+<g class="tilde-posada"><use href="#tilde" x="150" y="36" width="28" height="18"/></g>
+<g class="d d1">
+  <path d="M56 124V84" stroke="#3A2E25" stroke-width="2.2"/><circle cx="56" cy="88" r="13" fill="url(#e-luz)" opacity=".8"/><path d="M52 84h8l-1.5 8h-5z" fill="#FFD98A" stroke="#3A2E25" stroke-width="1.2"/><path d="M224 124V84" stroke="#3A2E25" stroke-width="2.2"/><circle cx="224" cy="88" r="13" fill="url(#e-luz)" opacity=".8"/><path d="M220 84h8l-1.5 8h-5z" fill="#FFD98A" stroke="#3A2E25" stroke-width="1.2"/><rect x="124" y="92" width="14" height="22" rx="1.5" fill="#FFD98A"/><rect x="186" y="92" width="14" height="22" rx="1.5" fill="#FFD98A"/>
+</g>
+<g class="d d2">
+  <circle cx="162" cy="60" r="8" fill="#FBF6EC" stroke="#3A2E25" stroke-width="1.8"/><path d="M162 60v-5M162 60l3.5 1.5" stroke="#3A2E25" stroke-width="1.3" stroke-linecap="round"/>
+</g>
+<g class="d d3">
+  <g><rect x="74" y="120" width="26" height="3" rx="1" fill="#8A5A3C"/><rect x="74" y="113" width="26" height="3" rx="1" fill="#8A5A3C"/><path d="M77 123v6M97 123v6" stroke="#3A2E25" stroke-width="2"/></g>
+</g>
+<g class="d d4">
+  <rect x="128" y="75" width="68" height="11" rx="2" fill="#6E3B2A"/><text x="162" y="83.4" text-anchor="middle" font-size="7" font-weight="700" fill="#FBEBD0" font-family="Georgia,serif" letter-spacing="1">ESTACIÓN</text>
+</g>
+<g class="d d5">
+  <g class="tren-e"><rect x="-6" y="108" width="44" height="22" rx="3" fill="#8E3B46"/><rect x="0" y="113" width="10" height="8" rx="1" fill="#FFD98A"/><rect x="14" y="113" width="10" height="8" rx="1" fill="#FFD98A"/><rect x="40" y="104" width="34" height="26" rx="3" fill="#3A3F4E"/><rect x="62" y="94" width="8" height="12" fill="#3A3F4E"/><rect x="46" y="110" width="12" height="9" rx="1" fill="#FFD98A"/><g fill="#2A2420"><circle cx="6" cy="131" r="4"/><circle cx="28" cy="131" r="4"/><circle cx="48" cy="131" r="4.5"/><circle cx="66" cy="131" r="4.5"/></g></g>
+</g>
+<g class="d d6">
+  <g class="humo" fill="#FFFFFF" opacity=".8"><circle cx="66" cy="86" r="6"/><circle cx="72" cy="74" r="4.6"/><circle cx="68" cy="64" r="3.4"/></g>
+</g>
+</svg>
