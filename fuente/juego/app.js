@@ -639,6 +639,8 @@
         if (i < +esc.dataset.antes) g.classList.add("si"); else if (i < +esc.dataset.det) g.classList.add("nuevo");
       });
       setTimeout(function () { var b = $("barra-escena"); if (b) b.style.setProperty("--p", ahora / totalMundo * 100); }, 350);
+      // con la app instalada o el service worker activo, el siguiente nivel queda guardado para jugar sin conexión
+      if (D.siguiente && navigator.serviceWorker && navigator.serviceWorker.controller) setTimeout(function () { fetch(D.siguiente).catch(function () {}); }, 1500);
       setTimeout(function () { pintarMonedas(true); if (cofre) { suena.cofre(); var c = document.querySelector(".hoja .cofre"); if (c) c.classList.add("abre"); } }, 900);
     }
 
