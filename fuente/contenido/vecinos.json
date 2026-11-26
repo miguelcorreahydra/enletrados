@@ -1,0 +1,14 @@
+[
+  { "id": "lola", "nombre": "Lola", "animal": "la gata", "oficio": "panadera", "nivel": 3, "frase": "Amaso el pan antes de que salga el sol.", "palabra": "miga", "definicion": "La parte blanda de adentro del pan." },
+  { "id": "ramon", "nombre": "Ramón", "animal": "el perro", "oficio": "cartero", "nivel": 18, "frase": "Llevo las cartas de Tilde a cada casa del pueblo.", "palabra": "sobre", "definicion": "Envoltura de papel donde va una carta." },
+  { "id": "rosa", "nombre": "Rosa", "animal": "la coneja", "oficio": "florista", "nivel": 33, "frase": "En mi puesto hay flores de todos los colores.", "palabra": "pétalo", "definicion": "Cada hoja de color de una flor." },
+  { "id": "bruno", "nombre": "Bruno", "animal": "el oso", "oficio": "librero", "nivel": 55, "frase": "Tengo un libro para cada palabra del pueblo.", "palabra": "lomo", "definicion": "La parte del libro donde va el título." },
+  { "id": "tito", "nombre": "Tito", "animal": "el ratón", "oficio": "relojero", "nivel": 75, "frase": "Arreglo los relojes para que nadie llegue tarde.", "palabra": "manecilla", "definicion": "Aguja que marca la hora en un reloj." },
+  { "id": "pancho", "nombre": "Pancho", "animal": "el zorro", "oficio": "pescador", "nivel": 100, "frase": "Salgo a pescar cuando el mar está en calma.", "palabra": "marea", "definicion": "Subida y bajada del nivel del mar." },
+  { "id": "nube", "nombre": "Nube", "animal": "la oveja", "oficio": "tejedora", "nivel": 130, "frase": "Tejo bufandas con la lana más suave del cerro.", "palabra": "ovillo", "definicion": "Bola de hilo o de lana enrollada." },
+  { "id": "tono", "nombre": "Toño", "animal": "el cerdito", "oficio": "jefe de estación", "nivel": 165, "frase": "¡Pasajeros al andén, que el tren ya va a salir!", "palabra": "andén", "definicion": "Plataforma donde se sube al tren." },
+  { "id": "fede", "nombre": "Fede", "animal": "la rana", "oficio": "músico", "nivel": 195, "frase": "Toco en el kiosco todos los domingos.", "palabra": "compás", "definicion": "El ritmo con que se mide la música." },
+  { "id": "carmela", "nombre": "Carmela", "animal": "la tortuga", "oficio": "maestra", "nivel": 225, "frase": "Hace cien años que enseño a leer en el barrio.", "palabra": "tilde", "definicion": "Rayita que marca dónde suena más fuerte una palabra." },
+  { "id": "lupe", "nombre": "Lupe", "animal": "la ardilla", "oficio": "guardabosques", "nivel": 255, "frase": "Cuido el sendero para que nadie se pierda.", "palabra": "bellota", "definicion": "El fruto del roble." },
+  { "id": "olga", "nombre": "Olga", "animal": "la búho", "oficio": "astrónoma", "nivel": 285, "frase": "De noche miro las estrellas desde el observatorio.", "palabra": "constelación", "definicion": "Grupo de estrellas que forman una figura." }
+]

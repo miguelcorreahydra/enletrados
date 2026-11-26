@@ -61,7 +61,9 @@ function pagina(ruta, d) {
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
   paginas.push({ ruta, bytes: html.length, indexar: d.indexar !== false });
 }
-const sitio = { total: TOTAL, mundos: mundos.map(m => ({ id: m.id, lugar: m.lugar, tema: m.tema, color: m.color, desde: m.desde, hasta: m.hasta, frase: m.frase })) };
+// vecinos (12) y postales (2 por lugar: de día en el nivel 15 y de noche en el 30)
+const VECINOS = JSON.parse(leer("contenido/vecinos.json")), VECINOS_SVG = leer("plantillas/vecinos.svg").trim();
+const sitio = { total: TOTAL, vecinos: VECINOS, mundos: mundos.map(m => ({ id: m.id, lugar: m.lugar, tema: m.tema, color: m.color, desde: m.desde, hasta: m.hasta, frase: m.frase })) };
 const NOINDEX = { robots: "noindex, follow", indexar: false };
 
 // ---------- el pueblo isométrico de la portada (piezas de Kenney, CC0; ver herramientas/pueblo/) ----------
@@ -107,13 +109,6 @@ fs.mkdirSync(path.join(DIST, "diario/dia"), { recursive: true });
 diario.forEach((l, i) => fs.writeFileSync(path.join(DIST, `diario/dia/${i + 1}.json`), JSON.stringify({ letras: l.letras, palabras: l.palabras, filas: l.filas,
   columnas: l.columnas, extras: l.extras, pistas: Object.fromEntries(l.palabras.map(w => [w.p, PISTAS[w.p]])) })));
 
-// logros y ajustes (fuera del índice de Google)
-pagina("/logros/", Object.assign({ titulo: "Tus logros · Enletrados", pagina: "logros", descripcion: "Tus niveles, estrellas, rachas y medallas en Enletrados.",
-  contenido: plantilla("logros.html", { datos: json(sitio) }) }, NOINDEX));
-pagina("/ajustes/", Object.assign({ titulo: "Ajustes · Enletrados", pagina: "ajustes", descripcion: "Sonido, vibración, tema y tamaño de letra de Enletrados.",
-  contenido: plantilla("ajustes.html", {}) }, NOINDEX));
-
-// niveles
 // escena de cada lugar (tarjeta de «nivel completado»): acercamiento a la maqueta con 6 detalles (piezas o efectos de luz).
 // Va dentro de un <template>: sus imágenes se bajan recién al completar el nivel.
 const ESC = JSON.parse(leer("contenido/escenas.json")), { dibujar } = require("./pueblo/efectos");
@@ -133,16 +128,28 @@ function escena(id) {
 ${partes.join("\n")}
 <g class="tilde-posada"><use href="#tilde" x="${e.tilde[0] - 24}" y="${e.tilde[1] - 30}" width="48" height="30"/></g></svg>`;
 }
+
+// logros y ajustes (fuera del índice de Google)
+pagina("/logros/", Object.assign({ titulo: "Tus logros · Enletrados", pagina: "logros", descripcion: "Tus niveles, estrellas, rachas, postales, vecinos y medallas en Enletrados.",
+  contenido: plantilla("logros.html", { datos: json(sitio), vecinossvg: VECINOS_SVG,
+    plantillasPostales: mundos.map(m => `<template id="postal-${m.id}">${ESC[m.id] ? escena(m.id) : ""}</template>`).join("\n") }) }, NOINDEX));
+pagina("/ajustes/", Object.assign({ titulo: "Ajustes · Enletrados", pagina: "ajustes", descripcion: "Sonido, vibración, tema y tamaño de letra de Enletrados.",
+  contenido: plantilla("ajustes.html", {}) }, NOINDEX));
+
+// niveles
+
 niveles.forEach((l, i) => {
   const n = i + 1, m = mundos.find(x => n >= x.desde && n <= x.hasta), totalMundo = m.hasta - m.desde + 1, pos = n - m.desde + 1;
   const datos = { n, total: TOTAL, mundo: { id: m.id, lugar: m.lugar, color: m.color, desde: m.desde, hasta: m.hasta, detalles: m.detalles },
     letras: l.letras, palabras: l.palabras, filas: l.filas, columnas: l.columnas, extras: l.extras,
     pistas: Object.fromEntries(l.palabras.map(w => [w.p, PISTAS[w.p]])),
-    siguiente: n < TOTAL ? `/nivel/${n + 1}/` : null, vinetaSiguiente: n >= 3 };
+    siguiente: n < TOTAL ? `/nivel/${n + 1}/` : null, vinetaSiguiente: n >= 3,
+    vecino: VECINOS.find(v => v.nivel === n) || null,
+    postal: pos === 15 ? "dia" : pos === totalMundo ? "noche" : null };
   pagina(`/nivel/${n}/`, { titulo: `Nivel ${n} · ${m.lugar} · Enletrados`, pagina: "nivel", clase: "nivel", robots: "noindex, follow", indexar: false,
     descripcion: `Nivel ${n} de Enletrados: completa el crucigrama con las letras de la rueda.`,
     contenido: plantilla("nivel.html", { n, lugar: esc(m.lugar), posicion: pos, totalMundo, porcentaje: (pos / totalMundo * 100).toFixed(1),
-      escena: ESC[m.id] ? escena(m.id) : "", datos: json(datos) }) });
+      escena: ESC[m.id] ? escena(m.id) : "", vecinossvg: datos.vecino ? VECINOS_SVG : "", datos: json(datos) }) });
 });
 
 // cómo jugar, quiénes somos, contacto, créditos y páginas legales (en el índice de Google)

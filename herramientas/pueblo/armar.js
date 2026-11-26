@@ -9,14 +9,14 @@ const RAIZ = path.join(__dirname, "../.."), ANCHO = 920, IMG = path.join(RAIZ, "
 
 (async () => {
   fs.mkdirSync(IMG, { recursive: true });
-  const r = await componer(piezas, { ancho: ANCHO, calidad: 62, salida: path.join(IMG, "pueblo.webp") });
+  const r = await componer(piezas, { ancho: ANCHO, calidad: 55, salida: path.join(IMG, "pueblo.webp") });
   const k = r.escala, a = v => Math.round(v * 10) / 10;
   const geo = { ancho: ANCHO, alto: Math.round(r.caja.h * k), lugares: {} };
   let total = r.bytes;
   for (const [id, celdas] of Object.entries(lugares)) {
     const casillas = new Set(celdas.map(([x, y]) => x + "," + y));
     const delLugar = q => q.l === +id || ((q.z || 0) <= 0.05 && casillas.has(q.x + "," + q.y));
-    const c = await componer(piezas, { ancho: ANCHO, calidad: 80, salida: path.join(IMG, `lugar-${id}.webp`), capa: delLugar, recortar: true });
+    const c = await componer(piezas, { ancho: ANCHO, calidad: 74, salida: path.join(IMG, `lugar-${id}.webp`), capa: delLugar, recortar: true });
     total += c.bytes;
     // el pin va sobre la pieza más alta del lugar
     const alta = celdas.slice().sort((u, v) => posicion({ x: u[0], y: u[1], z: u[2] }).y - posicion({ x: v[0], y: v[1], z: v[2] }).y)[0];

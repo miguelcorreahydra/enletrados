@@ -491,6 +491,64 @@ body.nivel .pista-texto span { font-size: calc(18px * var(--escala)); }
 .titulo-nivel small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw; }
 .zona-grilla { overflow: hidden; }
 
+/* ---------- vecinos y postales ---------- */
+.vecino-tarjeta { display: flex; gap: var(--e-3); align-items: flex-start; padding: var(--e-3) var(--e-4); margin: var(--e-3) 0; background: var(--crema); border: 1px solid var(--linea); }
+.vecino-tarjeta .cara { width: 76px; height: 76px; flex: none; border-radius: 50%; background: var(--dorado-claro); }
+.vecino-tarjeta.nuevo .cara { animation: vecino-llega .8s var(--rebote) .9s both; }
+@keyframes vecino-llega { from { opacity: 0; transform: scale(.3) rotate(-20deg); } }
+.vecino-tarjeta b { display: block; font-family: var(--serif); font-size: var(--t-l); }
+.vecino-tarjeta small { color: var(--tinta-2); font-size: var(--t-s); }
+.vecino-tarjeta .etiqueta-nuevo { display: block; color: var(--dorado); font-weight: 800; font-family: var(--redonda); letter-spacing: .3px; }
+.vecino-tarjeta p { margin: var(--e-2) 0 0; font-size: var(--t-m); line-height: 1.4; }
+.vecino-tarjeta .favorita { color: var(--tinta-2); font-size: var(--t-s); }
+.premio-postal { margin: var(--e-4) 0; text-align: center; }
+.premio-postal > b { display: block; font-family: var(--serif); font-size: var(--t-l); margin-bottom: var(--e-2); }
+.premio-postal > a { display: inline-block; margin-top: var(--e-2); color: var(--terracota); font-weight: 800; font-family: var(--redonda); font-size: var(--t-s); }
+.postal { position: relative; margin: 0 auto; max-width: 420px; padding: var(--e-2) var(--e-2) 0; background: #FFFDF8; border-radius: var(--r-m);
+  box-shadow: var(--s-2), 0 0 0 1px var(--linea); transform: rotate(-1.2deg); }
+.premio-postal .postal { animation: postal-llega .8s var(--rebote) .9s both; }
+@keyframes postal-llega { from { opacity: 0; transform: translateY(30px) rotate(-8deg) scale(.8); } }
+.postal .escena { border-radius: var(--r-s); }
+.postal figcaption { padding: var(--e-2) var(--e-2) var(--e-3); font-family: var(--serif); font-size: var(--t-m); color: #2E241B; text-align: left; }
+.postal .sello { position: absolute; top: var(--e-4); right: var(--e-4); width: 46px; height: 54px; background: #FFFDF8; border: 2px dashed var(--terracota);
+  border-radius: 4px; display: grid; place-items: center; transform: rotate(6deg); box-shadow: 0 2px 6px rgb(0 0 0 / .12); }
+.postal .sello svg { width: 34px; height: 22px; --tilde: #2F3E5C; }
+.postal.noche .escena { --cielo-a: #1A2340; --cielo-b: #35304A; filter: brightness(.74) saturate(.9); }
+.postal.noche .escena .sol { fill: #F1E9D2; }
+.postales { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--e-3); }
+.postal-mini { padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+.postal-mini .postal { transform: none; padding: var(--e-1) var(--e-1) 0; }
+.postal-mini .postal figcaption { font-size: var(--t-xs); padding: var(--e-1) var(--e-1) var(--e-2); }
+.postal-mini .sello { width: 24px; height: 28px; top: var(--e-2); right: var(--e-2); }
+.postal-mini .sello svg { width: 18px; height: 12px; }
+.postal-mini.bloqueada { aspect-ratio: 16 / 12; border-radius: var(--r-m); border: 2px dashed var(--linea); display: grid; place-content: center; justify-items: center;
+  gap: var(--e-1); color: var(--tinta-2); text-align: center; padding: var(--e-2); }
+.postal-mini.bloqueada b { font-family: var(--serif); font-size: var(--t-s); color: var(--tinta); }
+.postal-mini.bloqueada small { font-size: var(--t-xs); }
+.postal-grande .postal { transform: rotate(-1deg); }
+.vecinos { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--e-3); }
+.vecino-mini { display: grid; justify-items: center; gap: 2px; padding: var(--e-3) var(--e-1); border-radius: var(--r-l); background: var(--crema); border: 1px solid var(--linea);
+  box-shadow: var(--s-1); cursor: pointer; font: inherit; color: inherit; }
+.vecino-mini svg { width: 64px; height: 64px; border-radius: 50%; background: var(--dorado-claro); }
+.vecino-mini b { font-family: var(--serif); font-size: var(--t-m); }
+.vecino-mini small { color: var(--tinta-2); font-size: var(--t-xs); text-align: center; }
+.vecino-mini.bloqueado { cursor: default; box-shadow: none; background: transparent; border-style: dashed; }
+.vecino-mini.bloqueado svg { background: var(--hundida); }
+.vecino-mini.bloqueado svg use { filter: brightness(0); opacity: .16; }
+.hoja .vecino-tarjeta:first-child { margin-top: var(--e-6); }
+.enlace-album { display: flex; align-items: center; gap: var(--e-2); margin-top: var(--e-3); padding: var(--e-3) var(--e-4); border-radius: var(--r-l);
+  background: var(--crema); border: 1px solid var(--linea); box-shadow: var(--s-1); text-decoration: none; }
+.enlace-album span { font-family: var(--serif); font-size: var(--t-m); flex: 1; }
+.enlace-album small { color: var(--dorado); font-weight: 800; font-family: var(--redonda); font-size: var(--t-xs); }
+.enlace-album[hidden] { display: none; }
+.seccion-t small { font-family: var(--redonda); font-size: var(--t-s); color: var(--dorado); margin-left: var(--e-2); }
+.nota-album { color: var(--tinta-2); font-size: var(--t-s); margin: calc(-1 * var(--e-2)) 0 var(--e-3); }
+
+/* el encabezado fijo lleva fondo para que el texto no se monte al bajar */
+.cabecera { background: linear-gradient(var(--papel) 70%, rgb(from var(--papel) r g b / 0)); }
+@supports not (color: rgb(from red r g b)) { .cabecera { background: var(--papel); } }
+body.nivel .cabecera { background: transparent; }
+
 /* ---------- componentes del sistema de diseño ---------- */
 /* tarjetas: todas con la misma esquina y la misma sombra */
 .tarjeta-lugar, .mundo-item, .pista, .racha > div, .cifras div, .logros li, .ajuste, .externo, .escena-tarjeta, .dato-contacto, .cartero, .cofre-tarjeta {

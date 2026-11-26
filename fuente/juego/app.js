@@ -289,6 +289,9 @@
       $("racha-p").textContent = p.protector; $("racha-e").textContent = totalEstrellas();
     }
     cartero();
+    var postales = sitio.mundos.reduce(function (s, mu) { return s + (p.hechos.indexOf(mu.desde + 14) >= 0) + (p.hechos.indexOf(mu.hasta) >= 0); }, 0);
+    var vecinos = sitio.vecinos.filter(function (v) { return p.hechos.indexOf(v.nivel) >= 0; }).length;
+    if (postales || vecinos) { $("enlace-album").hidden = false; $("album-cuenta").textContent = postales + " postales · " + vecinos + " vecinos"; }
     if (quieto) { var tv = document.querySelector(".tilde-vuela"); if (tv) tv.remove(); }
   }
 
@@ -304,8 +307,50 @@
     });
   }
 
+  // ---------- vecinos y postales ----------
+  function tarjetaVecino(v, nuevo) {
+    return '<div class="vecino-tarjeta' + (nuevo ? " nuevo" : "") + '"><svg class="cara" viewBox="0 0 96 96" aria-hidden="true"><use href="#v-' + v.id + '"/></svg><div>' +
+      (nuevo ? '<small class="etiqueta-nuevo">¡Llegó un vecino!</small>' : "") + "<b>" + v.nombre + ", " + v.animal + "</b><small>" + v.oficio.charAt(0).toUpperCase() + v.oficio.slice(1) + "</small>" +
+      '<p>«' + v.frase + '»</p><p class="favorita">Su palabra favorita: <strong>' + v.palabra + "</strong>. " + v.definicion + "</p></div></div>";
+  }
+  // cada copia de una escena necesita sus propios id de degradado (si no, todas usan los de la primera)
+  var copias = 0;
+  function idsPropios(svg) { var u = "-c" + (++copias); return svg.replace(/id="e-(\w+)"/g, 'id="e-$1' + u + '"').replace(/url\(#e-(\w+)\)/g, "url(#e-$1" + u + ")"); }
+  function postalHtml(m, tipo, svg) {
+    return '<figure class="postal' + (tipo === "noche" ? " noche" : "") + '">' + idsPropios(svg).replace(/class="d d(\d)"/g, 'class="d d$1 si"') +
+      '<span class="sello" aria-hidden="true"><svg viewBox="0 0 64 40"><use href="#tilde"/></svg></span>' +
+      "<figcaption>Saludos desde <b>" + m.lugar.charAt(0).toLowerCase() + m.lugar.slice(1) + "</b>" + (tipo === "noche" ? " · de noche" : "") + "</figcaption></figure>";
+  }
+  function album(sitio) {
+    var postales = [], tot = 0;
+    sitio.mundos.forEach(function (m) {
+      [["dia", m.desde + 14], ["noche", m.hasta]].forEach(function (par) {
+        tot++; var tiene = p.hechos.indexOf(par[1]) >= 0, t = document.getElementById("postal-" + m.id);
+        postales.push(tiene && t ? '<button class="postal-mini" data-postal="' + m.id + "-" + par[0] + '">' + postalHtml(m, par[0], t.innerHTML) + "</button>" :
+          '<div class="postal-mini bloqueada"><svg class="i"><use href="#i-candado"/></svg><b>' + m.lugar + '</b><small>' + (par[0] === "dia" ? "De día" : "De noche") + " · nivel " + par[1] + "</small></div>");
+      });
+    });
+    $("postales").innerHTML = postales.join("");
+    var tienePost = document.querySelectorAll(".postal-mini:not(.bloqueada)").length;
+    $("postales-n").textContent = tienePost + " de " + tot;
+    var vec = sitio.vecinos.map(function (v) {
+      var tiene = p.hechos.indexOf(v.nivel) >= 0;
+      return '<button class="vecino-mini' + (tiene ? "" : " bloqueado") + '" data-vecino="' + v.id + '"' + (tiene ? "" : " disabled") + '><svg viewBox="0 0 96 96" aria-hidden="true"><use href="#v-' + v.id + '"/></svg>' +
+        "<b>" + (tiene ? v.nombre : "?") + "</b><small>" + (tiene ? v.oficio : "Nivel " + v.nivel) + "</small></button>";
+    });
+    $("vecinos").innerHTML = vec.join("");
+    $("vecinos-n").textContent = sitio.vecinos.filter(function (v) { return p.hechos.indexOf(v.nivel) >= 0; }).length + " de " + sitio.vecinos.length;
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-vecino]"), q = e.target.closest("[data-postal]");
+      if (b) { var v = sitio.vecinos.filter(function (x) { return x.id === b.dataset.vecino; })[0]; abrir(tarjetaVecino(v, false) + '<div class="botones"><button class="boton sec" data-accion="cerrar">Cerrar</button></div>'); }
+      if (q) { var partes = q.dataset.postal.split("-"), m = sitio.mundos[+partes[0] - 1];
+        abrir('<div class="postal-grande">' + postalHtml(m, partes[1], document.getElementById("postal-" + partes[0]).innerHTML) + '</div><p class="sub">' + m.frase + '</p><div class="botones"><button class="boton sec" data-accion="cerrar">Cerrar</button></div>'); }
+    });
+  }
+
   // ---------- logros ----------
   function logros(sitio) {
+    album(sitio);
     var lugares = sitio.mundos.filter(function (m) { return hechosEn(m) >= m.hasta - m.desde + 1; }).length;
     var diarios = Object.keys(p.diario).length, est = totalEstrellas();
     var cifras = [["Niveles", p.hechos.length], ["Estrellas", est], ["Racha actual", rachaVigente()], ["Mejor racha", p.racha.mejor],
@@ -327,6 +372,9 @@
       ["Diccionario andante", "Encuentra 300 palabras extra", p.extras, 300],
       ["Buscador de oro", "Encuentra 10 palabras doradas", p.doradas, 10],
       ["Cazador de cofres", "Abre 10 cofres", p.cofres, 10],
+      ["Primer vecino", "Conoce a tu primer vecino", sitio.vecinos.filter(function (v) { return p.hechos.indexOf(v.nivel) >= 0; }).length, 1],
+      ["Todo el vecindario", "Conoce a los 12 vecinos", sitio.vecinos.filter(function (v) { return p.hechos.indexOf(v.nivel) >= 0; }).length, 12],
+      ["Coleccionista de postales", "Junta las 20 postales", sitio.mundos.reduce(function (s, m) { return s + (p.hechos.indexOf(m.desde + 14) >= 0) + (p.hechos.indexOf(m.hasta) >= 0); }, 0), 20],
       ["Sin ayuda", "Gana 30 niveles con 3 estrellas", Object.keys(p.estrellas).filter(function (k) { return p.estrellas[k] === 3; }).length, 30]
     ];
     $("logros").innerHTML = L.map(function (l) {
@@ -682,6 +730,9 @@
       if (premios.length) h += '<p class="premios">' + premios.join(" · ") + "</p>";
       if (est < 3 && !mismo) h += '<p class="nota-chica">Sin ayudas ganas las 3 estrellas.</p>';
       if (cofre) h += '<div class="cofre-tarjeta">' + COFRE + "<div><b>¡Un cofre!</b><small>Cada 5 niveles: +50 monedas y una letra gratis</small></div></div>";
+      if (D.vecino && !mismo) h += tarjetaVecino(D.vecino, true);
+      var tPostal = $("t-escena");
+      if (D.postal && !mismo && tPostal && tPostal.innerHTML.trim()) h += '<div class="premio-postal"><b>¡Te llegó una postal!</b>' + postalHtml(D.mundo, D.postal, tPostal.innerHTML) + '<a href="/logros/#album" data-google-interstitial="false">Ver el álbum</a></div>';
       if (msgRacha) h += '<p class="premios">' + msgRacha + "</p>";
       var t = $("t-escena");
       if (t && t.innerHTML.trim()) {
@@ -701,6 +752,8 @@
       h += ofertaNavegador(D.n, D.siguiente || location.pathname);
       h += '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)<br>Solo en esta pantalla, 36 px debajo de los botones</div>';
       abrir(h); chispasEstrellas();
+      setTimeout(function () { Array.prototype.forEach.call(document.querySelectorAll(".hoja .vecino-tarjeta.nuevo .cara, .hoja .premio-postal .postal"), function (el) {
+        var r = el.getBoundingClientRect(); chispas(r.left + r.width / 2, r.top + r.height / 2, { n: 10, radio: 60, ms: 900 }); }); }, 1100);
       var esc = document.querySelector(".hoja .escena");
       if (esc) Array.prototype.forEach.call(esc.querySelectorAll(".d"), function (g, i) {
         if (i < +esc.dataset.antes) g.classList.add("si");

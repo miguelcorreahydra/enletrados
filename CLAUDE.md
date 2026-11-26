@@ -66,6 +66,9 @@ Responder siempre en español.
     (`herramientas/pueblo/efectos.js`). `npm run pueblo` regenera el pueblo y las escenas (`npm run kenney` baja las
     piezas); `npm run escenas` muestra las 10 escenas completas;
   - **animaciones en estilo «mágico»** (elegido por el usuario): chispas, halos dorados y estelas de luz;
+  - **postales y vecinos** (26 nov 2026): 20 postales (cada lugar: de día en su nivel 15 y de noche en el 30) y 12 vecinos
+    (`fuente/contenido/vecinos.json`, caras en `fuente/plantillas/vecinos.svg`) que llegan en niveles fijos con su frase y
+    su palabra favorita. Álbum en `/logros/` (lo bloqueado se ve como silueta con su nivel) y enlace en la portada;
   - **sistema de diseño** (26 nov 2026), en `:root` de `estilos.css`: letra `--t-xs` a `--t-3xl` (crece con el ajuste
     «Tamaño de letra»; dentro de la partida solo crece la pista), espaciado `--e-1` a `--e-6` (múltiplos de 4), esquinas
     `--r-s/m/l/xl/pill`, sombras `--s-1/2/3`. **No usar números sueltos.** Botones de 56 px de alto, redondos de 44 px,
