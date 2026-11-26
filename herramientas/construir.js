@@ -75,6 +75,7 @@ const PUEBLO = `<svg class="pueblo" viewBox="0 0 ${GEO.ancho} ${ALTO_PUEBLO}" ro
 <defs>
   <filter id="apagado" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values=".2"/>
     <feComponentTransfer><feFuncR type="linear" slope=".8" intercept=".15"/><feFuncG type="linear" slope=".8" intercept=".14"/><feFuncB type="linear" slope=".8" intercept=".13"/></feComponentTransfer></filter>
+  <radialGradient id="g-halo"><stop offset="0" stop-color="#FFDE8C" stop-opacity=".95"/><stop offset="1" stop-color="#FFDE8C" stop-opacity="0"/></radialGradient>
   <radialGradient id="g-mar" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#9CC3CC"/><stop offset="1" stop-color="#6F9EAD"/></radialGradient>
 </defs>
 <g class="mar"><ellipse cx="${GEO.ancho * 0.68}" cy="${GEO.alto - 30}" rx="${GEO.ancho * 0.4}" ry="${GEO.alto * 0.15}" fill="url(#g-mar)"/>

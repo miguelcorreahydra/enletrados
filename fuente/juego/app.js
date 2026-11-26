@@ -140,6 +140,21 @@
     })(i);
   }
 
+  // ---------- chispas de luz (estilo «mágico», elegido por el usuario el 26 nov 2026) ----------
+  // x, y en coordenadas de la pantalla. modo «estallido»: salen en círculo; «sube»: flotan hacia arriba.
+  function chispas(x, y, op) {
+    if (quieto) return; op = op || {};
+    var n = op.n || 6, radio = op.radio || 36, ms = op.ms || 650;
+    for (var i = 0; i < n; i++) (function (i) {
+      var c = document.createElement("div"), a = i / n * 6.283 + (op.giro || 0), dx, dy;
+      c.className = "chispa"; c.style.left = (x - 3 + (op.ancho ? (Math.random() - 0.5) * op.ancho : 0)) + "px"; c.style.top = (y - 3) + "px";
+      document.body.appendChild(c);
+      if (op.modo === "sube") { dx = (Math.random() - 0.5) * 20; dy = -radio - Math.random() * radio * 0.8; } else { dx = Math.cos(a) * radio; dy = Math.sin(a) * radio; }
+      c.animate([{ opacity: 0, transform: "scale(1)" }, { opacity: 1, offset: 0.15 }, { opacity: 0, transform: "translate(" + dx + "px," + dy + "px) scale(.2)" }],
+        { duration: ms, delay: (op.delay || 0) + (op.escalonar ? i * op.escalonar : 0), easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" }).onfinish = function () { c.remove(); };
+    })(i);
+  }
+
   // ---------- confeti: canvas propio, unas 140 piezas de papel ----------
   function confeti() {
     if (quieto) return;
@@ -172,9 +187,15 @@
     var v = $("velo"); if (!v) return;
     v.addEventListener("click", function (e) { if (e.target.id === "velo" || e.target.id === "cerrar" || (e.target.closest && e.target.closest('[data-accion="cerrar"]'))) cerrar(); });
   }
+  // después de abrir la hoja: un estallido de chispas en cada estrella ganada, al ritmo de su entrada
+  function chispasEstrellas() {
+    Array.prototype.forEach.call(document.querySelectorAll(".hoja .estrellas.entra .est.si"), function (e, i) {
+      setTimeout(function () { var r = e.getBoundingClientRect(); chispas(r.left + r.width / 2, r.top + r.height / 2, { n: 7, radio: 46, ms: 720 }); }, 350 + i * 180 + 380);
+    });
+  }
   function estrellasHtml(n, animar) {
     var h = '<div class="estrellas' + (animar ? " entra" : "") + '" aria-label="' + n + ' de 3 estrellas">';
-    for (var i = 0; i < 3; i++) h += '<svg class="i' + (i < n ? " si" : "") + '" style="--i:' + i + '"><use href="#i-estrella"/></svg>';
+    for (var i = 0; i < 3; i++) h += '<span class="est' + (i < n ? " si" : "") + '" style="--i:' + i + '"><span class="rayos"></span><svg class="i"><use href="#i-estrella"/></svg></span>';
     return h + "</div>";
   }
   var COFRE = '<svg class="cofre" viewBox="0 0 120 96" aria-hidden="true"><ellipse cx="60" cy="90" rx="44" ry="5" fill="rgb(0 0 0 / .12)"/>' +
@@ -214,6 +235,27 @@
     }, { once: true });
   }
 
+  // revelado «mágico»: halo dorado, la capa de color sube desde abajo y flotan chispas
+  function encenderLugar(g) {
+    if (quieto) return;
+    var svg = g.ownerSVGElement, ns = "http://www.w3.org/2000/svg", x = +g.getAttribute("x"), y = +g.getAttribute("y"), w = +g.getAttribute("width"), h = +g.getAttribute("height");
+    var cp = document.createElementNS(ns, "clipPath"), rect = document.createElementNS(ns, "rect"), id = "sube-" + g.dataset.mundo;
+    cp.id = id; rect.setAttribute("x", x); rect.setAttribute("width", w); rect.setAttribute("y", y + h); rect.setAttribute("height", 0);
+    cp.appendChild(rect); svg.querySelector("defs").appendChild(cp); g.setAttribute("clip-path", "url(#" + id + ")");
+    var halo = document.createElementNS(ns, "ellipse");
+    halo.setAttribute("cx", x + w / 2); halo.setAttribute("cy", y + h * 0.6); halo.setAttribute("rx", w * 0.9); halo.setAttribute("ry", h * 0.55);
+    halo.setAttribute("fill", "url(#g-halo)"); halo.setAttribute("class", "halo-lugar"); svg.insertBefore(halo, g);
+    var t0 = performance.now(), dur = 1300;
+    (function paso(t) {
+      var k = Math.max(0, Math.min(1, (t - t0) / dur)), e = Math.max(0, Math.min(1, k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2));
+      rect.setAttribute("y", y + h * (1 - e)); rect.setAttribute("height", h * e);
+      if (k < 1) requestAnimationFrame(paso); else { g.removeAttribute("clip-path"); cp.remove(); setTimeout(function () { halo.remove(); }, 1600); }
+    })(t0);
+    var b = g.getBoundingClientRect();
+    chispas(b.left + b.width / 2, b.top + b.height * 0.8, { n: 12, radio: 60, ms: 1300, modo: "sube", ancho: b.width * 0.8, escalonar: 70, delay: 200 });
+    suena.cofre();
+  }
+
   function portada(sitio) {
     var n = nivelActual(sitio), m = mundoDe(sitio, n), hechos = hechosEn(m);
     var jugar = $("b-jugar");
@@ -227,7 +269,11 @@
       var g = document.querySelector('.pueblo .luz-lugar[data-mundo="' + mu.id + '"]'); if (!g) return;
       var completo = hechosEn(mu) >= (mu.hasta - mu.desde + 1) && mu.hasta <= sitio.total;
       if (!completo && mu.id !== m.id) return;
-      g.addEventListener("load", function () { g.classList.add(completo ? "encendido" : "en-curso"); }, { once: true });
+      var codigo = mu.id + (completo ? "e" : "c"), nuevoLugar = (p.lugaresVistos || []).indexOf(codigo) < 0;
+      g.addEventListener("load", function () {
+        g.classList.add(completo ? "encendido" : "en-curso");
+        if (nuevoLugar) { p.lugaresVistos = (p.lugaresVistos || []).concat(codigo); guardarP(); setTimeout(function () { encenderLugar(g); }, 500); }
+      }, { once: true });
       g.setAttribute("href", g.dataset.src); // la capa de color se baja solo para los lugares encendidos
     });
     var pt = sitio.pines && sitio.pines[m.id], pin = $("pin");
@@ -500,12 +546,18 @@
         el.style.cssText = "left:" + (r.left + r.width / 2 - lado / 2) + "px;top:" + (r.top + r.height / 2 - lado / 2) + "px;width:" + lado + "px;height:" + lado + "px;font-size:" + Math.round(lado * 0.56) + "px";
         document.body.appendChild(el);
         var dx = (o.left + o.width / 2) - (r.left + r.width / 2), dy = (o.top + o.height / 2) - (r.top + r.height / 2), s0 = Math.max(o.width, o.height) / lado;
-        var fin1 = dorada ? 0.25 : 1;
+        var fin1 = dorada ? 0.25 : 1, alto = dorada ? 46 : 60;
         var an = el.animate([
           { transform: "translate(" + dx + "px," + dy + "px) scale(" + s0 + ")", opacity: 1 },
-          { transform: "translate(" + dx * 0.45 + "px," + (dy * 0.45 - 46) + "px) scale(" + (s0 + fin1) / 2 * 1.2 + ")", opacity: 1, offset: 0.5 },
+          { transform: "translate(" + dx * 0.4 + "px," + (dy * 0.4 - alto) + "px) scale(" + (s0 + fin1) / 2 * 1.15 + ") rotate(-8deg)", opacity: 1, offset: 0.5 },
           { transform: "translate(0,0) scale(" + fin1 + ")", opacity: dorada ? 0 : 1 }
-        ], { duration: 520, delay: i * 70, easing: "cubic-bezier(.45,0,.25,1)", fill: "both" });
+        ], { duration: 600, delay: i * 70, easing: "cubic-bezier(.45,0,.25,1)", fill: "both" });
+        // estela de chispas detrás de cada letra
+        var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        for (var k = 0; k < 5; k++) (function (k) {
+          var f = k / 5, px = cx + dx * (1 - f) * 0.62, py = cy + dy * (1 - f) * 0.62 - alto * 0.9 * Math.sin(f * 3.14);
+          chispas(px, py, { n: 1, radio: 10, ms: 520, delay: i * 70 + 110 + k * 50, giro: k });
+        })(k);
         an.onfinish = function () { el.remove(); alLlegar && alLlegar(i); if (!--quedan && fin) fin(); };
       });
     }
@@ -533,7 +585,8 @@
         var clones = copiarFichas(); $("actual").innerHTML = ""; // se mide antes de vaciar la burbuja
         volar(clones, destinos.map(celdaEl), false, function (j) {
           var el = celdaEl(destinos[j]); if (!el) return;
-          el.classList.remove("esperando"); el.style.setProperty("--j", 0); el.classList.add("gira", "brilla");
+          el.classList.remove("esperando"); el.classList.add("luz");
+          var rc = el.getBoundingClientRect(); chispas(rc.left + rc.width / 2, rc.top + rc.height / 2, { n: 5, radio: rc.width * 0.75, ms: 600, giro: j });
         }, function () {
           if (esDorada) { suena.dorada(); aviso("¡Palabra dorada! +10 monedas"); ganarMonedas(10, celdaEl(destinos[0])); }
           if (seleccion < 0) setTimeout(completado, esDorada ? 900 : 450);
@@ -568,7 +621,7 @@
       persistir(); evento("enl_ayuda", { tipo: todas ? "palabra" : "letra", nivel: D.n, modo: modo });
       if (encontrada(seleccion)) seleccion = siguientePendiente(seleccion);
       dibujarGrilla({ sinEntrada: true }); dibujarPista(true); dibujarGuia(); progresoDiario(); suena.extra();
-      nuevas.forEach(function (k, j) { var el = celdaEl(k); if (el) { el.style.setProperty("--j", j); el.classList.add("gira", "brilla"); } });
+      nuevas.forEach(function (k, j) { var el = celdaEl(k); if (el) { el.classList.add("luz"); var rc = el.getBoundingClientRect(); chispas(rc.left + rc.width / 2, rc.top + rc.height / 2, { n: 5, radio: rc.width * 0.75, delay: j * 70 }); } });
       if (seleccion < 0) setTimeout(completado, 800); else esperarTilde();
     }
     function pedirLetra() {
@@ -622,7 +675,7 @@
       suena.completo(); vibrar([20, 60, 20, 60, 40]); confeti();
 
       var elogios = ["¡Muy bien!", "¡Excelente!", "¡Impecable!", "¡Así se hace!", "¡Bravo!", "¡Qué buena mente!"];
-      var h = "<h2>" + (est === 3 ? "¡Perfecto!" : elogios[(D.n * 7) % elogios.length]) + '</h2><p class="sub">Nivel ' + D.n + " completado</p>" + estrellasHtml(est, true);
+      var h = '<h2 class="brillo">' + (est === 3 ? "¡Perfecto!" : elogios[(D.n * 7) % elogios.length]) + '</h2><p class="sub">Nivel ' + D.n + " completado</p>" + estrellasHtml(est, true);
       var premios = [];
       if (!mismo) premios.push("+10 monedas");
       if (st.x.length) premios.push("+" + st.x.length * 2 + " por palabras extra");
@@ -647,7 +700,7 @@
       h += '<div class="botones">' + sig + '<a class="boton sec" href="/" data-google-interstitial="false">Volver al pueblo</a></div>';
       h += ofertaNavegador(D.n, D.siguiente || location.pathname);
       h += '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)<br>Solo en esta pantalla, 36 px debajo de los botones</div>';
-      abrir(h);
+      abrir(h); chispasEstrellas();
       var esc = document.querySelector(".hoja .escena");
       if (esc) Array.prototype.forEach.call(esc.querySelectorAll(".d"), function (g, i) {
         if (i < +esc.dataset.antes) g.classList.add("si"); else if (i < +esc.dataset.det) g.classList.add("nuevo");
@@ -667,7 +720,7 @@
       }
       var r = rachaVigente(), fechaLarga = new Date().toLocaleDateString("es", { day: "numeric", month: "long" });
       compartirTexto = "Enletrados · El Diario del Pueblo\n" + fechaLarga + "\n" + cuadros + "\n" + "⭐".repeat(est) + (r > 1 ? " · 🔥 " + r + " días" : "") + "\nhttps://enletrados.com/diario/";
-      var h = '<h2>¡Diario completo!</h2><p class="sub">El tablero del ' + fechaLarga + "</p>" + estrellasHtml(est, nuevo) +
+      var h = '<h2 class="brillo">¡Diario completo!</h2><p class="sub">El tablero del ' + fechaLarga + "</p>" + estrellasHtml(est, nuevo) +
         '<div class="resultado" aria-label="Tu resultado">' + cuadros + "</div>" +
         '<p class="premios">' + (nuevo ? "+25 monedas · " : "") + (r ? "Racha de " + r + (r === 1 ? " día" : " días") : "") + "</p>" +
         (msgRacha ? '<p class="premios">' + msgRacha + "</p>" : "") +
@@ -677,7 +730,7 @@
         '<a class="boton sec" href="/" data-google-interstitial="false">Volver al pueblo</a></div>' +
         '<p class="nota-chica">Mañana habrá un tablero nuevo en el Diario.</p>' + repaso() +
         '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>';
-      abrir(h);
+      abrir(h); if (nuevo) chispasEstrellas();
       setTimeout(function () { pintarMonedas(true); }, 900);
     }
 
