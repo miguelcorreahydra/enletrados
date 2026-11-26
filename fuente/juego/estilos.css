@@ -448,6 +448,7 @@ body.con-anchor { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
 .escena .flota { animation: flota 3.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -1.1s); transform-box: fill-box; transform-origin: center; }
 @keyframes flota { 25% { transform: translate(4px, -5px) scaleX(.7); } 50% { transform: translate(8px, 0); } 75% { transform: translate(4px, -4px) scaleX(.8); } }
 .escena .titila { animation: parpadeo 1.8s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -.37s); }
+.escena .titila.lento { animation-duration: 3.4s; }
 .escena .fugaz { animation: fugaz 5s ease-in infinite; }
 @keyframes fugaz { 0%, 70% { opacity: 0; transform: none; } 75% { opacity: 1; } 92%, 100% { opacity: 0; transform: translate(-70px, 24px); } }
 .escena .haz-e { animation: haz-e 5s ease-in-out infinite; transform-origin: 182px 28px; }

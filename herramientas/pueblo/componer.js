@@ -24,8 +24,10 @@ async function cerrar() { if (nav) await nav.close(); nav = null; }
 // que queda delante del lugar lo tapa igual que en la imagen completa. Con op.recortar se recorta al contenido visible.
 async function componer(piezas, op) {
   const lista = ordenar(piezas).map(p => Object.assign({}, p, posicion(p), op.capa ? { borra: !op.capa(p) } : {}));
-  const minX = Math.min(...lista.map(p => p.x)), minY = Math.min(...lista.map(p => p.y));
-  const maxX = Math.max(...lista.map(p => p.x + IW)), maxY = Math.max(...lista.map(p => p.y + IH));
+  const rc = op.recorte;
+  // la caja de dibujo incluye el recorte, aunque salga de la maqueta (por ejemplo, el cielo sobre el faro)
+  const minX = Math.min(...lista.map(p => p.x), rc ? rc.x : Infinity), minY = Math.min(...lista.map(p => p.y), rc ? rc.y : Infinity);
+  const maxX = Math.max(...lista.map(p => p.x + IW), rc ? rc.x + rc.w : -Infinity), maxY = Math.max(...lista.map(p => p.y + IH), rc ? rc.y + rc.h : -Infinity);
   const nombres = [...new Set(lista.map(p => p.t))];
   const imagenes = Object.fromEntries(nombres.map(t => [t, "data:image/png;base64," + fs.readFileSync(archivo(t)).toString("base64")]));
   const recorte = op.recorte || null; // { x, y, w, h } en píxeles de la composición, si se quiere solo una parte
@@ -36,6 +38,7 @@ async function componer(piezas, op) {
     const c = document.createElement("canvas"); c.width = caja.w; c.height = caja.h; const x = c.getContext("2d");
     for (const q of lista) {
       x.globalCompositeOperation = q.borra ? "destination-out" : "source-over";
+      x.filter = q.filtro && !q.borra ? q.filtro : "none"; // por ejemplo, los alrededores apagados en las escenas
       x.drawImage(im[q.t], q.x - caja.x, q.y - caja.y);
     }
     x.globalCompositeOperation = "source-over";

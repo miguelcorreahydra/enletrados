@@ -12,6 +12,9 @@
     "construir": "node herramientas/construir.js",
     "start": "node herramientas/servidor.js",
     "dev": "node herramientas/servidor.js --vigilar",
-    "capturas": "node herramientas/pruebas/capturas.js"
+    "capturas": "node herramientas/pruebas/capturas.js",
+    "kenney": "sh herramientas/descargar_kenney.sh",
+    "pueblo": "node herramientas/pueblo/armar.js && node herramientas/pueblo/escenas.js",
+    "escenas": "node herramientas/pruebas/escenas.js"
   }
 }

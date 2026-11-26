@@ -9,7 +9,7 @@ const RAIZ = path.join(__dirname, "../.."), ANCHO = 920, IMG = path.join(RAIZ, "
 
 (async () => {
   fs.mkdirSync(IMG, { recursive: true });
-  const r = await componer(piezas, { ancho: ANCHO, calidad: 72, salida: path.join(IMG, "pueblo.webp") });
+  const r = await componer(piezas, { ancho: ANCHO, calidad: 62, salida: path.join(IMG, "pueblo.webp") });
   const k = r.escala, a = v => Math.round(v * 10) / 10;
   const geo = { ancho: ANCHO, alto: Math.round(r.caja.h * k), lugares: {} };
   let total = r.bytes;

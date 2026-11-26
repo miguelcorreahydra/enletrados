@@ -8,12 +8,12 @@
     "hasta": 30,
     "frase": "Cada mañana olía a pan recién hecho. Hoy el recetario está en blanco.",
     "detalles": [
-      "las luces de la vitrina",
-      "el letrero",
-      "el toldo",
-      "las flores",
+      "las luces de las ventanas",
+      "el árbol",
+      "el cerco",
+      "el huerto",
       "el humo del horno",
-      "el farol y el pan"
+      "las guirnaldas"
     ]
   },
   {
@@ -25,10 +25,10 @@
     "hasta": 60,
     "frase": "Las flores ya no recuerdan sus nombres.",
     "detalles": [
-      "el agua de la fuente",
-      "los bancos",
-      "los faroles",
+      "el agua del pozo",
       "las flores",
+      "los árboles",
+      "el huerto",
       "las mariposas",
       "las guirnaldas"
     ]
@@ -42,12 +42,12 @@
     "hasta": 90,
     "frase": "Los letreros de las tiendas quedaron mudos.",
     "detalles": [
-      "las vitrinas encendidas",
-      "los letreros",
-      "los faroles",
-      "el reloj",
-      "los toldos",
-      "las guirnaldas de luces"
+      "las ventanas encendidas",
+      "una casa nueva",
+      "otra casa más",
+      "el árbol de la esquina",
+      "las guirnaldas",
+      "los farolitos"
     ]
   },
   {
@@ -60,11 +60,11 @@
     "frase": "Los barcos no saben a qué puerto volver.",
     "detalles": [
       "las luces del muelle",
-      "la barca",
+      "el cerco",
+      "las rocas de la orilla",
       "las gaviotas",
-      "las boyas",
-      "las banderas",
-      "el velero"
+      "la barca",
+      "las banderas"
     ]
   },
   {
@@ -77,8 +77,8 @@
     "frase": "Desde arriba se ve todo, pero nadie sabe cómo se llama.",
     "detalles": [
       "la baranda",
-      "el catalejo",
-      "las banderas",
+      "el árbol",
+      "la torre antigua",
       "las aves",
       "las nubes",
       "el arcoíris"
@@ -93,12 +93,12 @@
     "hasta": 180,
     "frase": "Los boletos no dicen adónde van.",
     "detalles": [
-      "las luces del andén",
+      "las luces de la estación",
+      "el cerco del andén",
       "el reloj",
-      "los bancos",
-      "el letrero",
-      "el tren",
-      "el vapor del tren"
+      "el árbol",
+      "el vapor del tren",
+      "las guirnaldas"
     ]
   },
   {
@@ -110,11 +110,11 @@
     "hasta": 210,
     "frase": "La banda toca, pero las canciones perdieron la letra.",
     "detalles": [
-      "las luces del kiosco",
-      "las guirnaldas",
+      "los farolitos",
+      "el árbol",
       "las notas musicales",
-      "los atriles",
-      "los bancos",
+      "las flores",
+      "las guirnaldas",
       "el banderín"
     ]
   },
@@ -128,10 +128,10 @@
     "frase": "En las casas nadie encuentra nada: todo perdió su nombre.",
     "detalles": [
       "las ventanas encendidas",
+      "una casa nueva",
+      "otra casa más",
       "el humo de las chimeneas",
-      "los maceteros",
-      "la ropa tendida",
-      "el gato del tejado",
+      "el huerto",
       "las guirnaldas"
     ]
   },
@@ -144,12 +144,12 @@
     "hasta": 270,
     "frase": "Los árboles susurran, pero sin palabras.",
     "detalles": [
-      "los faroles del sendero",
       "las luciérnagas",
-      "los hongos",
-      "la ardilla",
-      "el puente",
-      "la cabaña encendida"
+      "más pinos",
+      "el pino grande",
+      "las rocas del sendero",
+      "los arbustos",
+      "la cabaña"
     ]
   },
   {
@@ -162,9 +162,9 @@
     "frase": "Las estrellas esperan que alguien vuelva a nombrarlas.",
     "detalles": [
       "la luz del faro",
+      "el observatorio",
+      "las rocas",
       "las estrellas",
-      "la cúpula abierta",
-      "el telescopio",
       "la luna",
       "la estrella fugaz"
     ]

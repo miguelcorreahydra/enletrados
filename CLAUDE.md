@@ -61,7 +61,12 @@ Responder siempre en español.
     `fuente/imagenes/pueblo.webp` (se ve apagado) y `lugar-N.webp` (cada lugar con color, recortado a su silueta; solo se
     bajan los encendidos). El mapa está en `herramientas/pueblo/pueblo.js`;
   - la primera carga cuenta letras e imágenes: portada ~96 KB, nivel ~47 KB;
-  - pendiente: escenas de los lugares con el mismo estilo, animaciones con resorte y sistema de diseño.
+  - **escenas de los 10 lugares** (tarjeta de «nivel completado»): acercamiento a la maqueta, con el lugar en color y los
+    alrededores apagados. Sus 6 detalles son piezas (marcadas con `d` en `pueblo.js`) o efectos de luz en SVG
+    (`herramientas/pueblo/efectos.js`). `npm run pueblo` regenera el pueblo y las escenas (`npm run kenney` baja las
+    piezas); `npm run escenas` muestra las 10 escenas completas;
+  - **animaciones en estilo «mágico»** (elegido por el usuario): chispas, halos dorados y estelas de luz;
+  - pendiente: sistema de diseño (tamaños, espaciado, sombras e íconos).
 - **Tandas 4 y 5** (26 nov 2026): 282 palabras de la vida diaria y 296 de 5–6 letras, revisadas y aprobadas por Claude.
   Fuera por doble sentido o tema delicado: yegua, pandero, enano, nicho, cadete, alcalde (agregadas al bloqueo).
   Total: **2.070 palabras con pista aprobada**. El diario tiene **730 tableros (dos años)**: 3 días de 5 letras, 3 de

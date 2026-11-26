@@ -703,7 +703,11 @@
       abrir(h); chispasEstrellas();
       var esc = document.querySelector(".hoja .escena");
       if (esc) Array.prototype.forEach.call(esc.querySelectorAll(".d"), function (g, i) {
-        if (i < +esc.dataset.antes) g.classList.add("si"); else if (i < +esc.dataset.det) g.classList.add("nuevo");
+        if (i < +esc.dataset.antes) g.classList.add("si");
+        else if (i < +esc.dataset.det) {
+          g.classList.add("nuevo"); // el detalle nuevo aparece con un destello de chispas
+          setTimeout(function () { var r = g.getBoundingClientRect(); if (r.width) chispas(r.left + r.width / 2, r.top + r.height * 0.7, { n: 10, radio: 50, ms: 1100, modo: "sube", ancho: Math.min(r.width, 160), escalonar: 60 }); }, 900);
+        }
       });
       setTimeout(function () { var b = $("barra-escena"); if (b) b.style.setProperty("--p", ahora / totalMundo * 100); }, 350);
       setTimeout(function () { pintarMonedas(true); if (cofre) { suena.cofre(); var c = document.querySelector(".hoja .cofre"); if (c) c.classList.add("abre"); } }, 900);

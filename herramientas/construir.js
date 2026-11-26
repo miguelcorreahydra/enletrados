@@ -114,7 +114,25 @@ pagina("/ajustes/", Object.assign({ titulo: "Ajustes · Enletrados", pagina: "aj
   contenido: plantilla("ajustes.html", {}) }, NOINDEX));
 
 // niveles
-const ESCENAS = { 1: "panaderia", 2: "plaza", 3: "calle", 4: "puerto", 5: "mirador", 6: "estacion", 7: "kiosco", 8: "casas", 9: "bosque", 10: "faro" };
+// escena de cada lugar (tarjeta de «nivel completado»): acercamiento a la maqueta con 6 detalles (piezas o efectos de luz).
+// Va dentro de un <template>: sus imágenes se bajan recién al completar el nivel.
+const ESC = JSON.parse(leer("contenido/escenas.json")), { dibujar } = require("./pueblo/efectos");
+function escena(id) {
+  const e = ESC[id], partes = [];
+  for (let d = 1; d <= 6; d++) {
+    const c = e.capas[d], img = c ? `<image href="${ARCHIVO[`escena-${id}-d${d}.webp`]}" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}"/>` : "";
+    partes.push(`<g class="d d${d}">${img}${e.efectos.filter(f => f.d === d).map(f => dibujar(f, e.escala)).join("")}</g>`);
+  }
+  return `<svg class="escena" viewBox="0 0 ${e.ancho} ${e.alto}" aria-hidden="true"><defs>
+<linearGradient id="e-cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--cielo-a)"/><stop offset="1" style="stop-color:var(--cielo-b)"/></linearGradient>
+<radialGradient id="e-luz"><stop offset="0" stop-color="#FFE3A3"/><stop offset="1" stop-color="#FFE3A3" stop-opacity="0"/></radialGradient>
+<radialGradient id="e-mar" cx=".5" cy=".3" r=".7"><stop offset="0" stop-color="#9CC3CC"/><stop offset="1" stop-color="#6F9EAD"/></radialGradient></defs>
+<rect width="${e.ancho}" height="${e.alto}" fill="url(#e-cielo)"/><circle class="sol" cx="${e.ancho - 70}" cy="60" r="26" fill="#F2C27B" opacity=".8"/>
+<ellipse cx="${e.ancho / 2}" cy="${e.alto + 30}" rx="${e.ancho * 0.75}" ry="90" fill="url(#e-mar)"/>
+<image href="${ARCHIVO[`escena-${id}.webp`]}" width="${e.ancho}" height="${e.alto}"/>
+${partes.join("\n")}
+<g class="tilde-posada"><use href="#tilde" x="${e.tilde[0] - 24}" y="${e.tilde[1] - 30}" width="48" height="30"/></g></svg>`;
+}
 niveles.forEach((l, i) => {
   const n = i + 1, m = mundos.find(x => n >= x.desde && n <= x.hasta), totalMundo = m.hasta - m.desde + 1, pos = n - m.desde + 1;
   const datos = { n, total: TOTAL, mundo: { id: m.id, lugar: m.lugar, color: m.color, desde: m.desde, hasta: m.hasta, detalles: m.detalles },
@@ -124,7 +142,7 @@ niveles.forEach((l, i) => {
   pagina(`/nivel/${n}/`, { titulo: `Nivel ${n} · ${m.lugar} · Enletrados`, pagina: "nivel", clase: "nivel", robots: "noindex, follow", indexar: false,
     descripcion: `Nivel ${n} de Enletrados: completa el crucigrama con las letras de la rueda.`,
     contenido: plantilla("nivel.html", { n, lugar: esc(m.lugar), posicion: pos, totalMundo, porcentaje: (pos / totalMundo * 100).toFixed(1),
-      escena: ESCENAS[m.id] ? leer(`plantillas/escenas/${ESCENAS[m.id]}.svg`).trim() : "", datos: json(datos) }) });
+      escena: ESC[m.id] ? escena(m.id) : "", datos: json(datos) }) });
 });
 
 // cómo jugar, quiénes somos, contacto, créditos y páginas legales (en el índice de Google)
