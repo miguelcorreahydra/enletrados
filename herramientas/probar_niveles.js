@@ -51,6 +51,10 @@ function probar(lista, nombre, ventana, letrasEsperadas) {
     if (visit.size !== celdas.size) mal("el crucigrama tiene partes sueltas");
     recientes.push(l.palabras.map(w => w.p)); if (recientes.length > ventana) recientes.shift();
   });
+  // que no se repitan muchas palabras en todo el juego (pedido del usuario, 26 nov 2026)
+  const veces = {}; lista.forEach(l => l.palabras.forEach(w => { veces[w.p] = (veces[w.p] || 0) + 1; }));
+  const tope = nombre === "Nivel" ? 4 : 10, pasadas = Object.entries(veces).filter(([, n]) => n > tope);
+  if (pasadas.length) { errores += pasadas.length; console.log(`  ✗ ${nombre}: más de ${tope} veces: ${pasadas.map(([w, n]) => w + "×" + n).join(", ")}`); }
   console.log(`${nombre}: ${lista.length} revisados`);
 }
 

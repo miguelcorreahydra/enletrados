@@ -59,6 +59,9 @@ Responder siempre en español.
   Fuera por doble sentido o tema delicado: yegua, pandero, enano, nicho, cadete, alcalde (agregadas al bloqueo).
   Total: **2.070 palabras con pista aprobada**. El diario tiene **730 tableros (dos años)**: 3 días de 5 letras, 3 de
   6 y 1 de 7 por semana (`npm run generar` genera 730; `--dias N` para otro número).
+- **Que no se repitan palabras** (pedido del usuario, 26 nov 2026): el generador prefiere las palabras menos usadas y
+  pone un tope: 4 veces en los 300 niveles y 10 en los 730 tableros del diario. `probar_niveles.js` lo comprueba.
+  Tanda 6: 130 palabras cortas (3 y 4 letras), que eran las que más se repetían. Total: 2.200 con pista aprobada.
 
 ## Historia y diseño (decididos el 24 nov 2026)
 - **Historia: «El pueblo que perdió sus palabras».** Una noche de viento se llevó las palabras del pueblo; el jugador,

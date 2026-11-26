@@ -114,14 +114,18 @@ function plan(n) {
 }
 
 // Intenta armar un nivel con una palabra principal dada. Devuelve null si no alcanza.
+// Uso total de cada palabra (pedido del usuario, 26 nov 2026: que no se repitan muchas palabras en el juego).
+// Se prefieren las menos usadas y ninguna pasa del tope en toda la serie (niveles y diario se cuentan aparte).
+let usos = new Map(), TOPE = 4, TOPE_EXTRA = 0; // TOPE_EXTRA: solo en el último intento, si no hay otra salida
+const vecesUsada = w => usos.get(w) || 0;
 function intentar(base, p, prohibidas) {
   const letras = cuenta(base);
-  const posibles = RESPUESTAS.filter(w => w !== base && !prohibidas.has(w) && cabe(w, letras));
+  const posibles = RESPUESTAS.filter(w => w !== base && !prohibidas.has(w) && vecesUsada(w) < TOPE + TOPE_EXTRA && cabe(w, letras));
   if (posibles.length < p.min - 1) return null;
   // nunca una palabra y su plural en el mismo nivel («ala» y «alas»)
   const plural = (x, y) => x === y + "s" || x === y + "es" || y === x + "s" || y === x + "es";
   const elegidas = [base];
-  for (const w of posibles.sort((a, b) => (rangoDe(a) - rangoDe(b)) + (azar() - 0.5) * 900)) {
+  for (const w of posibles.sort((a, b) => (rangoDe(a) + vecesUsada(a) * 2500) - (rangoDe(b) + vecesUsada(b) * 2500) + (azar() - 0.5) * 900)) {
     if (elegidas.length >= p.max + 5) break;
     if (!elegidas.some(x => plural(x, w))) elegidas.push(w);
   }
@@ -142,6 +146,7 @@ function generarSerie(cant, planDe, ventana, basesUsadas, temaDe) {
     // relajar de a poco si no alcanza: más palabras candidatas, luego una palabra menos y, al final, cualquier palabra
     // con pista sin importar su frecuencia (todas las que tienen pista son de uso común)
     for (const relajo of [0, 1, 2, 3]) {
+      TOPE_EXTRA = relajo === 3 ? 2 : 0;
       const q = Object.assign({}, p, { base: relajo === 3 ? Infinity : p.base * (1 + relajo), min: Math.max(2, p.min - (relajo >= 2 ? 1 : 0)) });
       const ok = w => w.length === q.largo && !basesUsadas.has(w) && !prohibidas.has(w);
       const delTema = barajar((temaDe(p) || []).filter(w => ok(w) && RESPUESTAS.includes(w) && rangoDe(w) < q.base * 2));
@@ -156,6 +161,7 @@ function generarSerie(cant, planDe, ventana, basesUsadas, temaDe) {
     basesUsadas.add(hecho.palabras[0].p);
     if (tema) hecho.tema = true; if (p.respiro) hecho.respiro = true; if (p.grande) hecho.grande = true;
     serie.push(hecho);
+    hecho.palabras.forEach(x => usos.set(x.p, vecesUsada(x.p) + 1));
     recientes.push(hecho.palabras.map(x => x.p)); if (recientes.length > ventana) recientes.shift();
   }
   return { serie };
@@ -170,6 +176,7 @@ fs.writeFileSync(C("niveles.json"), JSON.stringify(r.serie) + "\n");
 semilla = 20270101;
 // 3 días de 5 letras, 3 de 6 y 1 de 7 (un tablero algo más grande, como el del domingo en los diarios de papel)
 const planDiario = n => (n % 7 === 6 ? { largo: 7, min: 5, max: 8, base: 8000, lado: 8 } : { largo: n % 7 >= 3 ? 6 : 5, min: 4, max: 7, base: 4000, lado: 7 });
+usos = new Map(); TOPE = 8; // el diario es otro grupo: dos años de tableros, con su propio tope (una vez cada ~3 meses)
 const d = generarSerie(DIAS, planDiario, VENTANA_DIARIO, basesUsadas, () => null);
 fs.writeFileSync(C("diario.json"), JSON.stringify(d.serie) + "\n");
 
