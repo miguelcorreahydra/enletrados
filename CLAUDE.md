@@ -80,6 +80,10 @@ Responder siempre en español.
 - **Que no se repitan palabras** (pedido del usuario, 26 nov 2026): el generador prefiere las palabras menos usadas y
   pone un tope: 4 veces en los 300 niveles y 10 en los 730 tableros del diario. `probar_niveles.js` lo comprueba.
   Tanda 6: 130 palabras cortas (3 y 4 letras), que eran las que más se repetían. Total: 2.200 con pista aprobada.
+- **Tanda 7 y repaso** (26 nov 2026): 300 palabras (herramientas, naturaleza, ropa, cocina, comercio, verbos, adjetivos,
+  emociones, animales, escuela, deportes, música, casa, materiales, transporte, oficios y figuras) y 13 pistas viejas
+  corregidas por vagas. Fuera por doble sentido o tema delicado: caliente, perico, gordo, moreno, granada, pesebre.
+  **Meta cumplida: 2.500 palabras con pista aprobada.**
 
 ## Historia y diseño (decididos el 24 nov 2026)
 - **Historia: «El pueblo que perdió sus palabras».** Una noche de viento se llevó las palabras del pueblo; el jugador,
