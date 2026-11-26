@@ -5,7 +5,7 @@
 const fs = require("fs");
 const SR = 44100;
 
-function sintetizar(salida, segundos, eventos) {
+function sintetizar(salida, segundos, eventos, estilo) {
   const n = Math.ceil(segundos * SR), mix = new Float32Array(n);
   const sumar = (t0, f) => { const i0 = Math.floor(t0 * SR); for (let i = 0; i < f.length && i0 + i < n; i++) if (i0 + i >= 0) mix[i0 + i] += f[i]; };
   const env = (t, a, d) => t < a ? t / a : Math.exp(-(t - a) / d);
@@ -21,12 +21,18 @@ function sintetizar(salida, segundos, eventos) {
   const palmas = vol => { const s = new Float32Array(Math.floor(0.18 * SR)); let lp = 0; for (let i = 0; i < s.length; i++) { const t = i / SR, r = ruido(); lp += 0.35 * (r - lp);
     s[i] = vol * (r - lp) * (Math.exp(-t * 24) + 0.6 * Math.exp(-Math.abs(t - 0.012) * 300)); } return s; };
   const platillo = vol => { const s = new Float32Array(Math.floor(0.05 * SR)); let prev = 0; for (let i = 0; i < s.length; i++) { const r = ruido(); s[i] = vol * (r - prev) * Math.exp(-i / SR * 70); prev = r; } return s; };
+  // «whoosh»: ruido que sube y baja, filtrado de a poco (cortes de escena y viento)
+  const soplo = (dur, vol) => { const s = new Float32Array(Math.floor(dur * SR)); let lp = 0; for (let i = 0; i < s.length; i++) { const t = i / SR, x = t / dur;
+    const a = 0.02 + 0.25 * Math.sin(Math.PI * x); lp += a * (ruido() - lp); s[i] = vol * lp * Math.sin(Math.PI * x) * 3; } return s; };
   const destello = (t0, base, vol) => [0, 4, 7, 12, 16].forEach((m, k) => sumar(t0 + k * 0.045, marimba(nota(base + m), 0.5, vol)));
 
   // ---------- música de fondo ----------
   const pulso = 60 / 124, inicio = 0, finMusica = (eventos.find(e => e.e === "final") || { t: segundos * 1000 }).t / 1000;
   const acordes = [[60, 64, 67], [55, 59, 62], [57, 60, 64], [53, 57, 60]], raices = [36, 31, 33, 29]; // Do, Sol, La m, Fa
-  const entraBateria = ((eventos.find(e => e.e === "palabra") || { t: 1500 }).t / 1000) - 0.25;
+  // la batería entra con el evento «ritmo» si existe (la historia empieza suave); si no, con la primera palabra
+  const ritmo = eventos.find(e => e.e === "ritmo"), entraBateria = ritmo ? ritmo.t / 1000 : ((eventos.find(e => e.e === "palabra") || { t: 1500 }).t / 1000) - 0.25;
+  // colchón suave antes del ritmo (acordes largos), para la historia
+  if (estilo === "historia") for (let b = 0; b * pulso * 4 < entraBateria; b++) acordes[b % 4].forEach(m => sumar(b * pulso * 4, marimba(nota(m), pulso * 4.2, 0.05)));
   for (let b = 0; inicio + b * pulso < finMusica; b++) {
     const t = inicio + b * pulso, compas = Math.floor(b / 4) % 4, acorde = acordes[compas];
     if (t >= entraBateria) {
@@ -49,6 +55,11 @@ function sintetizar(salida, segundos, eventos) {
     if (ev.e === "cofre") { sumar(t, bajo(nota(43), 0.25, 0.2)); destello(t + 0.2, 79, 0.14); destello(t + 0.45, 84, 0.1); }
     if (ev.e === "lugar") { for (let i = 0; i < 14; i++) sumar(t + 0.3 + i * 0.06, marimba(nota(72 + i * 2), 0.6, 0.07 + i * 0.004)); }
     if (ev.e === "vecino") { destello(t + 0.6, 76, 0.13); }
+    if (ev.e === "corte") sumar(t - 0.18, soplo(0.45, 0.22));
+    if (ev.e === "viento") sumar(t, soplo(2.8, 0.2));
+    if (ev.e === "paso") { sumar(t, marimba(nota(84), 0.25, 0.12)); sumar(t + 0.06, marimba(nota(91), 0.3, 0.1)); }
+    if (ev.e === "tilde") for (let i = 0; i < 6; i++) sumar(t + i * 0.09, marimba(nota(79 + (i % 2) * 5), 0.25, 0.07));
+    if (ev.e === "golpe") { sumar(t, bombo(0.9)); sumar(t, palmas(0.3)); }
   }
   // ---------- mezcla: suavizar picos y normalizar ----------
   let max = 0; for (let i = 0; i < n; i++) { mix[i] = Math.tanh(mix[i] * 1.1); max = Math.max(max, Math.abs(mix[i])); }
