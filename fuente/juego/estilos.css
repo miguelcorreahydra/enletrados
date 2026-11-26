@@ -549,6 +549,24 @@ body.nivel .pista-texto span { font-size: calc(18px * var(--escala)); }
 @supports not (color: rgb(from red r g b)) { .cabecera { background: var(--papel); } }
 body.nivel .cabecera { background: transparent; }
 
+/* oferta de anuncio con recompensa: se reconoce como oferta (etiqueta «Anuncio»), distinta de los botones del juego */
+.oferta-anuncio { position: relative; display: flex; align-items: center; gap: var(--e-3); width: 100%; margin: var(--e-3) 0; padding: var(--e-3) var(--e-4);
+  border-radius: var(--r-l); border: 2px solid var(--dorado); background: linear-gradient(120deg, var(--dorado-claro), var(--crema) 70%); color: var(--tinta);
+  text-align: left; cursor: pointer; font: inherit; overflow: hidden; box-shadow: var(--s-1); }
+.oferta-anuncio::after { content: ""; position: absolute; inset: 0; transform: translateX(-120%) skewX(-20deg); pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / .45), transparent); animation: destello 3.8s 1s infinite; }
+.oferta-anuncio:active { transform: scale(.99); }
+.oferta-anuncio[disabled] { cursor: default; border-color: var(--salvia); }
+.oferta-anuncio[disabled]::after { display: none; }
+.oferta-anuncio .oferta-icono { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--dorado); color: #FFF8EE;
+  box-shadow: 0 0 0 6px rgb(226 182 90 / .22); }
+.oferta-anuncio .oferta-icono svg.i { width: 24px; height: 24px; }
+.oferta-anuncio b { display: block; font-family: var(--serif); font-size: var(--t-l); }
+.oferta-anuncio small { color: var(--tinta-2); font-size: var(--t-s); }
+.oferta-anuncio > span:nth-child(2) { flex: 1; min-width: 0; }
+.etiqueta-anuncio { align-self: flex-start; font-family: var(--redonda); font-weight: 800; font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--tinta-2); border: 1px solid var(--linea); background: var(--crema); border-radius: var(--r-pill); padding: 1px 8px; }
+
 /* ---------- componentes del sistema de diseño ---------- */
 /* tarjetas: todas con la misma esquina y la misma sombra */
 .tarjeta-lugar, .mundo-item, .pista, .racha > div, .cifras div, .logros li, .ajuste, .externo, .escena-tarjeta, .dato-contacto, .cartero, .cofre-tarjeta, .vecino-tarjeta {

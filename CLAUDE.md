@@ -198,8 +198,14 @@ Responder siempre en español.
   - +10 por nivel, +2 por palabra extra y +25 por el desafío diario;
   - revelar una letra cuesta 30 y revelar una palabra cuesta 80;
   - mezclar es gratis.
-  - Sin monedas, se puede ver un anuncio con recompensa para recibir una letra. Siempre es opcional y siempre se puede decir
-    «No, gracias».
+  - **Anuncios con recompensa** (decidido el 26 nov 2026: «que la gente sienta que vale la pena verlo»), siempre opcionales,
+    rotulados «Anuncio» y con el premio solo si se ve completo. Tope de 10 al día por jugador y una oferta por pantalla:
+    - pista sin monedas: **2 letras** (si no hay anuncio disponible, Tilde regala 1 letra igual);
+    - cofre (cada 5 niveles): **duplicar el cofre** (+50 monedas y otra letra gratis);
+    - nivel completado, cada 3 niveles: **triplicar las monedas** (+20);
+    - cartero: **abrir otra carta ahora**, sin esperar las 4 horas.
+    - Todo pasa por `verAnuncio()` en `app.js`: hoy simula; con Ad Manager activo usa `window.enlAnuncios.recompensa()`.
+      Evento `enl_recompensa` (pedido, visto, cerrado, sin_anuncio). Vigilar el CTR: en los blogs el reward llegó a 45–48 %.
   - Las monedas nunca se compran, nunca se canjean por dinero ni premios y no se transfieren.
 - **Logros y estadísticas:** niveles, rachas, palabras extra y días jugados.
 - **Ajustes:** sonido, vibración, modo oscuro y tamaño de letra. También «Borrar progreso», con confirmación.

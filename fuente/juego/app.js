@@ -212,6 +212,34 @@
   function mundoDe(sitio, n) { for (var i = 0; i < sitio.mundos.length; i++) if (n >= sitio.mundos[i].desde && n <= sitio.mundos[i].hasta) return sitio.mundos[i]; return sitio.mundos[0]; }
   function hechosEn(m) { return p.hechos.filter(function (n) { return n >= m.desde && n <= m.hasta; }).length; }
 
+  // ---------- anuncios con recompensa: siempre opcionales y rotulados como anuncio ----------
+  // El premio se entrega solo si el anuncio se vio completo (así lo exige Google). Tope de 10 al día por jugador, para no
+  // cansar y cuidar la cuenta de Groone. Cuando Ad Manager esté activo, window.enlAnuncios.recompensa(listo) pide el
+  // anuncio real y avisa con «visto», «cerrado» o «sin-anuncio»; mientras tanto se simula.
+  var TOPE_RECOMPENSAS = 10;
+  function recompensasHoy() { var r = leer("recompensas", null); return r && r.fecha === HOY ? r.n : 0; }
+  function quedanRecompensas() { return recompensasHoy() < TOPE_RECOMPENSAS; }
+  function verAnuncio(tipo, alGanar, sinAnuncio) {
+    evento("enl_recompensa", { tipo: tipo, estado: "pedido" });
+    var listo = function (estado) {
+      if (estado === "visto") { guardar("recompensas", { fecha: HOY, n: recompensasHoy() + 1 }); evento("enl_recompensa", { tipo: tipo, estado: "visto" }); alGanar(); }
+      else if (estado === "sin-anuncio") { evento("enl_recompensa", { tipo: tipo, estado: "sin_anuncio" }); if (sinAnuncio) sinAnuncio(); else aviso("Ahora no hay anuncios disponibles. Prueba más tarde.", 2600); }
+      else { evento("enl_recompensa", { tipo: tipo, estado: "cerrado" }); aviso("El premio se entrega al ver el anuncio completo", 2600); }
+    };
+    if (window.enlAnuncios && window.enlAnuncios.recompensa) return window.enlAnuncios.recompensa(listo);
+    simularAnuncio(listo);
+  }
+  function simularAnuncio(listo) {
+    var sim = $("sim"); if (!sim) { sim = document.createElement("div"); sim.className = "sim"; sim.id = "sim"; document.body.appendChild(sim); }
+    var n = 3; sim.innerHTML = "Aquí iría el anuncio con recompensa<small>Simulación: " + n + " s</small>"; sim.classList.add("ver");
+    var t = setInterval(function () { n--; sim.querySelector("small").textContent = "Simulación: " + n + " s"; if (n <= 0) { clearInterval(t); sim.classList.remove("ver"); listo("visto"); } }, 1000);
+  }
+  // tarjeta de oferta: se ve como oferta (con la etiqueta «Anuncio»), nunca como un botón del juego
+  function ofertaAnuncio(accion, titulo, detalle) {
+    return '<button class="oferta-anuncio" data-accion="' + accion + '"><span class="oferta-icono" aria-hidden="true"><svg class="i"><use href="#i-video"/></svg></span>' +
+      "<span><b>" + titulo + "</b><small>" + detalle + '</small></span><span class="etiqueta-anuncio">Anuncio</span></button>';
+  }
+
   // El cartero de Tilde: una carta cada 4 horas, hasta 3 por día. Si no entras, no pasa nada: la carta espera.
   var CARTAS = [{ m: 20, t: "20 monedas" }, { g: 1, t: "una letra gratis" }, { m: 30, t: "30 monedas" }];
   function carteroListo() {
@@ -232,6 +260,17 @@
       b.querySelector("small").textContent = c.hoy < 3 ? "Volverá con otra carta más tarde" : "Mañana trae más cartas";
       if (regalo.m) ganarMonedas(regalo.m, b); else pintarMonedas(true);
       evento("enl_cartero", { regalo: regalo.t });
+      if (c.hoy < 3 && quedanRecompensas()) {
+        var o = document.createElement("div"); o.innerHTML = ofertaAnuncio("otra-carta", "¿No quieres esperar?", "Mira un anuncio y Tilde trae otra carta ahora"); o = o.firstChild;
+        b.insertAdjacentElement("afterend", o);
+        o.addEventListener("click", function () {
+          verAnuncio("carta", function () {
+            p.cartero.ultimo = 0; guardarP(); o.remove();
+            b.classList.remove("abierta"); b.querySelector("b").textContent = "Tilde te trajo otra carta"; b.querySelector("small").textContent = "Ábrela para ver tu regalo";
+            cartero();
+          });
+        }, { once: true });
+      }
     }, { once: true });
   }
 
@@ -678,13 +717,9 @@
       var h = '<h2>¿Necesitas una ayuda?</h2><p class="sub">Tienes <b>' + p.monedas + '</b> monedas. Las ganas jugando: nunca se compran.</p><div class="botones">' +
         '<button class="boton prin" data-accion="letra"' + (p.monedas < PRECIO_LETRA ? " disabled" : "") + '>Revelar una letra <small>' + PRECIO_LETRA + ' monedas</small></button>' +
         '<button class="boton sec" data-accion="palabra"' + (p.monedas < PRECIO_PALABRA ? " disabled" : "") + '>Revelar la palabra <small>' + PRECIO_PALABRA + ' monedas</small></button>';
-      if (p.monedas < PRECIO_LETRA) h += '<button class="boton sec" data-accion="ver-letra">Ver un anuncio y revelar una letra</button>';
+      if (p.monedas < PRECIO_LETRA && quedanRecompensas()) h += ofertaAnuncio("ver-letra", "Mira un anuncio corto", "y te revelamos 2 letras");
       h += '<button class="boton sec" data-accion="cerrar">No, gracias</button></div><p class="nota-chica">Cada 5 palabras extra llenas el frasco y ganas una letra gratis.</p>';
       abrir(h);
-    }
-    function simular(texto, s, despues) {
-      var sim = $("sim"), n = s; sim.innerHTML = texto + "<small>Simulación: " + n + " s</small>"; sim.classList.add("ver");
-      var t = setInterval(function () { n--; sim.querySelector("small").textContent = "Simulación: " + n + " s"; if (n <= 0) { clearInterval(t); sim.classList.remove("ver"); despues(); } }, 1000);
     }
 
     // ---- mezclar: las fichas se cambian de lugar con movimiento ----
@@ -730,6 +765,8 @@
       if (premios.length) h += '<p class="premios">' + premios.join(" · ") + "</p>";
       if (est < 3 && !mismo) h += '<p class="nota-chica">Sin ayudas ganas las 3 estrellas.</p>';
       if (cofre) h += '<div class="cofre-tarjeta">' + COFRE + "<div><b>¡Un cofre!</b><small>Cada 5 niveles: +50 monedas y una letra gratis</small></div></div>";
+      if (cofre && quedanRecompensas()) h += ofertaAnuncio("doble-cofre", "Duplica tu cofre", "Mira un anuncio: +50 monedas y otra letra gratis");
+      else if (!mismo && D.n % 3 === 0 && D.n > 3 && quedanRecompensas()) h += ofertaAnuncio("triple-monedas", "Triplica tus monedas", "Mira un anuncio: +20 monedas más");
       if (D.vecino && !mismo) h += tarjetaVecino(D.vecino, true);
       var tPostal = $("t-escena");
       if (D.postal && !mismo && tPostal && tPostal.innerHTML.trim()) h += '<div class="premio-postal"><b>¡Te llegó una postal!</b>' + postalHtml(D.mundo, D.postal, tPostal.innerHTML) + '<a href="/logros/#album" data-google-interstitial="false">Ver el álbum</a></div>';
@@ -819,7 +856,11 @@
       var a = b.dataset.accion;
       if (a === "letra" && p.monedas >= PRECIO_LETRA) { cerrar(); p.monedas -= PRECIO_LETRA; pintarMonedas(true); revelar(false); }
       else if (a === "palabra" && p.monedas >= PRECIO_PALABRA) { cerrar(); p.monedas -= PRECIO_PALABRA; pintarMonedas(true); revelar(true); }
-      else if (a === "ver-letra") { cerrar(); evento("enl_ayuda", { tipo: "anuncio", nivel: D.n, modo: modo }); simular("Aquí iría el anuncio con recompensa", 3, function () { revelar(false); }); }
+      else if (a === "ver-letra") { cerrar(); evento("enl_ayuda", { tipo: "anuncio", nivel: D.n, modo: modo });
+        verAnuncio("letras", function () { revelar(false); setTimeout(function () { if (seleccion >= 0) revelar(false); }, 500); },
+          function () { aviso("Ahora no hay anuncios: Tilde te regala una letra", 2600); revelar(false, true); }); }
+      else if (a === "doble-cofre") { verAnuncio("cofre", function () { p.gratis++; guardarP(); ganarMonedas(50, b); b.disabled = true; b.querySelector("b").textContent = "¡Cofre duplicado!"; b.querySelector("small").textContent = "+50 monedas y otra letra gratis"; suena.cofre(); }); }
+      else if (a === "triple-monedas") { verAnuncio("monedas", function () { ganarMonedas(20, b); b.disabled = true; b.querySelector("b").textContent = "¡Monedas triplicadas!"; b.querySelector("small").textContent = "+20 monedas más"; }); }
       else if (a === "tilde") { st.t = 1; tildeVisible = false; persistir(); revelar(false, true); aviso("Tilde te regaló una letra"); }
       else if (a === "compartir") { navigator.share({ text: compartirTexto }).catch(function () {}); }
       else if (a === "copiar") { try { navigator.clipboard.writeText(compartirTexto); aviso("Resultado copiado"); } catch (x) {} }
