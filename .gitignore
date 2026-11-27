@@ -27,3 +27,6 @@ herramientas/demos/salida/
 
 # respaldos del sitio publicado (los ZIP pesan; el registro cambios.jsonl sí va a GitHub)
 respaldos/*.zip
+
+# llaves privadas (cuenta de servicio de Google): nunca a GitHub ni al sitio
+.secretos/
