@@ -81,6 +81,8 @@ Responder siempre en español.
   Al píxel van `enl_nivel_3` como **Lead** (conversión «ENL - Nivel 3») y como personalizados `enl_nivel_1/5/10`,
   `enl_diario` y `enl_regreso`. La CSP abre solo los dominios de cada servicio encendido; las etiquetas de «HTML
   personalizado» de Tag Manager quedan bloqueadas. `npm run prueba:medicion` lo comprueba sin mandar nada.
+- **Accesibilidad y SEO revisados (27 nov 2026):** `npm run accesibilidad` (axe-core, WCAG 2.2 AA, y SEO de las 313
+  páginas) en 0 problemas. **Jugar con teclado: descartado** por el usuario (la campaña es solo para celulares).
 - **Vista previa al compartir:** `fuente/publico/compartir.jpg` (1200×630, JPG aprobado como excepción a la regla 6),
   se rehace con `npm run compartir`; etiquetas Open Graph en todas las páginas.
 - **Rediseño premium en curso** (aprobado el 26 nov 2026, antes de postales y vecinos):
