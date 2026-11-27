@@ -187,13 +187,34 @@ pagina("/404.html", { titulo: "Página no encontrada · Enletrados", pagina: "40
 fs.writeFileSync(path.join(DIST, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${DOMINIO}/sitemap.xml\n`);
 fs.writeFileSync(path.join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   paginas.filter(p => p.indexar).map(p => `  <url><loc>${DOMINIO}${p.ruta}</loc></url>`).join("\n") + "\n</urlset>\n");
+// ---------- cabeceras de seguridad (revisión del 27 nov 2026) ----------
+// CSP: solo archivos propios; el único script en línea (el del tema, en base.html) se autoriza por su huella SHA-256.
+// Los <script type="application/json"> son datos y no se ejecutan. Cuando los anuncios estén activos se permiten los
+// dominios https de Google, Meta, Clarity y Hotjar (script, imágenes, conexiones y marcos), sin abrir el código en línea.
+const scriptTema = (BASE.match(/<script>([\s\S]*?)<\/script>/) || [])[1] || "";
+const HUELLA_TEMA = "'sha256-" + crypto.createHash("sha256").update(scriptTema).digest("base64") + "'";
+const externos = MODO_ANUNCIOS === "activos" ? " https:" : "";
+const CSP = [
+  "default-src 'self'", `script-src 'self' ${HUELLA_TEMA}${externos}`, "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob:${externos}`, "font-src 'self'", `connect-src 'self'${externos}`, `frame-src ${externos ? "https:" : "'none'"}`,
+  "object-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-ancestors 'none'", "upgrade-insecure-requests"
+].join("; ");
+const CABECERAS_SEGURIDAD = [
+  "Content-Security-Policy: " + CSP,
+  "X-Frame-Options: DENY",                                   // no se puede meter el sitio dentro de otra página
+  "Strict-Transport-Security: max-age=31536000",             // solo este subdominio (sin includeSubDomains)
+  "Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()",
+  "Cross-Origin-Opener-Policy: same-origin-allow-popups",
+  "X-Content-Type-Options: nosniff",
+  "Referrer-Policy: strict-origin-when-cross-origin"
+];
 fs.writeFileSync(path.join(DIST, "_headers"), [
   "# Archivos con nombre versionado: caché larga. El HTML queda con la caché corta por omisión de Cloudflare Pages.",
   "/app.*.js", "  Cache-Control: public, max-age=31536000, immutable",
   "/estilos.*.css", "  Cache-Control: public, max-age=31536000, immutable",
   "/img/*", "  Cache-Control: public, max-age=31536000, immutable",
   "/letras/*", "  Cache-Control: public, max-age=31536000, immutable",
-  "/*", "  X-Content-Type-Options: nosniff", "  Referrer-Policy: strict-origin-when-cross-origin", ""].join("\n"));
+  "/*", ...CABECERAS_SEGURIDAD.map(h => "  " + h), ""].join("\n"));
 
 // ---------- resumen de peso (gzip, como lo transfiere Cloudflare) ----------
 const gz = f => zlib.gzipSync(fs.readFileSync(path.join(DIST, f)), { level: 9 }).length;

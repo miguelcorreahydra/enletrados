@@ -11,6 +11,19 @@ const TIPOS = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=
 const RECARGA = '<script>(function(){var s=new EventSource("/__recarga");s.onmessage=function(){location.reload()};' +
   's.addEventListener("error-construccion",function(e){console.error("Error al construir:\\n"+e.data)})})();</script>';
 const oyentes = new Set();
+// Seguridad de las páginas solo locales (revisión de pistas y demostraciones), revisión del 27 nov 2026:
+//  - el pedido debe venir de este computador, con una dirección local (frena el truco de «DNS rebinding»);
+//  - si trae Origin, debe ser esta misma página (otra web abierta en el navegador no puede usar la API);
+//  - los cambios (POST) llevan además la cabecera X-Enletrados, que una web ajena no puede agregar sin permiso.
+function pedidoLocal(req, cambia) {
+  const ip = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress);
+  const anfitriones = [`localhost:${PUERTO}`, `127.0.0.1:${PUERTO}`, `[::1]:${PUERTO}`];
+  const host = anfitriones.includes(String(req.headers.host || ""));
+  const origen = !req.headers.origin || anfitriones.map(h => "http://" + h).includes(req.headers.origin);
+  return ip && host && origen && (!cambia || req.headers["x-enletrados"] === "1");
+}
+// una ruta pedida nunca sale de su carpeta (ni a una carpeta hermana con un nombre que empiece igual)
+const dentroDe = (base, archivo) => archivo === base || archivo.startsWith(base + path.sep);
 
 http.createServer((req, res) => {
   let ruta = decodeURIComponent(new URL(req.url, "http://x").pathname);
@@ -21,7 +34,7 @@ http.createServer((req, res) => {
   if (VIGILAR && (ruta === "/revisar/" || ruta === "/revisar" || ruta.startsWith("/__api/"))) return revision(req, res, ruta);
   if (VIGILAR && ruta.startsWith("/demos/")) return demos(req, res, ruta);
   let archivo = path.normalize(path.join(DIST, ruta));
-  if (!archivo.startsWith(DIST)) { res.writeHead(403); return res.end(); }
+  if (!dentroDe(DIST, archivo)) { res.writeHead(403); return res.end(); }
   if (fs.existsSync(archivo) && fs.statSync(archivo).isDirectory()) {
     if (!ruta.endsWith("/")) { res.writeHead(301, { Location: ruta + "/" }); return res.end(); }
     archivo = path.join(archivo, "index.html");
@@ -43,9 +56,9 @@ http.createServer((req, res) => {
 // ---------- página local de revisión de pistas (/revisar/): solo en modo desarrollo y solo desde este computador ----------
 function revision(req, res, ruta) {
   const L = require("./lib/contenido");
-  const local = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress);
+  const local = pedidoLocal(req, req.method !== "GET");
   const enviar = (estado, cuerpo, tipo = "application/json; charset=utf-8") => { res.writeHead(estado, { "Content-Type": tipo, "Cache-Control": "no-store" }); res.end(typeof cuerpo === "string" ? cuerpo : JSON.stringify(cuerpo)); };
-  if (!local) return enviar(403, "La revisión solo se abre desde este computador (http://localhost).", "text/plain; charset=utf-8");
+  if (!local) return enviar(403, "La revisión solo se abre desde este computador, en http://localhost:" + PUERTO + ".", "text/plain; charset=utf-8");
   if (!ruta.startsWith("/__api/")) return enviar(200, fs.readFileSync(path.join(__dirname, "revisar.html"), "utf8"), "text/html; charset=utf-8");
   const conAlertas = () => { const t = L.cargarTandas(), ctx = L.contexto(t); return { t, ctx }; };
   if (req.method === "GET" && ruta === "/__api/revision") {
@@ -90,11 +103,10 @@ function revision(req, res, ruta) {
 // ---------- demostraciones de diseño (/demos/): solo en modo desarrollo y solo desde este computador ----------
 // /demos/x.html → herramientas/demos/x.html · /demos/img/… → fuente/imagenes/ · /demos/letras/… → fuente/letras/
 function demos(req, res, ruta) {
-  const local = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress);
-  if (!local) { res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Las demostraciones solo se abren desde este computador."); }
+  if (!pedidoLocal(req, false)) { res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Las demostraciones solo se abren desde este computador (http://localhost)."); }
   const resto = ruta.slice("/demos/".length), base = resto.startsWith("img/") ? path.join(RAIZ, "fuente/imagenes") : resto.startsWith("letras/") ? path.join(RAIZ, "fuente/letras") : path.join(__dirname, "demos");
   const archivo = path.normalize(path.join(base, resto.replace(/^(img|letras)\//, "") || "index.html"));
-  if (!archivo.startsWith(base) || !fs.existsSync(archivo) || fs.statSync(archivo).isDirectory()) { res.writeHead(404); return res.end(); }
+  if (!dentroDe(base, archivo) || !fs.existsSync(archivo) || fs.statSync(archivo).isDirectory()) { res.writeHead(404); return res.end(); }
   const tipos = Object.assign({ ".woff2": "font/woff2" }, TIPOS);
   res.writeHead(200, { "Content-Type": tipos[path.extname(archivo)] || "application/octet-stream", "Cache-Control": "no-store" });
   fs.createReadStream(archivo).pipe(res);

@@ -161,6 +161,18 @@ Responder siempre en español.
 - Los datos de cada nivel van dentro de su propia página, no en un JSON por mundo. Es más rápido y tampoco carga los
   300 niveles de una vez.
 
+## Seguridad (revisión del 27 nov 2026)
+- En línea solo está `dist/`: `.env`, `.git`, herramientas, pistas, respaldos y la revisión local dan 404 (comprobado).
+- **El progreso nunca se confía:** `limpiarProgreso()` en `app.js` acepta solo su formato exacto, al leerlo del navegador
+  y al traerlo por enlace (`?enl=`). Lo que venga del jugador se muestra con `esc()` o `textContent`, nunca como HTML.
+  (Un enlace armado permitía ejecutar código en Logros; corregido.)
+- `_headers` lleva CSP estricta (script en línea solo por huella), `frame-ancestors 'none'` y `X-Frame-Options: DENY`
+  (nadie puede meter el sitio en otra página para provocar clics), HSTS solo del subdominio y Permissions-Policy.
+  Con anuncios activos la CSP se abre a dominios https, sin permitir código en línea.
+- La revisión local (`/revisar/`, `/__api/`, `/demos/`) solo acepta pedidos de esta misma página en localhost, con la
+  cabecera `X-Enletrados` para los cambios.
+- `npm run seguridad` lo comprueba todo (con `--en-linea`, también el sitio publicado). Correrlo antes de cada publicación.
+
 ## Reglas de trabajo
 1. Antes de cambiar algo, mostrar la lista de cambios y esperar la aprobación del usuario. Esto incluye publicar, tocar
    DNS, Cloudflare, Groone, el píxel o la campaña.

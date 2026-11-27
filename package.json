@@ -20,6 +20,7 @@
     "videos": "node herramientas/videos/guiones.js todos",
     "publicar": "sh herramientas/publicar.sh",
     "paquete": "sh herramientas/paquete.sh",
-    "construir:publicado": "node herramientas/construir.js --publicado"
+    "construir:publicado": "node herramientas/construir.js --publicado",
+    "seguridad": "node herramientas/pruebas/seguridad.js"
   }
 }

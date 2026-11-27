@@ -26,8 +26,36 @@
   // ---------- progreso ----------
   // monedas: se empieza con 100. +10 por nivel, +2 por palabra extra, +25 por el diario. Letra 30, palabra 80.
   var PRECIO_LETRA = 30, PRECIO_PALABRA = 80;
+  // ---------- seguridad: el progreso se acepta solo con su formato exacto ----------
+  // Viene del navegador o de un enlace (?enl=) que cualquiera puede armar: todo lo que no calce con el formato se descarta.
+  // (Revisión de seguridad del 27 nov 2026: un enlace armado permitía ejecutar código en la página de Logros.)
+  var FECHA = /^\d{4}-\d{2}-\d{2}$/;
+  function entero(v, min, max) { v = Math.floor(Number(v)); return isFinite(v) ? Math.max(min, Math.min(max, v)) : min; }
+  function esFecha(v) { return typeof v === "string" && FECHA.test(v); }
+  function esObjeto(v) { return !!v && typeof v === "object" && !Array.isArray(v); }
+  function limpiarProgreso(x) {
+    var r = {}; if (!esObjeto(x)) return r;
+    if (Array.isArray(x.hechos)) r.hechos = x.hechos.slice(0, 1000).map(function (n) { return entero(n, 0, 1000); })
+      .filter(function (n, i, a) { return n >= 1 && a.indexOf(n) === i; });
+    [["gratis", 999], ["extras", 1e6], ["monedas", 1e7], ["doradas", 1e5], ["cofres", 1e5], ["ayudas", 1e6], ["protector", 2]].forEach(function (c) {
+      if (x[c[0]] != null) r[c[0]] = entero(x[c[0]], 0, c[1]); });
+    if (esObjeto(x.estrellas)) { r.estrellas = {}; Object.keys(x.estrellas).slice(0, 1000).forEach(function (k) { if (/^\d{1,4}$/.test(k)) r.estrellas[k] = entero(x.estrellas[k], 1, 3); }); }
+    if (Array.isArray(x.dias)) r.dias = x.dias.filter(esFecha).slice(-800);
+    if (esObjeto(x.racha)) r.racha = { n: entero(x.racha.n, 0, 1e5), mejor: entero(x.racha.mejor, 0, 1e5), ultimo: esFecha(x.racha.ultimo) ? x.racha.ultimo : null };
+    if (esObjeto(x.diario)) { r.diario = {}; Object.keys(x.diario).filter(esFecha).slice(-1000).forEach(function (k) {
+      var d = esObjeto(x.diario[k]) ? x.diario[k] : {};
+      r.diario[k] = { e: entero(d.e, 1, 3), c: typeof d.c === "string" ? d.c.replace(/[^\u{1F7E7}\u{1F7E8}]/gu, "").slice(0, 60) : "", x: entero(d.x, 0, 1000) }; }); }
+    if (esObjeto(x.cartero)) r.cartero = { ultimo: entero(x.cartero.ultimo, 0, 1e14), fecha: esFecha(x.cartero.fecha) ? x.cartero.fecha : null, hoy: entero(x.cartero.hoy, 0, 3) };
+    if (esFecha(x.llegada)) r.llegada = x.llegada;
+    if (x.regreso === true) r.regreso = true;
+    if (Array.isArray(x.lugaresVistos)) r.lugaresVistos = x.lugaresVistos.filter(function (v) { return typeof v === "string" && /^\d{1,2}[ec]$/.test(v); }).slice(0, 40);
+    return r;
+  }
+  // para mostrar cualquier valor dentro de HTML sin que se interprete como código
+  function esc(v) { return String(v).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
   var p = (function () {
-    var x = leer("progreso", null) || {};
+    var x = limpiarProgreso(leer("progreso", null));
     var def = { hechos: [], gratis: 1, extras: 0, monedas: 100, estrellas: {}, dias: [], racha: { n: 0, mejor: 0, ultimo: null }, protector: 0,
       diario: {}, cartero: { ultimo: 0, fecha: null, hoy: 0 }, doradas: 0, cofres: 0, ayudas: 0, llegada: null };
     for (var k in def) if (x[k] == null) x[k] = def[k];
@@ -41,7 +69,8 @@
     try {
       var b = m[1].replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "=";
       var x = JSON.parse(decodeURIComponent(escape(atob(b))));
-      if (x && Array.isArray(x.hechos) && typeof x.monedas === "number") {
+      x = limpiarProgreso(x);
+      if (Array.isArray(x.hechos) && x.monedas != null) {
         if (x.hechos.length >= p.hechos.length) { for (var k in x) p[k] = x[k]; guardarP(); avanceLlego = "Tu avance llegó. ¡Sigue donde quedaste!"; }
         else avanceLlego = "Aquí ya tenías más avance: lo mantuvimos.";
         evento("enl_navegador_externo", { accion: "llego" });
@@ -378,7 +407,7 @@
     var tienePost = document.querySelectorAll(".postal-mini:not(.bloqueada)").length;
     $("postales-n").textContent = tienePost + " de " + tot;
     var vec = sitio.vecinos.map(function (v) {
-      var tiene = p.hechos.indexOf(v.nivel) >= 0;
+      var tiene = p.hechos.indexOf(v.nivel) >= 0; // los datos de los vecinos son del sitio, no del jugador
       return '<button class="vecino-mini' + (tiene ? "" : " bloqueado") + '" data-vecino="' + v.id + '"' + (tiene ? "" : " disabled") + '><svg viewBox="0 0 96 96" aria-hidden="true"><use href="#v-' + v.id + '"/></svg>' +
         "<b>" + (tiene ? v.nombre : "?") + "</b><small>" + (tiene ? v.oficio : "Nivel " + v.nivel) + "</small></button>";
     });
@@ -399,7 +428,7 @@
     var diarios = Object.keys(p.diario).length, est = totalEstrellas();
     var cifras = [["Niveles", p.hechos.length], ["Estrellas", est], ["Racha actual", rachaVigente()], ["Mejor racha", p.racha.mejor],
       ["Palabras extra", p.extras], ["Días jugados", p.dias.length], ["Diarios", diarios], ["Monedas", p.monedas]];
-    $("cifras").innerHTML = cifras.map(function (c) { return "<div><b>" + c[1] + "</b><small>" + c[0] + "</small></div>"; }).join("");
+    $("cifras").innerHTML = cifras.map(function (c) { return "<div><b>" + esc(c[1]) + "</b><small>" + esc(c[0]) + "</small></div>"; }).join("");
     var L = [
       ["Primera palabra", "Completa tu primer nivel", p.hechos.length, 1],
       ["La panadería encendida", "Termina el primer lugar", lugares, 1],
@@ -719,7 +748,7 @@
     function pedirLetra() {
       if (seleccion < 0) return;
       if (p.gratis > 0) { p.gratis--; guardarP(); dibujarCupo(); return revelar(false); }
-      var h = '<h2>¿Necesitas una ayuda?</h2><p class="sub">Tienes <b>' + p.monedas + '</b> monedas. Las ganas jugando: nunca se compran.</p><div class="botones">' +
+      var h = '<h2>¿Necesitas una ayuda?</h2><p class="sub">Tienes <b>' + esc(p.monedas) + '</b> monedas. Las ganas jugando: nunca se compran.</p><div class="botones">' +
         '<button class="boton prin" data-accion="letra"' + (p.monedas < PRECIO_LETRA ? " disabled" : "") + '>Revelar una letra <small>' + PRECIO_LETRA + ' monedas</small></button>' +
         '<button class="boton sec" data-accion="palabra"' + (p.monedas < PRECIO_PALABRA ? " disabled" : "") + '>Revelar la palabra <small>' + PRECIO_PALABRA + ' monedas</small></button>';
       if (p.monedas < PRECIO_LETRA && quedanRecompensas()) h += ofertaAnuncio("ver-letra", "Mira un anuncio corto", "y te revelamos 2 letras");

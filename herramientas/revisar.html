@@ -73,7 +73,7 @@ kbd { font-family: var(--redonda); background: var(--crema); border: 1px solid v
   var esc = function (s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); };
   function toast(t) { var e = $("toast"); e.textContent = t; e.classList.add("ver"); clearTimeout(e._t); e._t = setTimeout(function () { e.classList.remove("ver"); }, 1400); }
   function api(ruta, cuerpo) {
-    return fetch("/__api/" + ruta, cuerpo ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) } : {})
+    return fetch("/__api/" + ruta, cuerpo ? { method: "POST", headers: { "Content-Type": "application/json", "X-Enletrados": "1" }, body: JSON.stringify(cuerpo) } : {})
       .then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error(t); }); return r.json(); })
       .catch(function (e) { toast("No se pudo guardar: " + e.message); throw e; });
   }
