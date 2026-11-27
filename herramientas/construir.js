@@ -194,7 +194,7 @@ niveles.forEach((l, i) => {
 
 // cómo jugar, quiénes somos, contacto, créditos y páginas legales (en el índice de Google)
 const SITIO = JSON.parse(leer("contenido/sitio.json"));
-if (ESTRICTO && Object.values(SITIO).some(v => /POR CONFIRMAR/.test(v))) { console.error("Faltan datos en fuente/contenido/sitio.json (dicen POR CONFIRMAR)."); process.exit(1); }
+if (ESTRICTO && Object.entries(SITIO).some(([k, v]) => k !== "nota" && /POR CONFIRMAR/.test(v))) { console.error("Faltan datos en fuente/contenido/sitio.json (dicen POR CONFIRMAR)."); process.exit(1); }
 const TEXTOS = {
   "como-jugar": ["Cómo jugar · Enletrados", "Cómo se juega Enletrados: desliza el dedo por la rueda de letras, completa el crucigrama con las pistas, gana estrellas y juega el Diario del Pueblo.", true],
   "quienes-somos": ["Quiénes somos · Enletrados", "Enletrados es un sitio de juegos de palabras en español neutro para toda Latinoamérica."],
