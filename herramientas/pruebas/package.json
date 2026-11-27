@@ -3,6 +3,7 @@
   "private": true,
   "description": "Pruebas con navegador automático: capturas, errores de JavaScript y velocidad. Usa el Chrome instalado.",
   "dependencies": {
+    "axe-core": "^4.10.2",
     "puppeteer-core": "^24.43.1"
   }
 }

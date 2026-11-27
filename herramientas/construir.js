@@ -137,7 +137,7 @@ pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina
 const lista = mundos.map(m => `    <li><a class="mundo-item cerrado" data-mundo="${m.id}" style="--mundo:${m.color}"><span class="num">${m.id}</span><div><b>${esc(m.lugar)}</b>` +
   `<small>${esc(m.tema)} · <span class="cuenta">${m.desde <= TOTAL ? "Se abre al terminar el lugar anterior" : "Pronto"}</span></small><div class="barra"><i></i></div></div>` +
   `<svg class="i"><use href="#i-candado"/></svg></a></li>`).join("\n");
-pagina("/mundos/", { titulo: "Los lugares del pueblo · Enletrados", pagina: "mundos", clase: CON_ANCHOR, descripcion: "Los diez lugares del pueblo de Enletrados: de la panadería al faro.",
+pagina("/mundos/", { titulo: "Los lugares del pueblo · Enletrados", pagina: "mundos", clase: CON_ANCHOR, descripcion: "Los diez lugares del pueblo de Enletrados, de la panadería al faro: 300 niveles de crucigrama con rueda de letras.",
   contenido: ANCHOR + plantilla("mundos.html", { lista, datos: json(sitio) }) });
 
 // Diario del Pueblo: una página y un archivo por tablero (se baja solo el del día)
@@ -199,10 +199,10 @@ const TEXTOS = {
   "como-jugar": ["Cómo jugar · Enletrados", "Cómo se juega Enletrados: desliza el dedo por la rueda de letras, completa el crucigrama con las pistas, gana estrellas y juega el Diario del Pueblo.", true],
   "quienes-somos": ["Quiénes somos · Enletrados", "Enletrados es un sitio de juegos de palabras en español neutro para toda Latinoamérica."],
   "contacto": ["Contacto · Enletrados", "Escríbenos si encontraste un error en una pista o tienes una idea para Enletrados."],
-  "creditos": ["Créditos · Enletrados", "Las fuentes de datos abiertas que usa Enletrados y sus licencias."],
-  "privacidad": ["Política de privacidad · Enletrados", "Qué datos se usan en Enletrados, para qué y cuáles son tus derechos."],
-  "terminos": ["Términos de uso · Enletrados", "Las condiciones para usar Enletrados."],
-  "cookies": ["Política de cookies · Enletrados", "Cómo usa Enletrados las cookies y el almacenamiento del navegador."]
+  "creditos": ["Créditos · Enletrados", "Las listas de palabras, ilustraciones y letras de libre uso que usa Enletrados, con sus autores y licencias."],
+  "privacidad": ["Política de privacidad · Enletrados", "Qué datos se usan en Enletrados, para qué sirven, con quién se comparten y cómo ejercer tus derechos."],
+  "terminos": ["Términos de uso · Enletrados", "Las condiciones para usar Enletrados, el juego de palabras gratuito: monedas, anuncios, contenido y responsabilidades."],
+  "cookies": ["Política de cookies · Enletrados", "Cómo usa Enletrados las cookies y el almacenamiento del navegador para guardar tu avance, medir visitas y mostrar anuncios."]
 };
 for (const [slug, [titulo, descripcion, conAnuncio]] of Object.entries(TEXTOS)) {
   pagina(`/${slug}/`, { titulo, descripcion, pagina: "texto", clase: conAnuncio ? CON_ANCHOR : "",

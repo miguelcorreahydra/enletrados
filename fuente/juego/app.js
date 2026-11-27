@@ -263,7 +263,7 @@
     });
   }
   function estrellasHtml(n, animar) {
-    var h = '<div class="estrellas' + (animar ? " entra" : "") + '" aria-label="' + n + ' de 3 estrellas">';
+    var h = '<div class="estrellas' + (animar ? " entra" : "") + '" role="img" aria-label="' + n + ' de 3 estrellas">';
     for (var i = 0; i < 3; i++) h += '<span class="est' + (i < n ? " si" : "") + '" style="--i:' + i + '"><span class="rayos"></span><svg class="i"><use href="#i-estrella"/></svg></span>';
     return h + "</div>";
   }
