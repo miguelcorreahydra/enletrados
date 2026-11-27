@@ -177,6 +177,8 @@ ${partes.join("\n")}
 pagina("/logros/", Object.assign({ titulo: "Tus logros · Enletrados", pagina: "logros", descripcion: "Tus niveles, estrellas, rachas, postales, vecinos y medallas en Enletrados.",
   contenido: plantilla("logros.html", { datos: json(sitio), vecinossvg: VECINOS_SVG,
     plantillasPostales: mundos.map(m => `<template id="postal-${m.id}">${ESC[m.id] ? escena(m.id) : ""}</template>`).join("\n") }) }, NOINDEX));
+pagina("/tienda/", Object.assign({ titulo: "Tienda de Tilde · Enletrados", pagina: "tienda", descripcion: "Cambia tus monedas por protectores de racha y estilos para la rueda de letras.",
+  contenido: plantilla("tienda.html", {}) }, NOINDEX));
 pagina("/ajustes/", Object.assign({ titulo: "Ajustes · Enletrados", pagina: "ajustes", descripcion: "Sonido, vibración, tema y tamaño de letra de Enletrados.",
   contenido: plantilla("ajustes.html", {}) }, NOINDEX));
 

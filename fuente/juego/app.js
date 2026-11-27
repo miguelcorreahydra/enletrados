@@ -70,6 +70,17 @@
   // Viene del navegador o de un enlace (?enl=) que cualquiera puede armar: todo lo que no calce con el formato se descarta.
   // (Revisión de seguridad del 27 nov 2026: un enlace armado permitía ejecutar código en la página de Logros.)
   var FECHA = /^\d{4}-\d{2}-\d{2}$/;
+  // Tienda de Tilde (27 nov 2026): las monedas se ganan jugando y se cambian por esto. Nunca se compran con dinero.
+  // Los estilos solo cambian colores de la rueda y las fichas: no dan ninguna ventaja.
+  var ESTILOS = [
+    { id: "clasico", nombre: "Clásico", precio: 0, desc: "Fichas crema y brillo dorado" },
+    { id: "mar", nombre: "Mar", precio: 200, desc: "Fichas claras con brillo turquesa" },
+    { id: "bosque", nombre: "Bosque", precio: 200, desc: "Verde de hojas y musgo" },
+    { id: "atardecer", nombre: "Atardecer", precio: 300, desc: "Durazno y coral de las seis de la tarde" },
+    { id: "noche", nombre: "Noche estrellada", precio: 400, desc: "Fichas azul noche con brillo dorado" },
+    { id: "oro", nombre: "Oro", precio: 600, desc: "Fichas doradas con brillo terracota" }];
+  var PRECIO_PROTECTOR = 150, MAX_PROTECTOR = 2;
+  function estiloExiste(id) { return ESTILOS.some(function (e) { return e.id === id; }); }
   function entero(v, min, max) { v = Math.floor(Number(v)); return isFinite(v) ? Math.max(min, Math.min(max, v)) : min; }
   function esFecha(v) { return typeof v === "string" && FECHA.test(v); }
   function esObjeto(v) { return !!v && typeof v === "object" && !Array.isArray(v); }
@@ -88,6 +99,7 @@
     if (esObjeto(x.cartero)) r.cartero = { ultimo: entero(x.cartero.ultimo, 0, 1e14), fecha: esFecha(x.cartero.fecha) ? x.cartero.fecha : null, hoy: entero(x.cartero.hoy, 0, 3) };
     if (esFecha(x.llegada)) r.llegada = x.llegada;
     if (x.regreso === true) r.regreso = true;
+    if (Array.isArray(x.tienda)) r.tienda = x.tienda.filter(function (v, i, l) { return typeof v === "string" && estiloExiste(v) && v !== "clasico" && l.indexOf(v) === i; });
     if (Array.isArray(x.lugaresVistos)) r.lugaresVistos = x.lugaresVistos.filter(function (v) { return typeof v === "string" && /^\d{1,2}[ec]$/.test(v); }).slice(0, 40);
     return r;
   }
@@ -97,10 +109,13 @@
   var p = (function () {
     var x = limpiarProgreso(leer("progreso", null));
     var def = { hechos: [], gratis: 1, extras: 0, monedas: 100, estrellas: {}, dias: [], racha: { n: 0, mejor: 0, ultimo: null }, protector: 0,
-      diario: {}, cartero: { ultimo: 0, fecha: null, hoy: 0 }, doradas: 0, cofres: 0, ayudas: 0, llegada: null };
+      diario: {}, cartero: { ultimo: 0, fecha: null, hoy: 0 }, doradas: 0, cofres: 0, ayudas: 0, llegada: null, tienda: [] };
     for (var k in def) if (x[k] == null) x[k] = def[k];
     return x;
   })();
+  // el estilo de la rueda en uso (el script del tema en base.html ya lo pintó antes de cargar; aquí se confirma que es tuyo)
+  function estiloEnUso() { var e = leer("estilo", "clasico"); return p.tienda.indexOf(e) >= 0 ? e : "clasico"; }
+  (function () { var e = estiloEnUso(); if (e === "clasico") delete document.documentElement.dataset.estilo; else document.documentElement.dataset.estilo = e; })();
   function guardarP() { guardar("progreso", p); }
   // Avance que llega desde el navegador de Facebook o Instagram (?enl=): se usa si trae más niveles que el de aquí.
   var avanceLlego = null;
@@ -412,6 +427,7 @@
     cartero();
     var postales = sitio.mundos.reduce(function (s, mu) { return s + (p.hechos.indexOf(mu.desde + 14) >= 0) + (p.hechos.indexOf(mu.hasta) >= 0); }, 0);
     var vecinos = sitio.vecinos.filter(function (v) { return p.hechos.indexOf(v.nivel) >= 0; }).length;
+    if (p.hechos.length && $("enlace-tienda")) { $("enlace-tienda").hidden = false; $("tienda-cuenta").textContent = p.monedas + " monedas para gastar"; }
     if (postales || vecinos) { $("enlace-album").hidden = false; $("album-cuenta").textContent = postales + " postales · " + vecinos + " vecinos"; }
     if (quieto) { var tv = document.querySelector(".tilde-vuela"); if (tv) tv.remove(); }
   }
@@ -470,6 +486,59 @@
   }
 
   // ---------- logros ----------
+  // ---------- Tienda de Tilde ----------
+  // Cada compra pide un segundo toque para confirmar (así no se gasta por accidente).
+  function tienda() {
+    var cont = $("tienda"); if (!cont) return;
+    var MONEDA = '<svg class="i"><use href="#i-moneda"/></svg>', confirmando = null;
+    function pintar() {
+      $("saldo").innerHTML = MONEDA + "<span>Tienes " + esc(p.monedas) + " monedas</span>";
+      var pr = p.protector >= MAX_PROTECTOR ? '<button class="comprar" disabled>Tienes el máximo</button>' :
+        '<button class="comprar' + (confirmando === "protector" ? " confirmar" : "") + '" data-comprar="protector"' + (p.monedas < PRECIO_PROTECTOR ? " disabled" : "") + ">" +
+        (confirmando === "protector" ? "¿Confirmar? " + PRECIO_PROTECTOR : MONEDA + PRECIO_PROTECTOR) + "</button>";
+      var h = '<h2 class="seccion-t" id="protector">Protector de racha</h2>' +
+        '<div class="producto"><svg class="i icono-prod" aria-hidden="true"><use href="#i-escudo"/></svg><div><b>Un protector</b>' +
+        "<small>Si un día no juegas, cuida tu racha. Tienes " + esc(p.protector) + " de " + MAX_PROTECTOR + ". También se gana uno cada 7 días seguidos.</small></div>" + pr + "</div>" +
+        '<h2 class="seccion-t">Estilos de la rueda</h2><p class="nota-tienda">Cambian los colores de las fichas y de la rueda. Solo se ven distintos: no dan ventaja.</p>';
+      var actual = estiloEnUso();
+      ESTILOS.forEach(function (e) {
+        var tuyo = e.precio === 0 || p.tienda.indexOf(e.id) >= 0, boton;
+        if (e.id === actual) boton = '<button class="comprar en-uso" disabled>En uso</button>';
+        else if (tuyo) boton = '<button class="comprar usar" data-usar="' + e.id + '">Usar</button>';
+        else boton = '<button class="comprar' + (confirmando === e.id ? " confirmar" : "") + '" data-comprar="' + e.id + '"' + (p.monedas < e.precio ? " disabled" : "") + ">" +
+          (confirmando === e.id ? "¿Confirmar? " + e.precio : MONEDA + e.precio) + "</button>";
+        h += '<div class="producto"><div class="muestra" data-estilo="' + e.id + '" aria-hidden="true"><i>L</i><i class="sel">U</i><i class="sel">Z</i></div>' +
+          "<div><b>" + esc(e.nombre) + "</b><small>" + esc(e.desc) + "</small></div>" + boton + "</div>";
+      });
+      cont.innerHTML = h;
+    }
+    cont.addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b || b.disabled) return;
+      var usar = b.dataset.usar, item = b.dataset.comprar;
+      if (usar) {
+        guardar("estilo", usar);
+        if (usar === "clasico") delete document.documentElement.dataset.estilo; else document.documentElement.dataset.estilo = usar;
+        suena.toque(); aviso("Estilo en uso"); return pintar();
+      }
+      if (!item) return;
+      if (confirmando !== item) { confirmando = item; return pintar(); } // primer toque: pide confirmar
+      confirmando = null;
+      if (item === "protector") {
+        if (p.protector >= MAX_PROTECTOR || p.monedas < PRECIO_PROTECTOR) return pintar();
+        p.monedas -= PRECIO_PROTECTOR; p.protector++; guardarP(); suena.cofre(); aviso("¡Protector de racha listo!");
+        evento("enl_tienda", { item: "protector", precio: PRECIO_PROTECTOR });
+      } else {
+        var e = ESTILOS.filter(function (x) { return x.id === item; })[0];
+        if (!e || p.tienda.indexOf(e.id) >= 0 || p.monedas < e.precio) return pintar();
+        p.monedas -= e.precio; p.tienda.push(e.id); guardarP(); guardar("estilo", e.id);
+        document.documentElement.dataset.estilo = e.id; suena.cofre(); aviso("¡Estilo " + e.nombre + " en uso!");
+        evento("enl_tienda", { item: e.id, precio: e.precio });
+      }
+      pintarMonedas(true); pintar();
+    });
+    pintar();
+  }
+
   function logros(sitio) {
     album(sitio);
     var lugares = sitio.mundos.filter(function (m) { return hechosEn(m) >= m.hasta - m.desde + 1; }).length;
@@ -633,7 +702,7 @@
       var lista = demo || elegidas, pts = lista.map(function (i) { return centros[i].x.toFixed(1) + "," + centros[i].y.toFixed(1); });
       if (px != null && pts.length) pts.push(px.toFixed(1) + "," + py.toFixed(1));
       trazo.innerHTML = pts.length > 1 ?
-        '<polyline points="' + pts.join(" ") + '" fill="none" stroke="#E2B65A" stroke-opacity=".35" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<polyline points="' + pts.join(" ") + '" fill="none" style="stroke:var(--trazo,#E2B65A)" stroke-opacity=".35" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>' +
         '<polyline points="' + pts.join(" ") + '" fill="none" stroke="' + D.mundo.color + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' : "";
       centros.forEach(function (c, i) { c.e.classList.toggle(demo ? "demo" : "sel", lista.indexOf(i) >= 0); if (!demo) c.e.classList.remove("demo"); });
       if (!demo) burbuja(elegidas.map(function (i) { return orden[i]; }).join(""));
@@ -1039,4 +1108,5 @@
   else if (pagina === "diario") paginaDiario(datos("datos-diario"));
   else if (pagina === "logros") logros(datos("datos-sitio"));
   else if (pagina === "ajustes") ajustes();
+  else if (pagina === "tienda") tienda();
 })();

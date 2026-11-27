@@ -7,7 +7,7 @@ const BASE = "http://localhost:8080", RAIZ = path.join(__dirname, "../.."), DIST
 const AXE = fs.readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const construir = (...a) => execFileSync("node", [path.join(RAIZ, "herramientas/construir.js"), ...a], { cwd: RAIZ, stdio: "pipe" });
-const PAGINAS = ["/", "/mundos/", "/nivel/1/", "/nivel/12/", "/nivel/291/", "/diario/", "/logros/", "/ajustes/", "/como-jugar/", "/privacidad/", "/terminos/", "/cookies/", "/quienes-somos/", "/contacto/", "/creditos/", "/no-existe/"];
+const PAGINAS = ["/", "/mundos/", "/nivel/1/", "/nivel/12/", "/nivel/291/", "/diario/", "/logros/", "/ajustes/", "/tienda/", "/como-jugar/", "/privacidad/", "/terminos/", "/cookies/", "/quienes-somos/", "/contacto/", "/creditos/", "/no-existe/"];
 const hallazgos = {}; // regla → { impacto, ayuda, lugares: Set }
 const anotar = (v, donde) => { const h = hallazgos[v.id] = hallazgos[v.id] || { impacto: v.impact, ayuda: v.help, lugares: new Set(), ejemplos: new Set() };
   h.lugares.add(donde); v.nodes.slice(0, 3).forEach(n => h.ejemplos.add(n.target.join(" ") + (n.any[0] && n.any[0].message ? " · " + n.any[0].message : ""))); };

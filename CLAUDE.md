@@ -267,6 +267,14 @@ Responder siempre en español.
     - Todo pasa por `verAnuncio()` en `app.js`: hoy simula; con Ad Manager activo usa `window.enlAnuncios.recompensa()`.
       Evento `enl_recompensa` (pedido, visto, cerrado, sin_anuncio). Vigilar el CTR: en los blogs el reward llegó a 45–48 %.
   - Las monedas nunca se compran, nunca se canjean por dinero ni premios y no se transfieren.
+  - **Tienda de Tilde** (`/tienda/`, 27 nov 2026, aprobada por el usuario): protector de racha por 150 monedas (máximo 2,
+    como el que se gana cada 7 días) y 6 **estilos de la rueda** (solo colores, sin ventaja): Clásico gratis, Mar y
+    Bosque 200, Atardecer 300, Noche estrellada 400, Oro 600. Cada compra pide confirmar con un segundo toque. Lo
+    comprado va en el progreso (`tienda`, validado en `limpiarProgreso`); el estilo en uso, en `enl_estilo` (lo pinta
+    el script del tema antes de cargar y `app.js` confirma que esté comprado). Evento `enl_tienda`. Se llega por la
+    pastilla de monedas de la portada, la tarjeta de protectores, la tarjeta «Tienda de Tilde» y el pie.
+    `npm run prueba:tienda`. Ojo con el peso: para que la portada quede bajo 100 KB se bajó dos veces la calidad del
+    pueblo apagado (55 → 46); la próxima vez hay que recortar en otro lado.
 - **Logros y estadísticas:** niveles, rachas, palabras extra y días jugados.
 - **Ajustes:** sonido, vibración, modo oscuro y tamaño de letra. También «Borrar progreso», con confirmación.
 - **Repaso al terminar cada nivel:** las palabras con su definición. Aporta valor real para Google y para el jugador.

@@ -21,6 +21,7 @@
     "prueba:medicion": "node herramientas/pruebas/medicion.js",
     "accesibilidad": "node herramientas/pruebas/accesibilidad_seo.js",
     "velocidad": "node herramientas/pruebas/velocidad.js",
+    "prueba:tienda": "node herramientas/pruebas/tienda.js",
     "anuncio": "node herramientas/videos/anuncio.js",
     "videos": "node herramientas/videos/guiones.js todos",
     "publicar": "sh herramientas/publicar.sh",

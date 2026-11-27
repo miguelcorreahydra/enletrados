@@ -239,16 +239,16 @@ h1.titulo-nivel { margin: 0; font-size: inherit; font-weight: inherit; line-heig
 .abajo { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
 .rueda { position: relative; border-radius: 50%; touch-action: none; flex: none;
   background: radial-gradient(circle at 50% 38%, var(--crema), var(--papel-2) 62%, var(--hundida));
-  box-shadow: 0 14px 34px rgb(var(--sombra) / .14), inset 0 0 0 1px var(--linea), inset 0 0 0 7px var(--crema), inset 0 0 0 8px var(--dorado-claro); }
+  box-shadow: 0 14px 34px rgb(var(--sombra) / .14), inset 0 0 0 1px var(--linea), inset 0 0 0 7px var(--crema), inset 0 0 0 8px var(--rueda-aro, var(--dorado-claro)); }
 .rueda svg.trazo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .letra { position: absolute; width: var(--tam-ficha, 58px); height: var(--tam-ficha, 58px); margin: calc(var(--tam-ficha, 58px) / -2) 0 0 calc(var(--tam-ficha, 58px) / -2);
   border-radius: 50%; display: grid; place-items: center; pointer-events: none;
   font-family: var(--redonda); font-size: calc(var(--tam-ficha, 58px) * .48); font-weight: 800; text-transform: uppercase; color: #2E241B;
-  background: linear-gradient(180deg, #FFFFFF, var(--ficha)); border: 1px solid var(--ficha-borde);
-  box-shadow: 0 3px 0 var(--ficha-borde), 0 6px 12px rgb(var(--sombra) / .12);
+  background: linear-gradient(180deg, var(--letra-a, #FFFFFF), var(--letra-b, var(--ficha))); border: 1px solid var(--letra-borde, var(--ficha-borde));
+  color: var(--letra-texto, #2E241B); box-shadow: 0 3px 0 var(--letra-borde, var(--ficha-borde)), 0 6px 12px rgb(var(--sombra) / .12);
   transition: transform .14s var(--rebote), background .14s, color .14s, box-shadow .14s; }
-.letra.sel { color: #FFF8EE; background: linear-gradient(180deg, #E8BE63, var(--dorado)); border-color: #A97B27;
-  box-shadow: 0 3px 0 #A97B27, 0 0 0 8px rgb(226 182 90 / .25), 0 0 22px rgb(255 214 120 / .75); transform: scale(1.12); }
+.letra.sel { color: var(--sel-texto, #FFF8EE); background: linear-gradient(180deg, var(--sel-a, #E8BE63), var(--sel-b, var(--dorado))); border-color: var(--sel-borde, #A97B27);
+  box-shadow: 0 3px 0 var(--sel-borde, #A97B27), 0 0 0 8px rgb(var(--sel-halo, 226 182 90) / .25), 0 0 22px rgb(var(--sel-halo, 255 214 120) / .75); transform: scale(1.12); }
 .letra.demo { box-shadow: 0 3px 0 var(--dorado), 0 0 0 6px rgb(201 151 59 / .25); transform: scale(1.06); }
 .rueda.entra .letra { animation: ficha-entra .5s var(--rebote) both; animation-delay: calc(var(--i) * 45ms); }
 @keyframes ficha-entra { from { opacity: 0; transform: scale(.3) rotate(-30deg); } }
@@ -389,7 +389,7 @@ canvas.confeti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-e
 @keyframes sobre { 0%, 80%, 100% { transform: none; } 85% { transform: rotate(-8deg); } 90% { transform: rotate(6deg); } 95% { transform: rotate(-3deg); } }
 
 .racha { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--e-3); margin-top: 14px; }
-.racha > div { background: var(--crema); border: 1px solid var(--linea); border-radius: var(--r-l); padding: 10px 6px; text-align: center; display: grid; justify-items: center; gap: 2px; }
+.racha > div, .racha > a { color: inherit; text-decoration: none; background: var(--crema); border: 1px solid var(--linea); border-radius: var(--r-l); padding: 10px 6px; text-align: center; display: grid; justify-items: center; gap: 2px; }
 .racha svg.i { width: 24px; height: 24px; }
 .racha b { font-size: var(--t-xl); font-family: var(--serif); }
 .racha small { color: var(--tinta-2); font-size: var(--t-xs); font-weight: 700; }
@@ -576,7 +576,7 @@ body.nivel .cabecera { background: transparent; }
 
 /* ---------- componentes del sistema de diseño ---------- */
 /* tarjetas: todas con la misma esquina y la misma sombra */
-.tarjeta-lugar, .mundo-item, .pista, .racha > div, .cifras div, .logros li, .ajuste, .externo, .escena-tarjeta, .dato-contacto, .cartero, .cofre-tarjeta, .vecino-tarjeta {
+.tarjeta-lugar, .mundo-item, .pista, .racha > div, .racha > a, .cifras div, .logros li, .ajuste, .externo, .escena-tarjeta, .dato-contacto, .cartero, .cofre-tarjeta, .vecino-tarjeta {
   border-radius: var(--r-l); box-shadow: var(--s-2); }
 .hoja, .aviso { box-shadow: var(--s-3); }
 /* botones redondos: 44 px como mínimo para tocar cómodo */
@@ -611,3 +611,40 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .regalo .oferta-anuncio { width: 100%; margin: 0 0 var(--e-3); }
 .regalo .boton { width: 100%; }
 @media (prefers-reduced-motion: reduce) { .regalo-velo, .regalo { transition: none; } }
+
+/* ---------- estilos de la rueda (Tienda de Tilde): solo cambian colores, nunca dan ventaja ----------
+   Se aplican con data-estilo en <html> (el estilo en uso) o en una muestra de la tienda. */
+[data-estilo="clasico"] { --letra-a: #FFFFFF; --letra-b: var(--ficha); --letra-borde: var(--ficha-borde); --letra-texto: #2E241B; --sel-a: #E8BE63; --sel-b: var(--dorado);
+  --sel-borde: #A97B27; --sel-texto: #FFF8EE; --sel-halo: 226 182 90; --trazo: #E2B65A; --rueda-aro: var(--dorado-claro); }
+[data-estilo="mar"] { --letra-a: #FFFFFF; --letra-b: #E3F0F3; --letra-borde: #9CC3CC; --letra-texto: #1F3B47; --sel-a: #6FB3C4; --sel-b: #3E8698;
+  --sel-borde: #2C6573; --sel-texto: #FFFFFF; --sel-halo: 111 179 196; --trazo: #5FA8BA; --rueda-aro: #BFDDE4; }
+[data-estilo="bosque"] { --letra-a: #FBFDF7; --letra-b: #E6F0DD; --letra-borde: #A9C495; --letra-texto: #27391C; --sel-a: #8DB46C; --sel-b: #56803D;
+  --sel-borde: #3E6029; --sel-texto: #FFFFFF; --sel-halo: 127 166 95; --trazo: #6E9A52; --rueda-aro: #CFE0C2; }
+[data-estilo="atardecer"] { --letra-a: #FFF7F0; --letra-b: #FBE3D6; --letra-borde: #E8B9A2; --letra-texto: #5A2E1E; --sel-a: #F29A7A; --sel-b: #D8624A;
+  --sel-borde: #A9452F; --sel-texto: #FFFFFF; --sel-halo: 242 154 122; --trazo: #EE8A6A; --rueda-aro: #F6D3C2; }
+[data-estilo="noche"] { --letra-a: #3B4868; --letra-b: #24304B; --letra-borde: #131A2B; --letra-texto: #F3EADB; --sel-a: #F2CF7E; --sel-b: #C9973B;
+  --sel-borde: #8E6820; --sel-texto: #2E241B; --sel-halo: 226 182 90; --trazo: #E2B65A; --rueda-aro: #3B4768; }
+[data-estilo="oro"] { --letra-a: #FDF0C9; --letra-b: #E8C46F; --letra-borde: #B88A2E; --letra-texto: #3A2A10; --sel-a: #D27550; --sel-b: #A9502D;
+  --sel-borde: #7E3A22; --sel-texto: #FFF8EE; --sel-halo: 210 117 80; --trazo: #C0603A; --rueda-aro: #F0D28C; }
+
+/* ---------- Tienda de Tilde ---------- */
+.saldo { display: flex; align-items: center; gap: var(--e-2); margin: var(--e-3) 0 var(--e-4); font-family: var(--redonda); font-weight: 800; font-size: var(--t-l); }
+.saldo svg.i { width: 26px; height: 26px; }
+.producto { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: var(--e-3); padding: var(--e-3) var(--e-4); background: var(--crema); border: 1px solid var(--linea);
+  border-radius: var(--r-l); margin-bottom: var(--e-3); }
+.producto > div:not(.muestra) { flex: 1; min-width: 0; }
+.producto b { display: block; font-family: var(--serif); font-size: var(--t-m); }
+.producto small { display: block; color: var(--tinta-2); font-size: var(--t-s); line-height: 1.35; }
+.producto .icono-prod { width: 44px; height: 44px; flex: none; color: var(--salvia); }
+.comprar { grid-column: 1 / -1; justify-self: end; min-width: 140px; min-height: 44px; padding: 0 var(--e-3); border-radius: var(--r-pill); border: 0; cursor: pointer;
+  font-family: var(--redonda); font-weight: 800; font-size: var(--t-s); background: var(--terracota-osc); color: #FFF8EE; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.comprar svg.i { width: 18px; height: 18px; }
+.comprar.confirmar { background: var(--dorado-texto); color: var(--papel); }
+.comprar.usar { background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 2px var(--linea); }
+.comprar[disabled] { opacity: .55; cursor: default; }
+.comprar.en-uso { background: transparent; color: var(--salvia); box-shadow: inset 0 0 0 2px var(--salvia); opacity: 1; }
+.muestra { display: flex; gap: 4px; flex: none; padding: 6px; border-radius: var(--r-pill); background: var(--papel-2); box-shadow: inset 0 0 0 2px var(--rueda-aro, var(--dorado-claro)); }
+.muestra i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-family: var(--redonda); font-weight: 800; font-size: 14px;
+  color: var(--letra-texto, #2E241B); background: linear-gradient(180deg, var(--letra-a, #FFFFFF), var(--letra-b, var(--ficha))); border: 1px solid var(--letra-borde, var(--ficha-borde)); }
+.muestra i.sel { color: var(--sel-texto, #FFF8EE); background: linear-gradient(180deg, var(--sel-a, #E8BE63), var(--sel-b, var(--dorado))); border-color: var(--sel-borde, #A97B27); }
+.nota-tienda { color: var(--tinta-2); font-size: var(--t-s); }
