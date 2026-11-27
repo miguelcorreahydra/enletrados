@@ -66,7 +66,10 @@ Responder siempre en español.
   - `npm run paquete`: ZIP en `respaldos/` para subir a mano en Cloudflare Pages (sin token);
   - `npm run publicar`: con el token en `.env` (ver `.env.ejemplo`), pide confirmación, guarda respaldo y anota en
     `respaldos/cambios.jsonl`.
-  - **Pendiente para publicar de nuevo:** los datos legales en `fuente/contenido/sitio.json`.
+  - **Datos legales (27 nov 2026):** Cosmo Digital S.A.S., NIT 978.234.537-8 (confirmado por el usuario), Cl. 12 Nte.
+    #10-31, Armenia, Quindío, Colombia; infocosmovil@gmail.com; atiende datos personales Valentina Forero.
+  - **Segunda subida aprobada (27 nov 2026), con anuncios apagados:** paquete en `respaldos/`, respaldo de lo que
+    estaba en línea en `respaldos/en-linea-2026-11-27-antes.zip`. La sube el jefe a mano en Cloudflare.
 - **Ad Manager listo y apagado** (27 nov 2026): `fuente/juego/anuncios.js` solo se publica con `activo: true` en
   `anuncios.json` (con `red`, `unidades` y `ads_txt` de Groone) y se carga 1,2 s después de la página. Bloquea el muro de
   ofertas, pone display y anchor fuera de la partida, viñeta desde el nivel 3 y recompensa con `window.enlAnuncios`.
