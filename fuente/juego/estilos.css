@@ -598,3 +598,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
   @view-transition { navigation: none; }
   .cielo .tilde-vuela { display: none; }
 }
+
+/* ventana «Tilde tiene un regalo» (oferta de recompensa que sale sola en los niveles 4, 7, 10…; siempre se puede rechazar) */
+.regalo-velo { position: fixed; inset: 0; z-index: 48; display: grid; place-items: center; padding: var(--e-4); background: rgb(30 22 14 / .55); opacity: 0; transition: opacity .25s; }
+.regalo-velo.ver { opacity: 1; }
+.regalo { width: 100%; max-width: 360px; background: var(--crema); border-radius: var(--r-xl); box-shadow: var(--s-3); padding: var(--e-5) var(--e-4) var(--e-4); text-align: center;
+  transform: translateY(16px) scale(.96); transition: transform .3s var(--suave); }
+.regalo-velo.ver .regalo { transform: none; }
+.regalo-tilde { width: 72px; color: var(--tilde); }
+.regalo h3 { font-family: var(--serif); font-size: var(--t-xl); margin: var(--e-2) 0 var(--e-1); }
+.regalo p { margin: 0 0 var(--e-4); color: var(--tinta-2); }
+.regalo .oferta-anuncio { width: 100%; margin: 0 0 var(--e-3); }
+.regalo .boton { width: 100%; }
+@media (prefers-reduced-motion: reduce) { .regalo-velo, .regalo { transition: none; } }

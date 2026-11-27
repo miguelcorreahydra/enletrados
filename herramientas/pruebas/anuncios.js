@@ -108,6 +108,24 @@ async function formar(p, palabra) {
     if (rc.oferta && rc.letras === 0 && rc.n === 0) ok("recompensa cerrada antes: sin premio"); else mal("recompensa cerrada: " + JSON.stringify(rc));
     if (rs.oferta && rs.letras === 1 && rs.n === 0) ok("sin anuncio disponible: Tilde regala 1 letra"); else mal("sin anuncio: " + JSON.stringify(rs));
 
+    // 3b) regalo de Tilde: sale solo en el nivel 4 (no en el 5, que tiene cofre, ni en el 6); al verlo, +30 y sin viñeta
+    const regalo = async (n, modo, ver) => {
+      await progreso({ hechos: Array.from({ length: n - 1 }, (_, i) => i + 1), monedas: 100, llegada: "2026-11-01" });
+      await ir(`/nivel/${n}/`, 2000); await p.evaluate(m => (window.__gptModo = m), modo);
+      await completar(); const hay = !!(await p.$("#regalo-tilde"));
+      if (!hay || !ver) return { hay };
+      const antes = await p.evaluate(() => JSON.parse(localStorage.getItem("enl_progreso")).monedas);
+      await p.click('[data-accion="regalo-ver"]'); await espera(3000);
+      return { hay, ganadas: (await p.evaluate(() => JSON.parse(localStorage.getItem("enl_progreso")).monedas)) - antes,
+        sinVineta: await p.evaluate(() => { const a = [...document.querySelectorAll(".hoja .botones a")].find(x => /Siguiente/.test(x.textContent)); return !!a && a.dataset.googleInterstitial === "false" && !a.classList.contains("con-vineta"); }) };
+    };
+    const g4 = await regalo(4, "ok", true), g5 = await regalo(5, "ok", false), g6 = await regalo(6, "ok", false);
+    if (g4.hay && g4.ganadas === 30 && g4.sinVineta) ok("regalo de Tilde en el nivel 4: al ver el anuncio da +30 monedas y apaga la viñeta de ese paso"); else mal("regalo nivel 4: " + JSON.stringify(g4));
+    if (!g5.hay && !g6.hay) ok("sin regalo en el nivel 5 (tiene cofre) ni en el 6"); else mal("regalo fuera de lugar: " + JSON.stringify({ g5, g6 }));
+    const g7 = await regalo(7, "ok", false);
+    if (g7.hay) { await p.click('[data-accion="regalo-no"]'); await espera(500); }
+    if (g7.hay && !(await p.$("#regalo-tilde"))) ok("nivel 7: el regalo sale y «No, gracias» lo cierra sin anuncio"); else mal("nivel 7: " + JSON.stringify(g7));
+
     // 5) CSP
     if (avisos.length) mal("CSP o errores:\n   " + [...new Set(avisos)].slice(0, 8).join("\n   ")); else ok("sin bloqueos de la CSP ni errores de JavaScript");
     console.log("  (pedidos externos bloqueados en la prueba: " + ([...externos].join(", ") || "ninguno") + ")");

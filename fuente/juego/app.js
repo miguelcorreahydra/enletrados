@@ -824,6 +824,32 @@
     function estrellasDe(a) { return a === 0 ? 3 : a <= 2 ? 2 : 1; }
     function repaso() { return '<ul class="repaso">' + D.palabras.map(function (w, i) { return '<li style="--i:' + i + '"><b>' + w.p + "</b><span>" + D.pistas[w.p] + "</span></li>"; }).join("") + "</ul>"; }
     var UMBRALES = [1, 4, 8, 13, 20, 30];
+    // Ventana «Tilde tiene un regalo»: el anuncio solo se ve si el jugador toca «Ver anuncio» (así lo exige Google para la
+    // recompensa). Si lo ve, gana 30 monedas y ese paso al siguiente nivel no muestra la viñeta (nunca dos anuncios seguidos).
+    var REGALO_MONEDAS = 30;
+    function regaloTilde() {
+      if (!$("velo").classList.contains("ver") || $("regalo-tilde")) return;
+      var v = document.createElement("div"); v.className = "regalo-velo"; v.id = "regalo-tilde";
+      v.innerHTML = '<div class="regalo" role="dialog" aria-modal="true" aria-labelledby="regalo-t">' +
+        '<svg class="regalo-tilde" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 20C14 6 24 6 31 17s19 12 29-3" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><ellipse cx="33" cy="22" rx="9" ry="5.5" fill="currentColor"/><circle cx="42" cy="19" r="4.6" fill="currentColor"/><path d="M46 19.5l5 1-5 1.6z" fill="#E08A3C"/><path d="M25 23l-11 9M26 25l-8 11" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>' +
+        '<h3 id="regalo-t">Tilde tiene un regalo para ti</h3><p>Mira un anuncio corto y gana <b>+' + REGALO_MONEDAS + ' monedas</b>.</p>' +
+        ofertaAnuncio("regalo-ver", "Ver anuncio", "+" + REGALO_MONEDAS + " monedas al verlo completo") +
+        '<button class="boton sec" data-accion="regalo-no">No, gracias</button></div>';
+      document.body.appendChild(v);
+      requestAnimationFrame(function () { v.classList.add("ver"); });
+      evento("enl_recompensa", { tipo: "regalo", estado: "ofrecido", nivel: D.n });
+      var fuera = function () { v.classList.remove("ver"); setTimeout(function () { v.remove(); }, 250); };
+      v.addEventListener("click", function (e) {
+        if (e.target === v || e.target.closest('[data-accion="regalo-no"]')) return fuera();
+        var b = e.target.closest('[data-accion="regalo-ver"]'); if (!b) return;
+        fuera();
+        verAnuncio("regalo", function () {
+          ganarMonedas(REGALO_MONEDAS, $("monedas")); suena.cofre(); aviso("¡+" + REGALO_MONEDAS + " monedas de Tilde!", 2200);
+          var sig = document.querySelector(".hoja a.con-vineta"); // sin viñeta después de ver la recompensa
+          if (sig) { sig.classList.remove("con-vineta"); sig.setAttribute("data-google-interstitial", "false"); }
+        });
+      });
+    }
     function completado() {
       clearTimeout(tTilde);
       if (diario) return diarioCompletado();
@@ -848,7 +874,8 @@
       if (est < 3 && !mismo) h += '<p class="nota-chica">Sin ayudas ganas las 3 estrellas.</p>';
       if (cofre) h += '<div class="cofre-tarjeta">' + COFRE + "<div><b>¡Un cofre!</b><small>Cada 5 niveles: +50 monedas y una letra gratis</small></div></div>";
       if (cofre && quedanRecompensas()) h += ofertaAnuncio("doble-cofre", "Duplica tu cofre", "Mira un anuncio: +50 monedas y otra letra gratis");
-      else if (!mismo && D.n % 3 === 0 && D.n > 3 && quedanRecompensas()) h += ofertaAnuncio("triple-monedas", "Triplica tus monedas", "Mira un anuncio: +20 monedas más");
+      // regalo de Tilde (aprobado el 27 nov 2026): en los niveles 4, 7, 10, 13… sale solo, como oferta que se puede rechazar
+      var regalo = !mismo && !cofre && D.n >= 4 && (D.n - 4) % 3 === 0 && quedanRecompensas();
       if (D.vecino && !mismo) h += tarjetaVecino(D.vecino, true);
       var tPostal = $("t-escena");
       if (D.postal && !mismo && tPostal && tPostal.innerHTML.trim()) h += '<div class="premio-postal"><b>¡Te llegó una postal!</b>' + postalHtml(D.mundo, D.postal, tPostal.innerHTML) + '<a href="/logros/#album" data-google-interstitial="false">Ver el álbum</a></div>';
@@ -871,6 +898,7 @@
       h += ofertaNavegador(D.n, D.siguiente || location.pathname);
       h += espacioAnuncio("<br>Solo en esta pantalla, 36 px debajo de los botones");
       abrir(h); chispasEstrellas();
+      if (regalo) setTimeout(regaloTilde, 1800); // después de las estrellas y el confeti
       setTimeout(function () { Array.prototype.forEach.call(document.querySelectorAll(".hoja .vecino-tarjeta.nuevo .cara, .hoja .premio-postal .postal"), function (el) {
         var r = el.getBoundingClientRect(); chispas(r.left + r.width / 2, r.top + r.height / 2, { n: 10, radio: 60, ms: 900 }); }); }, 1100);
       var esc = document.querySelector(".hoja .escena");
@@ -942,7 +970,6 @@
         verAnuncio("letras", function () { revelar(false); setTimeout(function () { if (seleccion >= 0) revelar(false); }, 500); },
           function () { aviso("Ahora no hay anuncios: Tilde te regala una letra", 2600); revelar(false, true); }); }
       else if (a === "doble-cofre") { verAnuncio("cofre", function () { p.gratis++; guardarP(); ganarMonedas(50, b); b.disabled = true; b.querySelector("b").textContent = "¡Cofre duplicado!"; b.querySelector("small").textContent = "+50 monedas y otra letra gratis"; suena.cofre(); }); }
-      else if (a === "triple-monedas") { verAnuncio("monedas", function () { ganarMonedas(20, b); b.disabled = true; b.querySelector("b").textContent = "¡Monedas triplicadas!"; b.querySelector("small").textContent = "+20 monedas más"; }); }
       else if (a === "tilde") { st.t = 1; tildeVisible = false; persistir(); revelar(false, true); aviso("Tilde te regaló una letra"); }
       else if (a === "compartir") { navigator.share({ text: compartirTexto }).catch(function () {}); }
       else if (a === "copiar") { try { navigator.clipboard.writeText(compartirTexto); aviso("Resultado copiado"); } catch (x) {} }

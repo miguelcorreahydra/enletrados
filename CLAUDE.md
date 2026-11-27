@@ -251,7 +251,9 @@ Responder siempre en español.
     rotulados «Anuncio» y con el premio solo si se ve completo. Tope de 10 al día por jugador y una oferta por pantalla:
     - pista sin monedas: **2 letras** (si no hay anuncio disponible, Tilde regala 1 letra igual);
     - cofre (cada 5 niveles): **duplicar el cofre** (+50 monedas y otra letra gratis);
-    - nivel completado, cada 3 niveles: **triplicar las monedas** (+20);
+    - **regalo de Tilde** (aprobado el 27 nov 2026): en los niveles 4, 7, 10, 13… (no en los de cofre) sale sola una
+      ventana «Tilde tiene un regalo para ti» con «Ver anuncio» (+30 monedas) y «No, gracias». Si lo ve, ese paso al
+      siguiente nivel no muestra la viñeta. Reemplaza a «triplicar monedas»;
     - cartero: **abrir otra carta ahora**, sin esperar las 4 horas.
     - Todo pasa por `verAnuncio()` en `app.js`: hoy simula; con Ad Manager activo usa `window.enlAnuncios.recompensa()`.
       Evento `enl_recompensa` (pedido, visto, cerrado, sin_anuncio). Vigilar el CTR: en los blogs el reward llegó a 45–48 %.
