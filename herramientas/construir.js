@@ -59,9 +59,14 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replac
 // data-google-interstitial="false", salvo los que tienen la clase con-vineta («Siguiente nivel» desde el nivel 3).
 const sinVineta = html => html.replace(/<a\b(?![^>]*data-google-interstitial)(?![^>]*con-vineta)/g, '<a data-google-interstitial="false"');
 const paginas = [];
+// vista previa al compartir (WhatsApp, Facebook, X): imagen 1200×630 en JPG (excepción aprobada a la regla 6)
+const social = (ruta, d) => [["og:type", "website"], ["og:site_name", "Enletrados"], ["og:locale", "es_LA"], ["og:title", d.titulo], ["og:description", d.descripcion],
+  ["og:url", DOMINIO + ruta], ["og:image", DOMINIO + "/compartir.jpg"], ["og:image:type", "image/jpeg"], ["og:image:width", "1200"], ["og:image:height", "630"],
+  ["og:image:alt", "El pueblo de Enletrados y Tilde, la golondrina"]].map(([k, v]) => `<meta property="${k}" content="${esc(v)}">`).join("\n")
+  + `\n<meta name="twitter:card" content="summary_large_image">`;
 function pagina(ruta, d) {
   const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS,
-    canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">` }, d)));
+    canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">`, social: social(ruta, d) }, d)));
   if (ruta.endsWith(".html")) fs.writeFileSync(path.join(DIST, ruta), html);
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
   paginas.push({ ruta, bytes: html.length, indexar: d.indexar !== false });
