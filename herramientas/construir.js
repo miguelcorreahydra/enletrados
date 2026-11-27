@@ -68,7 +68,7 @@ const social = (ruta, d) => [["og:type", "website"], ["og:site_name", "Enletrado
   ["og:image:alt", "El pueblo de Enletrados y Tilde, la golondrina"]].map(([k, v]) => `<meta property="${k}" content="${esc(v)}">`).join("\n")
   + `\n<meta name="twitter:card" content="summary_large_image">`;
 function pagina(ruta, d) {
-  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS, anunciosJs: (ANUNCIOS_JS ? ` data-anuncios-js="/${ANUNCIOS_JS}"` : "") + (GTM ? ` data-gtm="${GTM}"` : ""),
+  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS, anunciosJs: (ANUNCIOS_JS ? ` data-anuncios-js="/${ANUNCIOS_JS}"` : "") + Object.entries(MED).map(([k, v]) => ` data-${k}="${v}"`).join(""),
     canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">`, social: social(ruta, d) }, d)));
   if (ruta.endsWith(".html")) fs.writeFileSync(path.join(DIST, ruta), html);
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
@@ -114,8 +114,10 @@ const ANUNCIO = SIMULADOS ? '<div class="espacio-anuncio" data-clarity-mask="tru
   : ACTIVOS ? '<div class="espacio-anuncio real" data-unidad="display_portada" data-clarity-mask="true" data-hj-suppress></div>' : "";
 // medición: Google Tag Manager (lo administra el usuario). Solo en el sitio publicado, nunca en local ni en las pruebas.
 const MEDICION = fs.existsSync(F("contenido/medicion.json")) ? JSON.parse(leer("contenido/medicion.json")) : {};
-if (MEDICION.gtm && !/^GTM-[A-Z0-9]+$/.test(MEDICION.gtm)) { console.error("✗ medicion.json: el código de Tag Manager no tiene el formato GTM-XXXX."); process.exit(1); }
-const GTM = PUBLICADO && !PRUEBA_ANUNCIOS ? MEDICION.gtm || "" : "";
+const FORMATOS = { gtm: /^GTM-[A-Z0-9]+$/, pixel: /^\d{10,20}$/, clarity: /^[a-z0-9]{6,20}$/, hotjar: /^\d{4,12}$/ };
+for (const [k, re] of Object.entries(FORMATOS)) if (MEDICION[k] && !re.test(MEDICION[k])) { console.error(`✗ medicion.json: «${k}» no tiene el formato esperado.`); process.exit(1); }
+const MED = {}; if (PUBLICADO && !PRUEBA_ANUNCIOS) for (const k of Object.keys(FORMATOS)) if (MEDICION[k]) MED[k] = MEDICION[k];
+const GTM = MED.gtm || "";
 // anuncios.js (el tag de Google): solo existe en el sitio cuando los anuncios están activos
 let ANUNCIOS_JS = "";
 if (ACTIVOS) {
@@ -222,12 +224,18 @@ fs.writeFileSync(path.join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="
 const scriptTema = (BASE.match(/<script>([\s\S]*?)<\/script>/) || [])[1] || "";
 const HUELLA_TEMA = "'sha256-" + crypto.createHash("sha256").update(scriptTema).digest("base64") + "'";
 const externos = MODO_ANUNCIOS === "activos" ? " https:" : "";
-// Tag Manager y Google Analytics 4 (si los anuncios están activos, " https:" ya los cubre)
-const gtmCsp = GTM && !externos ? { script: " https://*.googletagmanager.com", img: " https://*.googletagmanager.com https://*.google-analytics.com",
-  connect: " https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com" } : { script: "", img: "", connect: "" };
+// medición: solo los dominios de cada servicio encendido (con anuncios activos, " https:" ya cubre casi todo)
+const DOMINIOS_MED = {
+  gtm: { script: "https://*.googletagmanager.com", img: "https://*.googletagmanager.com https://*.google-analytics.com", connect: "https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com" },
+  pixel: { script: "https://connect.facebook.net", img: "https://www.facebook.com", connect: "https://www.facebook.com https://connect.facebook.net" },
+  clarity: { script: "https://*.clarity.ms", img: "https://*.clarity.ms https://c.bing.com", connect: "https://*.clarity.ms" },
+  hotjar: { script: "https://*.hotjar.com https://*.hotjar.io", img: "https://*.hotjar.com", connect: "https://*.hotjar.com https://*.hotjar.io wss://*.hotjar.com", font: "https://*.hotjar.com", style: "https://*.hotjar.com" }
+};
+const med = tipo => { const l = Object.keys(MED).map(k => DOMINIOS_MED[k][tipo]).filter(Boolean).join(" ").split(" ").filter(Boolean);
+  return [...new Set(externos ? l.filter(d => !d.startsWith("https:")) : l)].map(d => " " + d).join(""); };
 const CSP = [
-  "default-src 'self'", `script-src 'self' ${HUELLA_TEMA}${externos}${gtmCsp.script}`, "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob:${externos}${gtmCsp.img}`, "font-src 'self'", `connect-src 'self'${externos}${gtmCsp.connect}`, `frame-src ${externos ? "https:" : "'none'"}`,
+  "default-src 'self'", `script-src 'self' ${HUELLA_TEMA}${externos}${med("script")}`, `style-src 'self' 'unsafe-inline'${med("style")}`,
+  `img-src 'self' data: blob:${externos}${med("img")}`, `font-src 'self'${med("font")}`, `connect-src 'self'${externos}${med("connect")}`, `frame-src ${externos ? "https:" : "'none'"}`,
   "object-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-ancestors 'none'", "upgrade-insecure-requests"
 ].join("; ");
 const CABECERAS_SEGURIDAD = [
@@ -252,7 +260,7 @@ fs.writeFileSync(path.join(DIST, "_headers"), [
 const gz = f => zlib.gzipSync(fs.readFileSync(path.join(DIST, f)), { level: 9 }).length;
 const kb = b => (b / 1024).toFixed(1) + " KB";
 const portadaGz = gz("index.html"), nivelGz = gz("nivel/5/index.html"), cssGz = gz(CSS), jsGz = gz(JS);
-console.log(`Modo: ${ESTRICTO ? "estricto (para publicar)" : PUBLICADO ? "publicado (para revisar)" : "local"} · anuncios: ${MODO_ANUNCIOS} · medición: ${GTM || "no"} · dominio: ${DOMINIO}`);
+console.log(`Modo: ${ESTRICTO ? "estricto (para publicar)" : PUBLICADO ? "publicado (para revisar)" : "local"} · anuncios: ${MODO_ANUNCIOS} · medición: ${Object.keys(MED).join(", ") || "no"} · dominio: ${DOMINIO}`);
 console.log(`dist/ listo: ${paginas.length} páginas (${TOTAL} niveles), ${CSS}, ${JS}`);
 console.log(`Peso transferido (gzip): CSS ${kb(cssGz)} · JS ${kb(jsGz)} · portada ${kb(portadaGz)} · nivel ${kb(nivelGz)}`);
 if (sinAprobar) console.log(`Ojo: ${sinAprobar} de ${enUso.length} palabras en uso tienen la pista sin aprobar todavía (solo sirve en local).`);

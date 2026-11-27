@@ -1,4 +1,7 @@
 {
-  "nota": "Medición propia de Enletrados (nunca la de los blogs). Solo entra en el sitio publicado (--publicado y --estricto); en local no se carga, para no ensuciar los datos. Los eventos del juego (enl_inicio, enl_nivel_3, enl_diario…) llegan a dataLayer y se usan como activadores de evento personalizado en Tag Manager.",
-  "gtm": "GTM-NWZLHLTD"
+  "nota": "Medición propia de Enletrados (nunca la de los blogs; comprobado el 27 nov 2026). Solo entra en el sitio publicado (--publicado y --estricto); en local no se carga. Los eventos del juego (enl_inicio, enl_nivel_3, enl_diario…) llegan a dataLayer; los del píxel los manda app.js. Deja un campo vacío para apagar ese servicio.",
+  "gtm": "GTM-NWZLHLTD",
+  "pixel": "1187863220859635",
+  "clarity": "zk7p49h1s2",
+  "hotjar": "6856127"
 }

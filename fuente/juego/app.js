@@ -25,7 +25,35 @@
     var cargarGtm = function () { var s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtm.js?id=" + encodeURIComponent(GTM); document.head.appendChild(s); };
     if (document.readyState === "complete") cargarGtm(); else addEventListener("load", cargarGtm);
   }
-  function evento(n, d) { (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: n }, d || {})); }
+  // Píxel de Meta, Clarity y Hotjar (códigos del usuario, propios de Enletrados). Las colas se crean ya, así ningún evento
+  // se pierde; los scripts se piden cuando la página terminó de cargar (el píxel) o un momento después (las grabaciones).
+  // Los espacios de anuncio llevan data-clarity-mask y data-hj-suppress: no se graban.
+  var RAIZ = document.documentElement.dataset;
+  function cargarScript(src) { var s = document.createElement("script"); s.async = true; s.src = src; document.head.appendChild(s); }
+  function alCargar(f, ms) { var g = function () { setTimeout(f, ms || 0); }; if (document.readyState === "complete") g(); else addEventListener("load", g); }
+  if (RAIZ.pixel) {
+    var fb = window.fbq = function () { fb.callMethod ? fb.callMethod.apply(fb, arguments) : fb.queue.push(arguments); };
+    if (!window._fbq) window._fbq = fb; fb.push = fb; fb.loaded = true; fb.version = "2.0"; fb.queue = [];
+    fb("init", RAIZ.pixel); fb("track", "PageView");
+    alCargar(function () { cargarScript("https://connect.facebook.net/en_US/fbevents.js"); });
+  }
+  if (RAIZ.clarity) {
+    window.clarity = window.clarity || function () { (window.clarity.q = window.clarity.q || []).push(arguments); };
+    alCargar(function () { cargarScript("https://www.clarity.ms/tag/" + encodeURIComponent(RAIZ.clarity)); }, 1500);
+  }
+  if (RAIZ.hotjar) {
+    window.hj = window.hj || function () { (window.hj.q = window.hj.q || []).push(arguments); };
+    window._hjSettings = { hjid: +RAIZ.hotjar, hjsv: 6 };
+    alCargar(function () { cargarScript("https://static.hotjar.com/c/hotjar-" + window._hjSettings.hjid + ".js?sv=6"); }, 1500);
+  }
+  // Al píxel van solo los momentos que sirven a la campaña. enl_nivel_3 es «Cliente potencial» (Lead): la conversión
+  // «ENL - Nivel 3» por la que optimiza la campaña (alguien que de verdad jugó).
+  var PIXEL = { enl_nivel_3: ["track", "Lead"], enl_nivel_1: ["trackCustom", "enl_nivel_1"], enl_nivel_5: ["trackCustom", "enl_nivel_5"],
+    enl_nivel_10: ["trackCustom", "enl_nivel_10"], enl_diario: ["trackCustom", "enl_diario"], enl_regreso: ["trackCustom", "enl_regreso"] };
+  function evento(n, d) {
+    (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: n }, d || {}));
+    if (window.fbq && RAIZ.pixel && PIXEL[n]) window.fbq(PIXEL[n][0], PIXEL[n][1], { content_name: n });
+  }
   function datos(id) { var e = $(id); return e ? JSON.parse(e.textContent) : null; }
 
   // ---------- fechas locales (el diario y la racha usan la fecha del jugador) ----------

@@ -20,7 +20,7 @@ Responder siempre en español.
 - **Repositorio:** privado en GitHub, `miguelcorreahydra/enletrados` (cuenta personal del usuario). Este repositorio
   tiene su propio ayudante de credenciales para usar esa cuenta, aunque la cuenta activa de `gh` sea otra. Los commits
   van con el correo `noreply` de GitHub de esa cuenta.
-- **Medición, más adelante:** Analytics, píxel de Meta, **Clarity y Hotjar** (los dos, decidido por el usuario). En las
+- **Medición:** Analytics (por Tag Manager), píxel de Meta, **Clarity y Hotjar** (los dos, decidido por el usuario); ya conectados, ver abajo. En las
   grabaciones se ocultan los espacios de anuncio (`data-clarity-mask`, `data-hj-suppress`). Se cargan después de que se
   vea el juego.
 - Decisiones del usuario:
@@ -74,11 +74,13 @@ Responder siempre en español.
   `--anuncios-prueba`, que `--estricto` rechaza). La frecuencia de la viñeta se fija en Ad Manager.
   **ads.txt:** Google lo busca en `cosmovil.com.mx/ads.txt`; para un subdominio, ese archivo debe incluir
   `subdomain=enletrados.cosmovil.com.mx` o las líneas de Groone.
-- **Tag Manager (27 nov 2026): `GTM-NWZLHLTD`**, del usuario, en `fuente/contenido/medicion.json`. Lo administra el
-  usuario (Analytics se configura dentro de Tag Manager). Solo entra en el sitio publicado; se carga desde `app.js` al
-  terminar la página (la CSP no permite el script en línea). Los eventos `enl_*` llegan a `dataLayer`. La CSP abre
-  `*.googletagmanager.com`, `*.google-analytics.com` y `*.analytics.google.com`; las etiquetas de «HTML personalizado»
-  de Tag Manager quedan bloqueadas por la CSP. `npm run prueba:medicion` lo comprueba sin mandar nada a Google.
+- **Medición conectada (27 nov 2026)**, códigos del usuario en `fuente/contenido/medicion.json` (comprobado que ninguno
+  es de los blogs): Tag Manager `GTM-NWZLHLTD` (Analytics lo configura el usuario dentro de Tag Manager), píxel de Meta
+  `1187863220859635`, Clarity `zk7p49h1s2` y Hotjar `6856127`. Solo entran en el sitio publicado; los carga `app.js`
+  (la CSP no permite scripts en línea): Tag Manager y el píxel al terminar la página, Clarity y Hotjar 1,5 s después.
+  Al píxel van `enl_nivel_3` como **Lead** (conversión «ENL - Nivel 3») y como personalizados `enl_nivel_1/5/10`,
+  `enl_diario` y `enl_regreso`. La CSP abre solo los dominios de cada servicio encendido; las etiquetas de «HTML
+  personalizado» de Tag Manager quedan bloqueadas. `npm run prueba:medicion` lo comprueba sin mandar nada.
 - **Vista previa al compartir:** `fuente/publico/compartir.jpg` (1200×630, JPG aprobado como excepción a la regla 6),
   se rehace con `npm run compartir`; etiquetas Open Graph en todas las páginas.
 - **Rediseño premium en curso** (aprobado el 26 nov 2026, antes de postales y vecinos):
