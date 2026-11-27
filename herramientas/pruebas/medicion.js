@@ -21,6 +21,7 @@ const construir = (...a) => execFileSync("node", [path.join(RAIZ, "herramientas/
       const u = r.url();
       if (u.startsWith("https://www.googletagmanager.com/gtm.js")) { gtm = { u, t: Date.now() }; return r.respond({ status: 200, contentType: "application/javascript", body: "window.__gtm=1;" }); }
       for (const [k, pre] of Object.entries(SIMULADOS)) if (u.startsWith(pre)) { pedidos[k] = { u, t: Date.now() }; return r.respond({ status: 200, contentType: "application/javascript", body: "" }); }
+      if (/groone\.com|doubleclick\.net/.test(u)) return r.abort(); // anuncios: los revisa npm run prueba:anuncios
       if (!u.startsWith(BASE)) { externos.push(u); return r.abort(); }
       if (r.resourceType() !== "document") return r.continue();
       try { const res = await fetch(u), cuerpo = (await res.text()).replace(/<script>\(function\(\)\{var s=new EventSource\("\/__recarga"\)[\s\S]*?<\/script>/, "");

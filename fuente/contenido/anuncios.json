@@ -1,13 +1,20 @@
 {
-  "nota": "Anuncios de Google Ad Manager a través de Groone. Mientras «activo» sea false, el sitio publicado no muestra anuncios ni ofertas de recompensa (en local se simulan). Los códigos los entrega Groone: «red» es el código de red (solo números) y cada unidad es su nombre o su ruta completa (/red/unidad). En «ads_txt» van las líneas de ads.txt tal como las entregue Groone.",
-  "activo": false,
-  "red": "",
-  "unidades": {
-    "recompensa": "",
-    "vineta": "",
-    "display_nivel": "",
-    "display_portada": "",
-    "anchor": ""
+  "nota": "Anuncios de Google Ad Manager a través de Groone (códigos entregados el 27 nov 2026). Con «activo» en false el sitio publicado no muestra anuncios ni ofertas de recompensa (en local se simulan). groone.js se carga fuera de la partida: en portada y páginas de texto al terminar de cargar; en niveles y diario solo cuando aparece la pantalla de completado. «recompensa» es la ruta de la unidad de Ad Manager del anuncio con recompensa (/red/dominio/unidad); vacía, el juego no ofrece anuncios con recompensa. No se usa rewardsv2.min.js de Groone: abre solo una ventana que bloquea la página.",
+  "activo": true,
+  "groone": {
+    "network": "23070559321",
+    "date": "20261127",
+    "domain": "enletrados.cosmovil.com.mx",
+    "subdomain": "Enletrados",
+    "title": "Enlaces Patrocinados:",
+    "anchor": "TOP"
   },
-  "ads_txt": ""
+  "espacios": {
+    "portada": "Content1",
+    "como_jugar": "Content2",
+    "nivel_completado": "Content3",
+    "diario_completado": "Content4"
+  },
+  "recompensa": "",
+  "ads_txt": "google.com, pub-5119245763044424, DIRECT, f08c47fec0942fa0"
 }

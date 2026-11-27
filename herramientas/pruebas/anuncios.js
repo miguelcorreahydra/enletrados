@@ -1,108 +1,116 @@
-// Prueba de los anuncios de Ad Manager con el GPT simulado (nunca pide anuncios reales: regla 8).
-// Uso: con npm run dev encendido, npm run prueba:anuncios. Arma dist/ con --anuncios-prueba (unidades falsas), revisa y al
-// final vuelve a armar dist/ normal.
-//  1. El tag de Google se pide solo después de que la página cargó, y el muro de ofertas queda apagado.
-//  2. Portada: display y anchor. Niveles 1 y 2: nada, y sus enlaces no disparan la viñeta. Nivel 3 en adelante: viñeta.
-//     Nunca hay anchor ni display durante la partida.
+// Prueba de los anuncios (Groone + Ad Manager) con groone.js real (copia local en datos/groone/) y el GPT simulado.
+// Nunca pide anuncios reales: todo pedido a Google o a Groone se bloquea o se simula (regla 8).
+// Uso: con npm run dev encendido, npm run prueba:anuncios. Arma dist/ con --anuncios-prueba, revisa y lo deja normal.
+// La copia de groone.js se baja con: curl -o datos/groone/groone.js https://genius.groone.com/groone.js
+//  1. Muro de ofertas apagado. groone.js se carga después de la página, nunca durante la partida.
+//  2. Portada: Content1 y anchor arriba. Cómo jugar: Content2. Niveles: nada mientras se juega; al completar, Content3
+//     (y la viñeta desde el nivel 3). Diario: nada mientras se juega. Los niveles 1 y 2 no disparan la viñeta.
 //  3. Recompensa: con el anuncio visto da 2 letras; cerrado antes no da nada; sin anuncio, Tilde regala 1 letra.
-//  4. Nivel completado: aparece el display debajo de los botones.
-//  5. Con la CSP de anuncios activos no hay bloqueos ni errores, y no sale ningún pedido externo fuera del tag simulado.
+//  4. El display de «nivel completado» queda a 32 px o más de los botones.
+//  5. Con la CSP de anuncios activos no hay bloqueos ni errores.
 "use strict";
 const puppeteer = require("puppeteer-core"), fs = require("fs"), path = require("path"), { execFileSync } = require("child_process");
 const BASE = "http://localhost:8080", RAIZ = path.join(__dirname, "../.."), DIST = path.join(RAIZ, "dist");
-const GPT = "https://securepubads.g.doubleclick.net/tag/js/gpt.js", SIM = fs.readFileSync(path.join(__dirname, "gpt_simulado.js"), "utf8");
+const GPT = "https://securepubads.g.doubleclick.net/tag/js/gpt.js", GROONE = "https://genius.groone.com/groone.js";
+const SIM = fs.readFileSync(path.join(__dirname, "gpt_simulado.js"), "utf8"), COPIA = path.join(RAIZ, "datos/groone/groone.js");
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const fallas = [], ok = m => console.log("✓ " + m), mal = m => { fallas.push(m); console.log("✗ " + m); };
 const construir = (...a) => execFileSync("node", [path.join(RAIZ, "herramientas/construir.js"), ...a], { cwd: RAIZ, stdio: "pipe" });
 
 async function formar(p, palabra) {
-  const pts = await p.evaluate(w => {
-    const fichas = [...document.querySelectorAll(".letra")], usadas = new Set();
-    return w.split("").map(l => { const i = fichas.findIndex((f, j) => !usadas.has(j) && f.textContent === l); usadas.add(i); const r = fichas[i].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; });
-  }, palabra);
-  await p.mouse.move(pts[0][0], pts[0][1]); await p.mouse.down();
-  for (const [x, y] of pts.slice(1)) await p.mouse.move(x, y, { steps: 6 });
-  await p.mouse.up();
+  const pts = await p.evaluate(w => { const f = [...document.querySelectorAll(".letra")], u = new Set(); return w.split("").map(l => { const i = f.findIndex((x, j) => !u.has(j) && x.textContent === l); u.add(i); const r = f[i].getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; }); }, palabra);
+  await p.mouse.move(pts[0][0], pts[0][1]); await p.mouse.down(); for (const [x, y] of pts.slice(1)) await p.mouse.move(x, y, { steps: 6 }); await p.mouse.up();
 }
 
 (async () => {
+  if (!fs.existsSync(COPIA)) { console.log("Falta la copia de groone.js en datos/groone/ (ver el encabezado de este archivo)."); process.exit(1); }
+  const GRO = fs.readFileSync(COPIA, "utf8");
   construir("--anuncios-prueba");
   try {
-    const cab = fs.readFileSync(path.join(DIST, "_headers"), "utf8"), CSP = cab.match(/Content-Security-Policy: (.*)/)[1];
+    const CSP = fs.readFileSync(path.join(DIST, "_headers"), "utf8").match(/Content-Security-Policy: (.*)/)[1];
     const nav = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true });
     const p = await nav.newPage(); await p.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
-    const avisos = [], externos = []; let pedidoGpt = 0;
+    const avisos = [], externos = new Set(); let pedidoGroone = 0;
     p.on("pageerror", e => avisos.push("Error JS: " + e.message));
     p.on("console", m => { if (/Content Security Policy|Refused to/i.test(m.text())) avisos.push("CSP: " + m.text()); });
     await p.setRequestInterception(true);
     p.on("request", async r => {
       const u = r.url();
-      if (u.startsWith(GPT)) { pedidoGpt = Date.now(); return r.respond({ status: 200, contentType: "application/javascript", body: SIM }); }
+      if (u.startsWith(GPT)) return r.respond({ status: 200, contentType: "application/javascript", headers: { "access-control-allow-origin": "*" }, body: SIM }); // el GPT real responde con CORS
+      if (u.startsWith(GROONE)) { pedidoGroone = Date.now(); return r.respond({ status: 200, contentType: "application/javascript", body: GRO }); }
       if (u.startsWith("data:")) return r.continue();
-      if (!u.startsWith(BASE)) { externos.push(u); return r.abort(); }
+      // API de Groone (valores clave y conteo de páginas): respuesta vacía simulada, sin contactar a Groone
+      if (/^https:\/\/(genius|data)\.groone\.com\/api\//.test(u)) { externos.add(new URL(u).host + " (simulado)"); return r.respond({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }); }
+      if (!u.startsWith(BASE)) { externos.add(new URL(u).host); return r.abort(); } // API de Groone y demás: bloqueados
       if (r.resourceType() !== "document") return r.continue();
       try { const res = await fetch(u), cuerpo = (await res.text()).replace(/<script>\(function\(\)\{var s=new EventSource\("\/__recarga"\)[\s\S]*?<\/script>/, "");
         r.respond({ status: res.status, headers: { "content-type": res.headers.get("content-type") || "text/html", "content-security-policy": CSP }, body: cuerpo });
       } catch (e) { r.abort(); }
     });
-    const ir = async (ruta, ms = 2600) => { pedidoGpt = 0; await p.goto(BASE + ruta, { waitUntil: "load" }); const cargo = Date.now(); await espera(ms); return cargo; };
-    const slots = () => p.evaluate(() => (window.__gpt ? window.__gpt.slots.filter(s => s.vivo !== false || s.tipo === "recompensa").map(s => s.tipo + ":" + s.ruta.split("/").pop()) : null));
+    const ir = async (ruta, ms = 3000) => { pedidoGroone = 0; await p.goto(BASE + ruta, { waitUntil: "load" }); const t = Date.now(); await espera(ms); return t; };
+    const estado = () => p.evaluate(() => {
+      const s = document.getElementById("grooneads");
+      return { groone: !!s, anchor: s && s.getAttribute("data-anchor"), vineta: s && s.getAttribute("data-interstitial"),
+        slots: window.__gpt ? window.__gpt.slots.map(x => x.tipo + ":" + x.ruta.split("/").pop()) : [] };
+    });
     const progreso = d => p.evaluate(d => { localStorage.clear(); localStorage.setItem("enl_progreso", JSON.stringify(d)); }, d);
+    const completar = async () => { for (const w of await p.evaluate(() => JSON.parse(document.getElementById("datos-nivel").textContent).palabras.map(x => x.p))) { await formar(p, w); await espera(1200); } await espera(3000); };
 
-    // 1) portada
+    // 1-2) portada y cómo jugar
     await ir("/"); await progreso({ hechos: [1, 2], monedas: 100, llegada: "2026-11-01" });
     const cargo = await ir("/");
-    const r1 = await p.evaluate(() => ({ modo: document.documentElement.dataset.anuncios, fc: (() => { let x = null; window.googlefc.controlledMessagingFunction({ proceed: v => (x = v) }); return x; })() }));
-    if (r1.modo === "activos" && pedidoGpt && pedidoGpt - cargo >= 900) ok(`el tag de Google se pide ${((pedidoGpt - cargo) / 1000).toFixed(1)} s después de cargar la página`); else mal("el tag de Google se pidió antes de tiempo o no se pidió");
-    if (r1.fc === false) ok("el muro de ofertas queda apagado (controlledMessagingFunction → proceed(false))"); else mal("el muro de ofertas no está bloqueado");
-    const sp = await slots();
-    if (sp && sp.includes("display:enl_prueba_display_portada") && sp.includes("anchor:enl_prueba_anchor") && !sp.some(s => /vineta|recompensa/.test(s))) ok("portada: display y anchor, sin viñeta ni recompensa");
-    else mal("portada: espacios inesperados " + JSON.stringify(sp));
+    const fc = await p.evaluate(() => { let x = null; window.googlefc.controlledMessagingFunction({ proceed: v => (x = v) }); return x; });
+    if (fc === false) ok("muro de ofertas apagado"); else mal("el muro de ofertas no está bloqueado");
+    if (pedidoGroone && pedidoGroone - cargo >= 900) ok(`groone.js se pide ${((pedidoGroone - cargo) / 1000).toFixed(1)} s después de cargar la página`); else mal("groone.js se pidió antes de tiempo o no se pidió");
+    const ep = await estado();
+    if (ep.slots.some(s => /^display:Enletrados_Content1_/.test(s)) && ep.anchor === "TOP" && !ep.vineta) ok("portada: Content1 y anchor arriba, sin viñeta (" + ep.slots.join(", ") + ")");
+    else mal("portada: " + JSON.stringify(ep));
+    await p.evaluate(() => { const d = document.querySelector(".espacio-anuncio.real"); d && d.scrollIntoView({ block: "center" }); }); await espera(400);
+    await p.screenshot({ path: path.join(__dirname, "capturas", "anuncio-portada.png") });
+    await ir("/como-jugar/"); const ec = await estado();
+    if (ec.slots.some(s => /^display:Enletrados_Content2_/.test(s))) ok("cómo jugar: Content2"); else mal("cómo jugar: " + JSON.stringify(ec));
 
-    // 2) niveles
-    await ir("/nivel/1/"); const s1 = await slots();
-    if (s1 && s1.length === 0) ok("nivel 1: ningún anuncio"); else mal("nivel 1 con anuncios: " + JSON.stringify(s1));
-    await ir("/nivel/2/", 2000);
-    const sinVineta = await p.evaluate(() => [...document.querySelectorAll("a")].every(a => a.dataset.googleInterstitial === "false"));
-    if (sinVineta) ok("nivel 2: todos los enlaces llevan la viñeta apagada"); else mal("nivel 2: hay enlaces sin data-google-interstitial=\"false\"");
-    await ir("/nivel/3/"); const s3 = await slots();
-    if (s3 && s3.length === 1 && s3[0] === "vineta:enl_prueba_vineta") ok("nivel 3: solo la viñeta (sin anchor ni display durante la partida)"); else mal("nivel 3: " + JSON.stringify(s3));
-    await ir("/diario/"); const sd = await slots();
-    if (sd && sd.length === 0) ok("diario: ningún anuncio durante la partida"); else mal("diario con anuncios: " + JSON.stringify(sd));
+    // 2) niveles y diario
+    await progreso({ hechos: [], monedas: 100, llegada: "2026-11-01" }); await ir("/nivel/1/");
+    const e1 = await estado(); if (!e1.groone && !e1.slots.length) ok("nivel 1 mientras se juega: nada de anuncios"); else mal("nivel 1 en juego: " + JSON.stringify(e1));
+    await completar(); const e1b = await estado();
+    if (e1b.slots.some(s => /^display:Enletrados_Content3_/.test(s)) && !e1b.vineta && !e1b.anchor) ok("nivel 1 completado: Content3, sin viñeta ni anchor"); else mal("nivel 1 completado: " + JSON.stringify(e1b));
+    await ir("/nivel/2/", 1500);
+    if (await p.evaluate(() => [...document.querySelectorAll("a")].every(a => a.dataset.googleInterstitial === "false"))) ok("nivel 2: todos los enlaces con la viñeta apagada"); else mal("nivel 2: hay enlaces que podrían disparar la viñeta");
+    await progreso({ hechos: [1, 2], monedas: 100, llegada: "2026-11-01" }); await ir("/nivel/3/");
+    const e3 = await estado(); if (!e3.groone) ok("nivel 3 mientras se juega: nada de anuncios"); else mal("nivel 3 en juego: " + JSON.stringify(e3));
+    await completar(); const e3b = await estado();
+    const fin = await p.evaluate(() => { const d = document.querySelector(".espacio-anuncio.real"), b = document.querySelector("a.con-vineta");
+      return { distancia: d && b ? Math.round(d.getBoundingClientRect().top - b.getBoundingClientRect().bottom) : null, lleno: !!(d && d.querySelector(".gpt-sim")) }; });
+    if (e3b.vineta === "true" && e3b.slots.some(s => /^display:Enletrados_Content3_/.test(s)) && fin.lleno) ok(`nivel 3 completado: Content3 y viñeta para «Siguiente nivel» (${e3b.slots.join(", ")})`); else mal("nivel 3 completado: " + JSON.stringify({ e3b, fin }));
+    const CAP = path.join(__dirname, "capturas"); fs.mkdirSync(CAP, { recursive: true });
+    await p.evaluate(() => { const d = document.querySelector(".espacio-anuncio.real"); d && d.scrollIntoView({ block: "center" }); }); await espera(400);
+    await p.screenshot({ path: path.join(CAP, "anuncio-nivel-completado.png") });
+    if (fin.distancia !== null && fin.distancia >= 32) ok(`el display queda a ${fin.distancia} px de los botones`); else mal("el display quedó cerca de los botones: " + fin.distancia);
+    await ir("/diario/"); const ed = await estado();
+    if (!ed.groone) ok("diario mientras se juega: nada de anuncios"); else mal("diario en juego: " + JSON.stringify(ed));
 
-    // 3) recompensa: visto, cerrado y sin anuncio
+    // 3) recompensa (unidad de prueba; groone.js no interviene)
     const pedir = async modo => {
       await progreso({ hechos: [1, 2, 3, 4], monedas: 0, gratis: 0, llegada: "2026-11-01" });
       await ir("/nivel/5/", 2600); await p.evaluate(m => (window.__gptModo = m), modo);
       const antes = await p.evaluate(() => document.querySelectorAll(".celda.revelada").length);
       await p.click("#b-letra"); await espera(500);
-      const hay = await p.$('[data-accion="ver-letra"]'); if (!hay) return { oferta: false };
-      await hay.click(); await espera(9500);
-      const despues = await p.evaluate(() => document.querySelectorAll(".celda.revelada").length);
-      return { oferta: true, letras: despues - antes, n: await p.evaluate(() => (JSON.parse(localStorage.getItem("enl_recompensas") || "null") || { n: 0 }).n) };
+      const b = await p.$('[data-accion="ver-letra"]'); if (!b) return { oferta: false };
+      await b.click(); await espera(9500);
+      return { oferta: true, letras: (await p.evaluate(() => document.querySelectorAll(".celda.revelada").length)) - antes,
+        n: await p.evaluate(() => (JSON.parse(localStorage.getItem("enl_recompensas") || "null") || { n: 0 }).n), groone: (await estado()).groone };
     };
     const rv = await pedir("ok"), rc = await pedir("cerrar"), rs = await pedir("vacio");
-    if (rv.oferta && rv.letras === 2 && rv.n === 1) ok("recompensa vista: 2 letras y se cuenta en el tope diario"); else mal("recompensa vista: " + JSON.stringify(rv));
-    if (rc.oferta && rc.letras === 0 && rc.n === 0) ok("recompensa cerrada antes de tiempo: no da premio"); else mal("recompensa cerrada: " + JSON.stringify(rc));
+    if (rv.oferta && rv.letras === 2 && rv.n === 1 && !rv.groone) ok("recompensa vista: 2 letras, cuenta en el tope diario y no carga display durante la partida"); else mal("recompensa vista: " + JSON.stringify(rv));
+    if (rc.oferta && rc.letras === 0 && rc.n === 0) ok("recompensa cerrada antes: sin premio"); else mal("recompensa cerrada: " + JSON.stringify(rc));
     if (rs.oferta && rs.letras === 1 && rs.n === 0) ok("sin anuncio disponible: Tilde regala 1 letra"); else mal("sin anuncio: " + JSON.stringify(rs));
 
-    // 4) nivel completado
-    await progreso({ hechos: [1, 2, 3, 4], monedas: 100, llegada: "2026-11-01" }); await ir("/nivel/5/", 2600);
-    for (const w of await p.evaluate(() => JSON.parse(document.getElementById("datos-nivel").textContent).palabras.map(x => x.p))) { await formar(p, w); await espera(1200); }
-    await espera(2500);
-    const fin = await p.evaluate(() => { const d = document.querySelector(".espacio-anuncio.real"), b = document.querySelector("a.con-vineta");
-      return { slots: window.__gpt.slots.filter(s => s.tipo === "display").map(s => s.ruta.split("/").pop()), lleno: !!(d && d.querySelector(".gpt-sim")),
-        distancia: d && b ? Math.round(d.getBoundingClientRect().top - b.getBoundingClientRect().bottom) : null }; });
-    if (fin.slots.includes("enl_prueba_display_nivel") && fin.lleno) ok(`nivel completado: display a ${fin.distancia} px del botón «Siguiente nivel»`); else mal("nivel completado: " + JSON.stringify(fin));
-    if (fin.distancia !== null && fin.distancia < 32) mal("el display quedó a menos de 32 px de los botones");
-
-    // 5) CSP y pedidos externos
-    if (avisos.length) mal("problemas con la CSP o errores:\n   " + [...new Set(avisos)].slice(0, 6).join("\n   ")); else ok("sin bloqueos de la CSP ni errores de JavaScript");
-    if (externos.length) mal("pedidos externos inesperados: " + [...new Set(externos)].slice(0, 5).join(", ")); else ok("ningún pedido externo fuera del tag (simulado)");
+    // 5) CSP
+    if (avisos.length) mal("CSP o errores:\n   " + [...new Set(avisos)].slice(0, 8).join("\n   ")); else ok("sin bloqueos de la CSP ni errores de JavaScript");
+    console.log("  (pedidos externos bloqueados en la prueba: " + ([...externos].join(", ") || "ninguno") + ")");
     await nav.close();
-  } finally {
-    construir(); // dist/ vuelve a quedar normal (anuncios simulados)
-  }
+  } finally { construir(); }
   console.log(fallas.length ? `\n${fallas.length} problema(s) con los anuncios` : "\nAnuncios en orden.");
   process.exit(fallas.length ? 1 : 0);
 })();

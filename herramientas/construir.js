@@ -68,7 +68,7 @@ const social = (ruta, d) => [["og:type", "website"], ["og:site_name", "Enletrado
   ["og:image:alt", "El pueblo de Enletrados y Tilde, la golondrina"]].map(([k, v]) => `<meta property="${k}" content="${esc(v)}">`).join("\n")
   + `\n<meta name="twitter:card" content="summary_large_image">`;
 function pagina(ruta, d) {
-  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS, anunciosJs: (ANUNCIOS_JS ? ` data-anuncios-js="/${ANUNCIOS_JS}"` : "") + Object.entries(MED).map(([k, v]) => ` data-${k}="${v}"`).join(""),
+  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS, anunciosJs: (ANUNCIOS_JS ? ` data-anuncios-js="/${ANUNCIOS_JS}" data-espacio-nivel="${ESPACIOS.nivel_completado || ""}" data-espacio-diario="${ESPACIOS.diario_completado || ""}"` : "") + Object.entries(MED).map(([k, v]) => ` data-${k}="${v}"`).join(""),
     canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">`, social: social(ruta, d) }, d)));
   if (ruta.endsWith(".html")) fs.writeFileSync(path.join(DIST, ruta), html);
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
@@ -99,39 +99,41 @@ const PUEBLO = `<svg class="pueblo" viewBox="0 0 ${GEO.ancho} ${ALTO_PUEBLO}" ro
 ${Object.entries(GEO.lugares).map(([id, l]) => `<image class="luz-lugar" data-mundo="${id}" data-src="${ARCHIVO["lugar-" + id + ".webp"]}" x="${l.x}" y="${l.y}" width="${l.w}" height="${l.h}"/>`).join("\n")}
 </svg>`;
 // anuncio anchor SIMULADO: solo fuera de la partida (portada, lugares y cómo jugar); nunca en niveles ni en el diario
-const CONF_ANUNCIOS = PRUEBA_ANUNCIOS ? { activo: true, red: "0000000", unidades: { recompensa: "enl_prueba_recompensa", vineta: "enl_prueba_vineta", display_nivel: "enl_prueba_display_nivel", display_portada: "enl_prueba_display_portada", anchor: "enl_prueba_anchor" }, ads_txt: "" }
-  : fs.existsSync(F("contenido/anuncios.json")) ? JSON.parse(leer("contenido/anuncios.json")) : { activo: false };
+// --anuncios-prueba usa los mismos datos de Groone, pero con una unidad de recompensa falsa y el GPT simulado
+const CONF_LEIDA = fs.existsSync(F("contenido/anuncios.json")) ? JSON.parse(leer("contenido/anuncios.json")) : { activo: false };
+const CONF_ANUNCIOS = PRUEBA_ANUNCIOS ? Object.assign({}, CONF_LEIDA, { activo: true, recompensa: "/0000000/enletrados.prueba/enl_prueba_recompensa", ads_txt: "" }) : CONF_LEIDA;
 if (ESTRICTO && PRUEBA_ANUNCIOS) { console.error("✗ --anuncios-prueba es solo para pruebas: no se puede publicar así."); process.exit(1); }
 const MODO_ANUNCIOS = !PUBLICADO ? "simulados" : CONF_ANUNCIOS.activo ? "activos" : "no";
 const SIMULADOS = MODO_ANUNCIOS === "simulados", ACTIVOS = MODO_ANUNCIOS === "activos";
-if (ACTIVOS && ESTRICTO && (!/^\d+$/.test(CONF_ANUNCIOS.red || "") || !Object.values(CONF_ANUNCIOS.unidades || {}).some(Boolean))) {
-  console.error("✗ anuncios.json dice activo: true, pero falta el código de red o las unidades de Groone."); process.exit(1);
+const GROONE = CONF_ANUNCIOS.groone || {}, ESPACIOS = CONF_ANUNCIOS.espacios || {};
+if (ACTIVOS && (!/^\d+$/.test(GROONE.network || "") || !GROONE.domain || !GROONE.subdomain || !GROONE.date)) {
+  console.error("✗ anuncios.json dice activo: true, pero faltan datos de Groone (network, domain, subdomain, date)."); process.exit(1);
 }
-// con Ad Manager activo: el anchor lo pone Google (no hay div) y los espacios de display llevan su unidad
+// con Ad Manager activo: el anchor lo pone Groone (no hay div) y cada espacio de display es un <div groone="ContentN">
 const ANCHOR = SIMULADOS ? '<div class="anchor-sim" data-clarity-mask="true" data-hj-suppress>Anuncio anchor (simulado)</div>' : "";
 const CON_ANCHOR = SIMULADOS || ACTIVOS ? "con-anchor" : "";
-const ANUNCIO = SIMULADOS ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>'
-  : ACTIVOS ? '<div class="espacio-anuncio real" data-unidad="display_portada" data-clarity-mask="true" data-hj-suppress></div>' : "";
+const anuncio = (cual, perezoso) => SIMULADOS ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>'
+  : ACTIVOS && ESPACIOS[cual] ? `<div class="espacio-anuncio real" data-clarity-mask="true" data-hj-suppress><div groone="${ESPACIOS[cual]}"${perezoso ? ' lazyload="true"' : ""}></div></div>` : "";
 // medición: Google Tag Manager (lo administra el usuario). Solo en el sitio publicado, nunca en local ni en las pruebas.
 const MEDICION = fs.existsSync(F("contenido/medicion.json")) ? JSON.parse(leer("contenido/medicion.json")) : {};
 const FORMATOS = { gtm: /^GTM-[A-Z0-9]+$/, pixel: /^\d{10,20}$/, clarity: /^[a-z0-9]{6,20}$/, hotjar: /^\d{4,12}$/ };
 for (const [k, re] of Object.entries(FORMATOS)) if (MEDICION[k] && !re.test(MEDICION[k])) { console.error(`✗ medicion.json: «${k}» no tiene el formato esperado.`); process.exit(1); }
 const MED = {}; if (PUBLICADO && !PRUEBA_ANUNCIOS) for (const k of Object.keys(FORMATOS)) if (MEDICION[k]) MED[k] = MEDICION[k];
 const GTM = MED.gtm || "";
-// anuncios.js (el tag de Google): solo existe en el sitio cuando los anuncios están activos
+// anuncios.js (carga groone.js y la recompensa): solo existe en el sitio cuando los anuncios están activos
 let ANUNCIOS_JS = "";
 if (ACTIVOS) {
-  const conf = { red: CONF_ANUNCIOS.red, unidades: CONF_ANUNCIOS.unidades };
+  const conf = { groone: GROONE, recompensa: CONF_ANUNCIOS.recompensa || "" };
   const codigo = minJs(leer("juego/anuncios.js").replace("__CONF__", JSON.stringify(conf)));
   ANUNCIOS_JS = `anuncios.${huella(codigo)}.js`; fs.writeFileSync(path.join(DIST, ANUNCIOS_JS), codigo);
 }
-// ads.txt: las líneas que entregue Groone (campo ads_txt de anuncios.json)
+// ads.txt: las líneas que entregó Groone (campo ads_txt de anuncios.json)
 if (CONF_ANUNCIOS.ads_txt) fs.writeFileSync(path.join(DIST, "ads.txt"), String(CONF_ANUNCIOS.ads_txt).trim() + "\n");
 
 // portada
 pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina: "portada", clase: CON_ANCHOR,
   descripcion: "Forma palabras deslizando el dedo por las letras y completa el crucigrama. Cada palabra tiene su pista. Gratis y sin instalar nada.",
-  contenido: ANCHOR + plantilla("portada.html", { pueblo: PUEBLO, anuncioPortada: ANUNCIO, frase1: esc(mundos[0].frase), datos: json(sitio) }) });
+  contenido: ANCHOR + plantilla("portada.html", { pueblo: PUEBLO, anuncioPortada: anuncio("portada", false), frase1: esc(mundos[0].frase), datos: json(sitio) }) });
 
 // mundos
 const lista = mundos.map(m => `    <li><a class="mundo-item cerrado" data-mundo="${m.id}" style="--mundo:${m.color}"><span class="num">${m.id}</span><div><b>${esc(m.lugar)}</b>` +
@@ -206,7 +208,7 @@ const TEXTOS = {
 };
 for (const [slug, [titulo, descripcion, conAnuncio]] of Object.entries(TEXTOS)) {
   pagina(`/${slug}/`, { titulo, descripcion, pagina: "texto", clase: conAnuncio ? CON_ANCHOR : "",
-    contenido: plantilla("texto.html", { cuerpo: rellenar(leer(`paginas/${slug}.html`).trim(), Object.assign({ dominio: DOMINIO.replace("https://", "") }, SITIO)), anuncio: conAnuncio ? ANUNCIO + ANCHOR : "" }) });
+    contenido: plantilla("texto.html", { cuerpo: rellenar(leer(`paginas/${slug}.html`).trim(), Object.assign({ dominio: DOMINIO.replace("https://", "") }, SITIO)), anuncio: conAnuncio ? anuncio(slug === "como-jugar" ? "como_jugar" : slug, true) + ANCHOR : "" }) });
 }
 
 // 404

@@ -70,13 +70,18 @@ Responder siempre en español.
     #10-31, Armenia, Quindío, Colombia; infocosmovil@gmail.com; atiende datos personales Valentina Forero.
   - **Segunda subida aprobada (27 nov 2026), con anuncios apagados:** paquete en `respaldos/`, respaldo de lo que
     estaba en línea en `respaldos/en-linea-2026-11-27-antes.zip`. La sube el jefe a mano en Cloudflare.
-- **Ad Manager listo y apagado** (27 nov 2026): `fuente/juego/anuncios.js` solo se publica con `activo: true` en
-  `anuncios.json` (con `red`, `unidades` y `ads_txt` de Groone) y se carga 1,2 s después de la página. Bloquea el muro de
-  ofertas, pone display y anchor fuera de la partida, viñeta desde el nivel 3 y recompensa con `window.enlAnuncios`.
-  `npm run prueba:anuncios` lo prueba con el GPT simulado (`herramientas/pruebas/gpt_simulado.js`, unidades falsas con
-  `--anuncios-prueba`, que `--estricto` rechaza). La frecuencia de la viñeta se fija en Ad Manager.
-  **ads.txt:** Google lo busca en `cosmovil.com.mx/ads.txt`; para un subdominio, ese archivo debe incluir
-  `subdomain=enletrados.cosmovil.com.mx` o las líneas de Groone.
+- **Anuncios de Groone conectados (27 nov 2026)**, en `fuente/contenido/anuncios.json` (`activo: true`): red
+  `23070559321`, `groone.js` con `data-domain`/`data-subdomain`/`data-date`, y `ads.txt` con
+  `google.com, pub-5119245763044424, DIRECT, f08c47fec0942fa0`. `fuente/juego/anuncios.js` carga `groone.js` así:
+  portada y páginas de texto, 1,2 s después de la página (con `data-anchor="TOP"`); niveles y diario, **solo cuando
+  aparece la pantalla de completado** (groone busca los `div groone` una sola vez), con `data-interstitial` desde el
+  nivel 3. Espacios: portada Content1, cómo jugar Content2, nivel completado Content3, diario completado Content4
+  (Content5 libre). Muro de ofertas bloqueado con `googlefc.controlledMessagingFunction`.
+  **No se usa `rewardsv2.min.js`**: abre sola una ventana que bloquea la página al cargar (también en plena partida),
+  puede redirigir, carga Poppins de Google y no le avisa al juego. La recompensa va por `verAnuncio()` con la unidad de
+  Ad Manager en `recompensa` (**pendiente: pedirle a Groone la ruta de la unidad**); vacía, el juego no ofrece anuncios
+  con recompensa. `npm run prueba:anuncios` usa `groone.js` real (copia en `datos/groone/`) con el GPT simulado y las
+  API de Groone simuladas. **ads.txt:** Google lo busca en `cosmovil.com.mx/ads.txt`.
 - **Medición conectada (27 nov 2026)**, códigos del usuario en `fuente/contenido/medicion.json` (comprobado que ninguno
   es de los blogs): Tag Manager `GTM-NWZLHLTD` (Analytics lo configura el usuario dentro de Tag Manager), píxel de Meta
   `1187863220859635`, Clarity `zk7p49h1s2` y Hotjar `6856127`. Solo entran en el sitio publicado; los carga `app.js`

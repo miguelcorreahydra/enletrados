@@ -292,9 +292,13 @@
   if (ANUNCIOS === "activos" && document.documentElement.dataset.anunciosJs) addEventListener("load", function () {
     setTimeout(function () { var s = document.createElement("script"); s.src = document.documentElement.dataset.anunciosJs; document.head.appendChild(s); }, 1200);
   });
-  function hayAnuncios() { return ANUNCIOS === "simulados" || (ANUNCIOS === "activos" && !!window.enlAnuncios); }
-  function espacioAnuncio(extra) { return ANUNCIOS === "simulados" ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)' + (extra || "") + "</div>" :
-    ANUNCIOS === "activos" ? '<div class="espacio-anuncio real" data-clarity-mask="true" data-hj-suppress></div>' : ""; }
+  function hayAnuncios() { return ANUNCIOS === "simulados" || (ANUNCIOS === "activos" && !!(window.enlAnuncios && window.enlAnuncios.recompensa)); }
+  // display de las pantallas de completado: con Ad Manager, un <div groone="ContentN"> (groone.js se carga al aparecer)
+  function espacioAnuncio(extra, cual) {
+    if (ANUNCIOS === "simulados") return '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)' + (extra || "") + "</div>";
+    var nombre = ANUNCIOS === "activos" && document.documentElement.dataset[cual === "diario" ? "espacioDiario" : "espacioNivel"];
+    return nombre && /^Content\d+$/.test(nombre) ? '<div class="espacio-anuncio real" data-clarity-mask="true" data-hj-suppress><div groone="' + nombre + '" lazyload="true"></div></div>' : "";
+  }
   function recompensasHoy() { var r = leer("recompensas", null); return r && r.fecha === HOY ? r.n : 0; }
   function quedanRecompensas() { return hayAnuncios() && recompensasHoy() < TOPE_RECOMPENSAS; }
   function verAnuncio(tipo, alGanar, sinAnuncio) {
@@ -305,7 +309,7 @@
       else { evento("enl_recompensa", { tipo: tipo, estado: "cerrado" }); aviso("El premio se entrega al ver el anuncio completo", 2600); }
     };
     if (window.enlAnuncios && window.enlAnuncios.recompensa) return window.enlAnuncios.recompensa(listo);
-    simularAnuncio(listo);
+    if (ANUNCIOS === "simulados") simularAnuncio(listo); else listo("sin-anuncio"); // nunca se simula en el sitio publicado
   }
   function simularAnuncio(listo) {
     var sim = $("sim"); if (!sim) { sim = document.createElement("div"); sim.className = "sim"; sim.id = "sim"; document.body.appendChild(sim); }
@@ -901,7 +905,7 @@
         (navigator.share ? '<button class="boton sec" data-accion="compartir"><svg class="i"><use href="#i-compartir"/></svg>Compartir de otra forma</button>' : '<button class="boton sec" data-accion="copiar">Copiar el resultado</button>') +
         '<a class="boton sec" href="/" data-google-interstitial="false">Volver al pueblo</a></div>' +
         '<p class="nota-chica">Mañana habrá un tablero nuevo en el Diario.</p>' + repaso() +
-        espacioAnuncio();
+        espacioAnuncio("", "diario");
       abrir(h); if (nuevo) chispasEstrellas();
       setTimeout(function () { pintarMonedas(true); }, 900);
     }

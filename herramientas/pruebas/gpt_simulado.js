@@ -19,14 +19,16 @@
     pubads: function () { return pub; },
     sizeMapping: function () { var b = { addSize: function () { return b; }, build: function () { return []; } }; return b; },
     defineSlot: function (ruta, t, div) { var s = new Slot(ruta, "display", div); reg.slots.push(s); return s; },
-    defineOutOfPageSlot: function (ruta, f) { var nombre = { 3: "anchor", 4: "recompensa", 5: "vineta" }[f] || "otro"; var s = new Slot(ruta, nombre); reg.slots.push(s); return s; },
+    defineOutOfPageSlot: function (ruta, f) { var nombre = { 2: "anchor", 3: "anchor", 4: "recompensa", 5: "vineta" }[f] || "otro"; var s = new Slot(ruta, nombre); reg.slots.push(s); return s; },
     enableServices: function () { reg.servicios = true; },
+    setConfig: function (c) { reg.config = Object.assign(reg.config || {}, c); },
     destroySlots: function (l) { (l || []).forEach(function (s) { s.vivo = false; }); return true; },
     display: function (s) {
-      if (typeof s === "string") return;
+      if (typeof s === "string") { var id = s; s = reg.slots.filter(function (x) { return x.div === id; })[0]; if (!s || s.mostrado) return; }
+      s.mostrado = true;
       setTimeout(function () {
         var modo = window.__gptModo || "ok";
-        if (s.tipo === "display") { var d = document.getElementById(s.div); if (d) { d.insertAdjacentHTML("beforeend", '<div class="gpt-sim" style="width:300px;height:250px;background:#ddd;display:grid;place-items:center">GPT simulado</div>'); } emitir("slotRenderEnded", { slot: s, isEmpty: false }); }
+        if (s.tipo === "display") { if (window.__gptVacio) return emitir("slotRenderEnded", { slot: s, isEmpty: true }); var d = document.getElementById(s.div); if (d) { d.insertAdjacentHTML("beforeend", '<div class="gpt-sim" style="width:300px;height:250px;background:#ddd;display:inline-grid;place-items:center">GPT simulado</div>'); } emitir("slotRenderEnded", { slot: s, isEmpty: false }); }
         if (s.tipo === "recompensa") {
           if (modo === "vacio") return emitir("slotRenderEnded", { slot: s, isEmpty: true });
           emitir("rewardedSlotReady", { slot: s, makeRewardedVisible: function () {
