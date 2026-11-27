@@ -12,7 +12,9 @@ Responder siempre en español.
 - La empresa aprobó la prueba con sitio y dominio propios. **Fase 1 hecha en local**: estructura, `construir.js`,
   una página por nivel, mundos, portada con el pueblo y base visual. Nada publicado y nada comprado.
 - **Orden acordado:** se trabaja todo en local primero; el dominio se compra cuando el sitio esté listo para publicar.
-- Nombre: **Enletrados** (elegido por el usuario). `enletrados.com` estaba libre el 24 nov 2026 (registro de Verisign).
+- Nombre: **Enletrados** (elegido por el usuario).
+- **Dominio (27 nov 2026): `https://enletrados.cosmovil.com.mx`**, subdominio de cosmovil.com.mx, en Cloudflare. La empresa
+  publicó ahí la primera versión subiendo la carpeta `dist/` a mano. `enletrados.com` ya no se usa.
   La compra se hace en la cuenta de Cloudflare de la empresa, donde va alojado (guía paso a paso:
   https://claude.ai/artifact/Q8aErL23kQ8GmfYkWZrYGs).
 - **Repositorio:** privado en GitHub, `miguelcorreahydra/enletrados` (cuenta personal del usuario). Este repositorio
@@ -56,6 +58,15 @@ Responder siempre en español.
   - que el usuario pruebe en su celular;
   - postales y vecinos para coleccionar (no entraron en la lista de la fase 3);
   - más tandas de pistas para llegar a unas 2.500 (más variedad en los niveles).
+- **Cómo se publica** (27 nov 2026):
+  - `npm run construir`: local, con anuncios **simulados** (para probar);
+  - `npm run construir:publicado`: como lo ve el público, **sin anuncios simulados ni ofertas de recompensa** mientras
+    Ad Manager no esté conectado (`fuente/contenido/anuncios.json`, `activo: false`). Sirve para revisar;
+  - `--estricto` (lo usan `publicar` y `paquete`): además exige pistas aprobadas y datos legales completos;
+  - `npm run paquete`: ZIP en `respaldos/` para subir a mano en Cloudflare Pages (sin token);
+  - `npm run publicar`: con el token en `.env` (ver `.env.ejemplo`), pide confirmación, guarda respaldo y anota en
+    `respaldos/cambios.jsonl`.
+  - **Pendiente para publicar de nuevo:** los datos legales en `fuente/contenido/sitio.json`.
 - **Rediseño premium en curso** (aprobado el 26 nov 2026, antes de postales y vecinos):
   - el pueblo de la portada es una maqueta isométrica con piezas de **Kenney «Sketch Town» (CC0)**. Las piezas se bajan con
     `sh herramientas/descargar_kenney.sh` a `datos/kenney/` (no va a GitHub); `node herramientas/pueblo/armar.js` arma
@@ -241,7 +252,7 @@ Responder siempre en español.
 - **Sitio estático, sin WordPress ni base de datos.**
   - Un script de Node arma la carpeta `dist/` con todas las páginas.
   - Se publica en **Cloudflare Pages** con `wrangler`. El token va en el `.env`.
-  - Dominio `enletrados.com` en Cloudflare, con certificado automático.
+  - Dominio `enletrados.cosmovil.com.mx` en Cloudflare, con certificado automático (constante `DOMINIO` en `construir.js`).
 - **JavaScript propio, sin frameworks.** Primera carga: menos de 100 KB transferidos sin contar los anuncios.
   - Los datos de cada mundo van en su propio JSON, para no cargar los 300 niveles de una vez.
 - **Direcciones:**
@@ -327,7 +338,7 @@ Responder siempre en español.
 
 ## Ruta
 0. **Permisos y consultas** (sin costo):
-   - la empresa compra `enletrados.com` en Cloudflare (ver la guía);
+   - dominio listo: `enletrados.cosmovil.com.mx`;
    - consulta por escrito a Groone con el prototipo;
    - opcional: postular a AdSense para juegos.
 1. **Base técnica:**

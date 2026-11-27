@@ -217,8 +217,13 @@
   // cansar y cuidar la cuenta de Groone. Cuando Ad Manager esté activo, window.enlAnuncios.recompensa(listo) pide el
   // anuncio real y avisa con «visto», «cerrado» o «sin-anuncio»; mientras tanto se simula.
   var TOPE_RECOMPENSAS = 10;
+  // «simulados» en local, «no» publicado sin Ad Manager (no se ofrece nada falso), «activos» con Ad Manager conectado
+  var ANUNCIOS = document.documentElement.dataset.anuncios || "simulados";
+  function hayAnuncios() { return ANUNCIOS === "simulados" || (ANUNCIOS === "activos" && !!window.enlAnuncios); }
+  function espacioAnuncio(extra) { return ANUNCIOS === "simulados" ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)' + (extra || "") + "</div>" :
+    ANUNCIOS === "activos" ? '<div class="espacio-anuncio real" data-clarity-mask="true" data-hj-suppress></div>' : ""; }
   function recompensasHoy() { var r = leer("recompensas", null); return r && r.fecha === HOY ? r.n : 0; }
-  function quedanRecompensas() { return recompensasHoy() < TOPE_RECOMPENSAS; }
+  function quedanRecompensas() { return hayAnuncios() && recompensasHoy() < TOPE_RECOMPENSAS; }
   function verAnuncio(tipo, alGanar, sinAnuncio) {
     evento("enl_recompensa", { tipo: tipo, estado: "pedido" });
     var listo = function (estado) {
@@ -787,7 +792,7 @@
         ">Siguiente nivel <svg class=\"i\"><use href=\"#i-flecha\"/></svg></a>" : '<a class="boton prin" href="/mundos/" data-google-interstitial="false">Ver los lugares</a>';
       h += '<div class="botones">' + sig + '<a class="boton sec" href="/" data-google-interstitial="false">Volver al pueblo</a></div>';
       h += ofertaNavegador(D.n, D.siguiente || location.pathname);
-      h += '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)<br>Solo en esta pantalla, 36 px debajo de los botones</div>';
+      h += espacioAnuncio("<br>Solo en esta pantalla, 36 px debajo de los botones");
       abrir(h); chispasEstrellas();
       setTimeout(function () { Array.prototype.forEach.call(document.querySelectorAll(".hoja .vecino-tarjeta.nuevo .cara, .hoja .premio-postal .postal"), function (el) {
         var r = el.getBoundingClientRect(); chispas(r.left + r.width / 2, r.top + r.height / 2, { n: 10, radio: 60, ms: 900 }); }); }, 1100);
@@ -813,7 +818,7 @@
         suena.completo(); vibrar([20, 60, 20, 60, 40]); confeti();
       }
       var r = rachaVigente(), fechaLarga = new Date().toLocaleDateString("es", { day: "numeric", month: "long" });
-      compartirTexto = "Enletrados · El Diario del Pueblo\n" + fechaLarga + "\n" + cuadros + "\n" + "⭐".repeat(est) + (r > 1 ? " · 🔥 " + r + " días" : "") + "\nhttps://enletrados.com/diario/";
+      compartirTexto = "Enletrados · El Diario del Pueblo\n" + fechaLarga + "\n" + cuadros + "\n" + "⭐".repeat(est) + (r > 1 ? " · 🔥 " + r + " días" : "") + "\n" + location.origin + "/diario/";
       var h = '<h2 class="brillo">¡Diario completo!</h2><p class="sub">El tablero del ' + fechaLarga + "</p>" + estrellasHtml(est, nuevo) +
         '<div class="resultado" aria-label="Tu resultado">' + cuadros + "</div>" +
         '<p class="premios">' + (nuevo ? "+25 monedas · " : "") + (r ? "Racha de " + r + (r === 1 ? " día" : " días") : "") + "</p>" +
@@ -823,7 +828,7 @@
         (navigator.share ? '<button class="boton sec" data-accion="compartir"><svg class="i"><use href="#i-compartir"/></svg>Compartir de otra forma</button>' : '<button class="boton sec" data-accion="copiar">Copiar el resultado</button>') +
         '<a class="boton sec" href="/" data-google-interstitial="false">Volver al pueblo</a></div>' +
         '<p class="nota-chica">Mañana habrá un tablero nuevo en el Diario.</p>' + repaso() +
-        '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>';
+        espacioAnuncio();
       abrir(h); if (nuevo) chispasEstrellas();
       setTimeout(function () { pintarMonedas(true); }, 900);
     }

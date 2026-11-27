@@ -1,0 +1,12 @@
+{
+  "nota": "Anuncios de Google Ad Manager a través de Groone. Mientras «activo» sea false, el sitio publicado no muestra anuncios ni ofertas de recompensa (en local se simulan). Los códigos los entrega Groone.",
+  "activo": false,
+  "red": "",
+  "unidades": {
+    "recompensa": "",
+    "vineta": "",
+    "display_nivel": "",
+    "display_portada": "",
+    "anchor": ""
+  }
+}

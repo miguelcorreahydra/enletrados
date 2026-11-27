@@ -5,7 +5,7 @@ deslizando el dedo por una rueda de letras, con una pista para cada palabra.
 
 - Sitio estático: sin WordPress ni base de datos. El progreso del jugador queda en su navegador (`localStorage`, prefijo `enl_`).
 - JavaScript propio, sin frameworks.
-- Alojamiento previsto: Cloudflare Pages, con el dominio `enletrados.com`.
+- En línea: https://enletrados.cosmovil.com.mx (Cloudflare Pages).
 
 ## Estructura prevista
 - `herramientas/`: `generar.js` (niveles), `construir.js` (arma `dist/`), `revisar_pistas.js`, `publicar.sh` y `pruebas/`.

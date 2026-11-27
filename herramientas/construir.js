@@ -3,14 +3,19 @@
 "use strict";
 const fs = require("fs"), path = require("path"), crypto = require("crypto"), zlib = require("zlib");
 const RAIZ = path.join(__dirname, ".."), F = p => path.join(RAIZ, "fuente", p), DIST = path.join(RAIZ, "dist");
-const DOMINIO = "https://enletrados.com";
+// dominio del sitio publicado (decidido el 27 nov 2026): subdominio de cosmovil.com.mx, en Cloudflare
+const DOMINIO = "https://enletrados.cosmovil.com.mx";
 const leer = p => fs.readFileSync(F(p), "utf8");
 
 // ---------- contenido ----------
 const mundos = JSON.parse(leer("contenido/mundos.json"));
 const niveles = JSON.parse(leer("contenido/niveles.json")), diario = JSON.parse(leer("contenido/diario.json"));
 // En local se usan las pistas vigentes (aprobadas y pendientes). Con --estricto (antes de publicar) solo las aprobadas.
-const ESTRICTO = process.argv.includes("--estricto"), L = require("./lib/contenido");
+// --estricto: para publicar. Exige pistas aprobadas y datos legales completos, y activa el modo publicado.
+// --publicado: el sitio tal como lo ve el público (sin anuncios simulados), sin las exigencias de --estricto (para revisarlo).
+// Anuncios: «simulados» en local; «no» publicado mientras Ad Manager no esté conectado (no se muestra nada falso);
+// «activos» cuando fuente/contenido/anuncios.json diga activo: true.
+const ESTRICTO = process.argv.includes("--estricto"), PUBLICADO = ESTRICTO || process.argv.includes("--publicado"), L = require("./lib/contenido");
 const PISTAS = L.pistas(ESTRICTO ? "aprobadas" : "vigentes"), APROBADAS = L.pistas("aprobadas");
 const TOTAL = niveles.length;
 const enUso = [...new Set(niveles.concat(diario).flatMap(l => l.palabras.map(w => w.p)))];
@@ -55,7 +60,7 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replac
 const sinVineta = html => html.replace(/<a\b(?![^>]*data-google-interstitial)(?![^>]*con-vineta)/g, '<a data-google-interstitial="false"');
 const paginas = [];
 function pagina(ruta, d) {
-  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA,
+  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS,
     canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">` }, d)));
   if (ruta.endsWith(".html")) fs.writeFileSync(path.join(DIST, ruta), html);
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
@@ -86,18 +91,23 @@ const PUEBLO = `<svg class="pueblo" viewBox="0 0 ${GEO.ancho} ${ALTO_PUEBLO}" ro
 ${Object.entries(GEO.lugares).map(([id, l]) => `<image class="luz-lugar" data-mundo="${id}" data-src="${ARCHIVO["lugar-" + id + ".webp"]}" x="${l.x}" y="${l.y}" width="${l.w}" height="${l.h}"/>`).join("\n")}
 </svg>`;
 // anuncio anchor SIMULADO: solo fuera de la partida (portada, lugares y cómo jugar); nunca en niveles ni en el diario
-const ANCHOR = '<div class="anchor-sim" data-clarity-mask="true" data-hj-suppress>Anuncio anchor (simulado)</div>';
+const CONF_ANUNCIOS = fs.existsSync(F("contenido/anuncios.json")) ? JSON.parse(leer("contenido/anuncios.json")) : { activo: false };
+const MODO_ANUNCIOS = !PUBLICADO ? "simulados" : CONF_ANUNCIOS.activo ? "activos" : "no";
+const SIMULADOS = MODO_ANUNCIOS === "simulados";
+const ANCHOR = SIMULADOS ? '<div class="anchor-sim" data-clarity-mask="true" data-hj-suppress>Anuncio anchor (simulado)</div>' : "";
+const CON_ANCHOR = SIMULADOS ? "con-anchor" : "";
+const ANUNCIO = SIMULADOS ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>' : "";
 
 // portada
-pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina: "portada", clase: "con-anchor",
+pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina: "portada", clase: CON_ANCHOR,
   descripcion: "Forma palabras deslizando el dedo por las letras y completa el crucigrama. Cada palabra tiene su pista. Gratis y sin instalar nada.",
-  contenido: ANCHOR + plantilla("portada.html", { pueblo: PUEBLO, frase1: esc(mundos[0].frase), datos: json(sitio) }) });
+  contenido: ANCHOR + plantilla("portada.html", { pueblo: PUEBLO, anuncioPortada: ANUNCIO, frase1: esc(mundos[0].frase), datos: json(sitio) }) });
 
 // mundos
 const lista = mundos.map(m => `    <li><a class="mundo-item cerrado" data-mundo="${m.id}" style="--mundo:${m.color}"><span class="num">${m.id}</span><div><b>${esc(m.lugar)}</b>` +
   `<small>${esc(m.tema)} · <span class="cuenta">${m.desde <= TOTAL ? "Se abre al terminar el lugar anterior" : "Pronto"}</span></small><div class="barra"><i></i></div></div>` +
   `<svg class="i"><use href="#i-candado"/></svg></a></li>`).join("\n");
-pagina("/mundos/", { titulo: "Los lugares del pueblo · Enletrados", pagina: "mundos", clase: "con-anchor", descripcion: "Los diez lugares del pueblo de Enletrados: de la panadería al faro.",
+pagina("/mundos/", { titulo: "Los lugares del pueblo · Enletrados", pagina: "mundos", clase: CON_ANCHOR, descripcion: "Los diez lugares del pueblo de Enletrados: de la panadería al faro.",
   contenido: ANCHOR + plantilla("mundos.html", { lista, datos: json(sitio) }) });
 
 // Diario del Pueblo: una página y un archivo por tablero (se baja solo el del día)
@@ -155,7 +165,6 @@ niveles.forEach((l, i) => {
 // cómo jugar, quiénes somos, contacto, créditos y páginas legales (en el índice de Google)
 const SITIO = JSON.parse(leer("contenido/sitio.json"));
 if (ESTRICTO && Object.values(SITIO).some(v => /POR CONFIRMAR/.test(v))) { console.error("Faltan datos en fuente/contenido/sitio.json (dicen POR CONFIRMAR)."); process.exit(1); }
-const ANUNCIO = '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>';
 const TEXTOS = {
   "como-jugar": ["Cómo jugar · Enletrados", "Cómo se juega Enletrados: desliza el dedo por la rueda de letras, completa el crucigrama con las pistas, gana estrellas y juega el Diario del Pueblo.", true],
   "quienes-somos": ["Quiénes somos · Enletrados", "Enletrados es un sitio de juegos de palabras en español neutro para toda Latinoamérica."],
@@ -166,8 +175,8 @@ const TEXTOS = {
   "cookies": ["Política de cookies · Enletrados", "Cómo usa Enletrados las cookies y el almacenamiento del navegador."]
 };
 for (const [slug, [titulo, descripcion, conAnuncio]] of Object.entries(TEXTOS)) {
-  pagina(`/${slug}/`, { titulo, descripcion, pagina: "texto", clase: conAnuncio ? "con-anchor" : "",
-    contenido: plantilla("texto.html", { cuerpo: rellenar(leer(`paginas/${slug}.html`).trim(), SITIO), anuncio: conAnuncio ? ANUNCIO + ANCHOR : "" }) });
+  pagina(`/${slug}/`, { titulo, descripcion, pagina: "texto", clase: conAnuncio ? CON_ANCHOR : "",
+    contenido: plantilla("texto.html", { cuerpo: rellenar(leer(`paginas/${slug}.html`).trim(), Object.assign({ dominio: DOMINIO.replace("https://", "") }, SITIO)), anuncio: conAnuncio ? ANUNCIO + ANCHOR : "" }) });
 }
 
 // 404
@@ -190,6 +199,7 @@ fs.writeFileSync(path.join(DIST, "_headers"), [
 const gz = f => zlib.gzipSync(fs.readFileSync(path.join(DIST, f)), { level: 9 }).length;
 const kb = b => (b / 1024).toFixed(1) + " KB";
 const portadaGz = gz("index.html"), nivelGz = gz("nivel/5/index.html"), cssGz = gz(CSS), jsGz = gz(JS);
+console.log(`Modo: ${ESTRICTO ? "estricto (para publicar)" : PUBLICADO ? "publicado (para revisar)" : "local"} · anuncios: ${MODO_ANUNCIOS} · dominio: ${DOMINIO}`);
 console.log(`dist/ listo: ${paginas.length} páginas (${TOTAL} niveles), ${CSS}, ${JS}`);
 console.log(`Peso transferido (gzip): CSS ${kb(cssGz)} · JS ${kb(jsGz)} · portada ${kb(portadaGz)} · nivel ${kb(nivelGz)}`);
 if (sinAprobar) console.log(`Ojo: ${sinAprobar} de ${enUso.length} palabras en uso tienen la pista sin aprobar todavía (solo sirve en local).`);

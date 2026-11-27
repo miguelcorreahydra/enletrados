@@ -24,3 +24,6 @@ herramientas/pruebas/informes/
 
 # videos e imágenes de las demostraciones de diseño
 herramientas/demos/salida/
+
+# respaldos del sitio publicado (los ZIP pesan; el registro cambios.jsonl sí va a GitHub)
+respaldos/*.zip

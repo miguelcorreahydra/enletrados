@@ -17,6 +17,9 @@
     "pueblo": "node herramientas/pueblo/armar.js && node herramientas/pueblo/escenas.js",
     "escenas": "node herramientas/pruebas/escenas.js",
     "anuncio": "node herramientas/videos/anuncio.js",
-    "videos": "node herramientas/videos/guiones.js todos"
+    "videos": "node herramientas/videos/guiones.js todos",
+    "publicar": "sh herramientas/publicar.sh",
+    "paquete": "sh herramientas/paquete.sh",
+    "construir:publicado": "node herramientas/construir.js --publicado"
   }
 }
