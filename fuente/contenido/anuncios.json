@@ -1,5 +1,5 @@
 {
-  "nota": "Anuncios de Google Ad Manager a través de Groone. Mientras «activo» sea false, el sitio publicado no muestra anuncios ni ofertas de recompensa (en local se simulan). Los códigos los entrega Groone.",
+  "nota": "Anuncios de Google Ad Manager a través de Groone. Mientras «activo» sea false, el sitio publicado no muestra anuncios ni ofertas de recompensa (en local se simulan). Los códigos los entrega Groone: «red» es el código de red (solo números) y cada unidad es su nombre o su ruta completa (/red/unidad). En «ads_txt» van las líneas de ads.txt tal como las entregue Groone.",
   "activo": false,
   "red": "",
   "unidades": {
@@ -8,5 +8,6 @@
     "display_nivel": "",
     "display_portada": "",
     "anchor": ""
-  }
+  },
+  "ads_txt": ""
 }

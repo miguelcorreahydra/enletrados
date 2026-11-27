@@ -248,6 +248,10 @@
   var TOPE_RECOMPENSAS = 10;
   // «simulados» en local, «no» publicado sin Ad Manager (no se ofrece nada falso), «activos» con Ad Manager conectado
   var ANUNCIOS = document.documentElement.dataset.anuncios || "simulados";
+  // el tag de Google se pide cuando la página ya cargó y el juego se ve: los anuncios nunca retrasan la primera partida
+  if (ANUNCIOS === "activos" && document.documentElement.dataset.anunciosJs) addEventListener("load", function () {
+    setTimeout(function () { var s = document.createElement("script"); s.src = document.documentElement.dataset.anunciosJs; document.head.appendChild(s); }, 1200);
+  });
   function hayAnuncios() { return ANUNCIOS === "simulados" || (ANUNCIOS === "activos" && !!window.enlAnuncios); }
   function espacioAnuncio(extra) { return ANUNCIOS === "simulados" ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)' + (extra || "") + "</div>" :
     ANUNCIOS === "activos" ? '<div class="espacio-anuncio real" data-clarity-mask="true" data-hj-suppress></div>' : ""; }

@@ -67,6 +67,15 @@ Responder siempre en español.
   - `npm run publicar`: con el token en `.env` (ver `.env.ejemplo`), pide confirmación, guarda respaldo y anota en
     `respaldos/cambios.jsonl`.
   - **Pendiente para publicar de nuevo:** los datos legales en `fuente/contenido/sitio.json`.
+- **Ad Manager listo y apagado** (27 nov 2026): `fuente/juego/anuncios.js` solo se publica con `activo: true` en
+  `anuncios.json` (con `red`, `unidades` y `ads_txt` de Groone) y se carga 1,2 s después de la página. Bloquea el muro de
+  ofertas, pone display y anchor fuera de la partida, viñeta desde el nivel 3 y recompensa con `window.enlAnuncios`.
+  `npm run prueba:anuncios` lo prueba con el GPT simulado (`herramientas/pruebas/gpt_simulado.js`, unidades falsas con
+  `--anuncios-prueba`, que `--estricto` rechaza). La frecuencia de la viñeta se fija en Ad Manager.
+  **ads.txt:** Google lo busca en `cosmovil.com.mx/ads.txt`; para un subdominio, ese archivo debe incluir
+  `subdomain=enletrados.cosmovil.com.mx` o las líneas de Groone.
+- **Vista previa al compartir:** `fuente/publico/compartir.jpg` (1200×630, JPG aprobado como excepción a la regla 6),
+  se rehace con `npm run compartir`; etiquetas Open Graph en todas las páginas.
 - **Rediseño premium en curso** (aprobado el 26 nov 2026, antes de postales y vecinos):
   - el pueblo de la portada es una maqueta isométrica con piezas de **Kenney «Sketch Town» (CC0)**. Las piezas se bajan con
     `sh herramientas/descargar_kenney.sh` a `datos/kenney/` (no va a GitHub); `node herramientas/pueblo/armar.js` arma

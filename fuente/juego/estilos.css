@@ -443,6 +443,10 @@ canvas.confeti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-e
 .enlaces-pie.legal a { font-weight: 500; color: var(--tinta-2); }
 .pie p { margin: 8px 0 0; }
 .portada .espacio-anuncio, .texto .espacio-anuncio { margin-top: 32px; }
+/* espacio real de Ad Manager: rotulado «Anuncio», con alto reservado para que la página no salte al llegar */
+.espacio-anuncio.real { border: 0; padding: 0; min-height: calc(250px + var(--e-5)); display: flex; flex-direction: column; align-items: center; color: var(--tinta-2); }
+.espacio-anuncio.real::before { content: "Anuncio"; display: block; margin-bottom: var(--e-1); font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.espacio-anuncio.real[hidden] { display: none; }
 
 /* páginas de texto y anuncio anchor simulado */
 .legal-texto h2 { font-family: var(--serif); font-size: var(--t-xl); margin: 28px 0 6px; }

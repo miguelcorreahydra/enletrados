@@ -17,6 +17,7 @@
     "pueblo": "node herramientas/pueblo/armar.js && node herramientas/pueblo/escenas.js",
     "escenas": "node herramientas/pruebas/escenas.js",
     "compartir": "node herramientas/pruebas/imagen_compartir.js",
+    "prueba:anuncios": "node herramientas/pruebas/anuncios.js",
     "anuncio": "node herramientas/videos/anuncio.js",
     "videos": "node herramientas/videos/guiones.js todos",
     "publicar": "sh herramientas/publicar.sh",

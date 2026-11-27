@@ -15,7 +15,10 @@ const niveles = JSON.parse(leer("contenido/niveles.json")), diario = JSON.parse(
 // --publicado: el sitio tal como lo ve el público (sin anuncios simulados), sin las exigencias de --estricto (para revisarlo).
 // Anuncios: «simulados» en local; «no» publicado mientras Ad Manager no esté conectado (no se muestra nada falso);
 // «activos» cuando fuente/contenido/anuncios.json diga activo: true.
-const ESTRICTO = process.argv.includes("--estricto"), PUBLICADO = ESTRICTO || process.argv.includes("--publicado"), L = require("./lib/contenido");
+// --anuncios-prueba: solo para las pruebas (herramientas/pruebas/anuncios.js): anuncios activos con unidades falsas y el
+// GPT simulado. Nunca se publica así (--estricto lo rechaza).
+const PRUEBA_ANUNCIOS = process.argv.includes("--anuncios-prueba");
+const ESTRICTO = process.argv.includes("--estricto"), PUBLICADO = ESTRICTO || PRUEBA_ANUNCIOS || process.argv.includes("--publicado"), L = require("./lib/contenido");
 const PISTAS = L.pistas(ESTRICTO ? "aprobadas" : "vigentes"), APROBADAS = L.pistas("aprobadas");
 const TOTAL = niveles.length;
 const enUso = [...new Set(niveles.concat(diario).flatMap(l => l.palabras.map(w => w.p)))];
@@ -65,7 +68,7 @@ const social = (ruta, d) => [["og:type", "website"], ["og:site_name", "Enletrado
   ["og:image:alt", "El pueblo de Enletrados y Tilde, la golondrina"]].map(([k, v]) => `<meta property="${k}" content="${esc(v)}">`).join("\n")
   + `\n<meta name="twitter:card" content="summary_large_image">`;
 function pagina(ruta, d) {
-  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS,
+  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS, anunciosJs: ANUNCIOS_JS ? ` data-anuncios-js="/${ANUNCIOS_JS}"` : "",
     canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">`, social: social(ruta, d) }, d)));
   if (ruta.endsWith(".html")) fs.writeFileSync(path.join(DIST, ruta), html);
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
@@ -96,12 +99,28 @@ const PUEBLO = `<svg class="pueblo" viewBox="0 0 ${GEO.ancho} ${ALTO_PUEBLO}" ro
 ${Object.entries(GEO.lugares).map(([id, l]) => `<image class="luz-lugar" data-mundo="${id}" data-src="${ARCHIVO["lugar-" + id + ".webp"]}" x="${l.x}" y="${l.y}" width="${l.w}" height="${l.h}"/>`).join("\n")}
 </svg>`;
 // anuncio anchor SIMULADO: solo fuera de la partida (portada, lugares y cómo jugar); nunca en niveles ni en el diario
-const CONF_ANUNCIOS = fs.existsSync(F("contenido/anuncios.json")) ? JSON.parse(leer("contenido/anuncios.json")) : { activo: false };
+const CONF_ANUNCIOS = PRUEBA_ANUNCIOS ? { activo: true, red: "0000000", unidades: { recompensa: "enl_prueba_recompensa", vineta: "enl_prueba_vineta", display_nivel: "enl_prueba_display_nivel", display_portada: "enl_prueba_display_portada", anchor: "enl_prueba_anchor" }, ads_txt: "" }
+  : fs.existsSync(F("contenido/anuncios.json")) ? JSON.parse(leer("contenido/anuncios.json")) : { activo: false };
+if (ESTRICTO && PRUEBA_ANUNCIOS) { console.error("✗ --anuncios-prueba es solo para pruebas: no se puede publicar así."); process.exit(1); }
 const MODO_ANUNCIOS = !PUBLICADO ? "simulados" : CONF_ANUNCIOS.activo ? "activos" : "no";
-const SIMULADOS = MODO_ANUNCIOS === "simulados";
+const SIMULADOS = MODO_ANUNCIOS === "simulados", ACTIVOS = MODO_ANUNCIOS === "activos";
+if (ACTIVOS && ESTRICTO && (!/^\d+$/.test(CONF_ANUNCIOS.red || "") || !Object.values(CONF_ANUNCIOS.unidades || {}).some(Boolean))) {
+  console.error("✗ anuncios.json dice activo: true, pero falta el código de red o las unidades de Groone."); process.exit(1);
+}
+// con Ad Manager activo: el anchor lo pone Google (no hay div) y los espacios de display llevan su unidad
 const ANCHOR = SIMULADOS ? '<div class="anchor-sim" data-clarity-mask="true" data-hj-suppress>Anuncio anchor (simulado)</div>' : "";
-const CON_ANCHOR = SIMULADOS ? "con-anchor" : "";
-const ANUNCIO = SIMULADOS ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>' : "";
+const CON_ANCHOR = SIMULADOS || ACTIVOS ? "con-anchor" : "";
+const ANUNCIO = SIMULADOS ? '<div class="espacio-anuncio" data-clarity-mask="true" data-hj-suppress>Espacio de anuncio (simulado)</div>'
+  : ACTIVOS ? '<div class="espacio-anuncio real" data-unidad="display_portada" data-clarity-mask="true" data-hj-suppress></div>' : "";
+// anuncios.js (el tag de Google): solo existe en el sitio cuando los anuncios están activos
+let ANUNCIOS_JS = "";
+if (ACTIVOS) {
+  const conf = { red: CONF_ANUNCIOS.red, unidades: CONF_ANUNCIOS.unidades };
+  const codigo = minJs(leer("juego/anuncios.js").replace("__CONF__", JSON.stringify(conf)));
+  ANUNCIOS_JS = `anuncios.${huella(codigo)}.js`; fs.writeFileSync(path.join(DIST, ANUNCIOS_JS), codigo);
+}
+// ads.txt: las líneas que entregue Groone (campo ads_txt de anuncios.json)
+if (CONF_ANUNCIOS.ads_txt) fs.writeFileSync(path.join(DIST, "ads.txt"), String(CONF_ANUNCIOS.ads_txt).trim() + "\n");
 
 // portada
 pagina("/", { titulo: "Enletrados · Crucigrama de palabras en español", pagina: "portada", clase: CON_ANCHOR,
@@ -216,6 +235,7 @@ const CABECERAS_SEGURIDAD = [
 fs.writeFileSync(path.join(DIST, "_headers"), [
   "# Archivos con nombre versionado: caché larga. El HTML queda con la caché corta por omisión de Cloudflare Pages.",
   "/app.*.js", "  Cache-Control: public, max-age=31536000, immutable",
+  "/anuncios.*.js", "  Cache-Control: public, max-age=31536000, immutable",
   "/estilos.*.css", "  Cache-Control: public, max-age=31536000, immutable",
   "/img/*", "  Cache-Control: public, max-age=31536000, immutable",
   "/letras/*", "  Cache-Control: public, max-age=31536000, immutable",
