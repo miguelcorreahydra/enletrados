@@ -13,6 +13,18 @@
   function leer(k, d) { try { var v = localStorage.getItem(PREFIJO + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function guardar(k, v) { try { localStorage.setItem(PREFIJO + k, JSON.stringify(v)); } catch (e) {} }
   function borrar(k) { try { localStorage.removeItem(PREFIJO + k); } catch (e) {} }
+  // Google Tag Manager (el código de medición que entregó el usuario). Va aquí y no en línea porque la CSP no permite
+  // scripts en línea. La cola dataLayer existe desde el principio (los eventos del juego no se pierden), y gtm.js se pide
+  // cuando la página ya cargó: la medición nunca retrasa la partida.
+  var GTM = document.documentElement.dataset.gtm;
+  if (GTM) {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date());
+    window.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
+    var cargarGtm = function () { var s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtm.js?id=" + encodeURIComponent(GTM); document.head.appendChild(s); };
+    if (document.readyState === "complete") cargarGtm(); else addEventListener("load", cargarGtm);
+  }
   function evento(n, d) { (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: n }, d || {})); }
   function datos(id) { var e = $(id); return e ? JSON.parse(e.textContent) : null; }
 

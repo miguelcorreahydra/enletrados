@@ -74,6 +74,11 @@ Responder siempre en español.
   `--anuncios-prueba`, que `--estricto` rechaza). La frecuencia de la viñeta se fija en Ad Manager.
   **ads.txt:** Google lo busca en `cosmovil.com.mx/ads.txt`; para un subdominio, ese archivo debe incluir
   `subdomain=enletrados.cosmovil.com.mx` o las líneas de Groone.
+- **Tag Manager (27 nov 2026): `GTM-NWZLHLTD`**, del usuario, en `fuente/contenido/medicion.json`. Lo administra el
+  usuario (Analytics se configura dentro de Tag Manager). Solo entra en el sitio publicado; se carga desde `app.js` al
+  terminar la página (la CSP no permite el script en línea). Los eventos `enl_*` llegan a `dataLayer`. La CSP abre
+  `*.googletagmanager.com`, `*.google-analytics.com` y `*.analytics.google.com`; las etiquetas de «HTML personalizado»
+  de Tag Manager quedan bloqueadas por la CSP. `npm run prueba:medicion` lo comprueba sin mandar nada a Google.
 - **Vista previa al compartir:** `fuente/publico/compartir.jpg` (1200×630, JPG aprobado como excepción a la regla 6),
   se rehace con `npm run compartir`; etiquetas Open Graph en todas las páginas.
 - **Rediseño premium en curso** (aprobado el 26 nov 2026, antes de postales y vecinos):

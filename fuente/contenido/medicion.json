@@ -1,0 +1,4 @@
+{
+  "nota": "Medición propia de Enletrados (nunca la de los blogs). Solo entra en el sitio publicado (--publicado y --estricto); en local no se carga, para no ensuciar los datos. Los eventos del juego (enl_inicio, enl_nivel_3, enl_diario…) llegan a dataLayer y se usan como activadores de evento personalizado en Tag Manager.",
+  "gtm": "GTM-NWZLHLTD"
+}
