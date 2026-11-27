@@ -34,7 +34,8 @@
     color-scheme: dark;
   }
 }
-:root[data-tema="oscuro"] {
+/* los niveles 21–30 de cada lugar son de noche: siempre con los colores oscuros */
+:root[data-tema="oscuro"], :root[data-hora="noche"] {
   --papel: #1B1712; --papel-2: #221D17; --crema: #2A241D; --tinta: #F3EADB; --tinta-2: #BFAF98; --linea: #3B3228;
   --ficha: #F4EADA; --ficha-borde: #CDBDA3; --hundida: #2F2820; --sombra: 0 0 0;
   --cielo-a: #1F2A44; --cielo-b: #3B3550; --tilde: #E9DFCB; --dorado-claro: #5A4724; --dorado-texto: #C9973B;

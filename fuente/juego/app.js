@@ -580,6 +580,8 @@
     s.checked = sonido; v.checked = vibra;
     s.addEventListener("change", function () { sonido = s.checked; guardar("sonido", sonido); suena.toque(); });
     v.addEventListener("change", function () { vibra = v.checked; guardar("vibracion", vibra); vibrar(20); });
+    var fm = $("a-fondos"); fm.checked = leer("fondomov", true) !== false;
+    fm.addEventListener("change", function () { guardar("fondomov", fm.checked); if (fm.checked) delete document.documentElement.dataset.fondoQuieto; else document.documentElement.dataset.fondoQuieto = "1"; suena.toque(); });
     function segmentos(id, clave, def, aplicar) {
       var g = $(id), actual = String(leer(clave, def));
       var pintar = function () { Array.prototype.forEach.call(g.children, function (b) { b.setAttribute("aria-checked", b.dataset.v === actual ? "true" : "false"); }); };

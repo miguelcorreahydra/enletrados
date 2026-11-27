@@ -64,13 +64,14 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replac
 // data-google-interstitial="false", salvo los que tienen la clase con-vineta («Siguiente nivel» desde el nivel 3).
 const sinVineta = html => html.replace(/<a\b(?![^>]*data-google-interstitial)(?![^>]*con-vineta)/g, '<a data-google-interstitial="false"');
 const paginas = [];
+const FONDOS = require("./lib/fondos");
 // vista previa al compartir (WhatsApp, Facebook, X): imagen 1200×630 en JPG (excepción aprobada a la regla 6)
 const social = (ruta, d) => [["og:type", "website"], ["og:site_name", "Enletrados"], ["og:locale", "es_LA"], ["og:title", d.titulo], ["og:description", d.descripcion],
   ["og:url", DOMINIO + ruta], ["og:image", DOMINIO + "/compartir.jpg"], ["og:image:type", "image/jpeg"], ["og:image:width", "1200"], ["og:image:height", "630"],
   ["og:image:alt", "El pueblo de Enletrados y Tilde, la golondrina"]].map(([k, v]) => `<meta property="${k}" content="${esc(v)}">`).join("\n")
   + `\n<meta name="twitter:card" content="summary_large_image">`;
 function pagina(ruta, d) {
-  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS, anunciosJs: (ANUNCIOS_JS ? ` data-anuncios-js="/${ANUNCIOS_JS}" data-espacio-nivel="${ESPACIOS.nivel_completado || ""}" data-espacio-diario="${ESPACIOS.diario_completado || ""}"` : "") + Object.entries(MED).map(([k, v]) => ` data-${k}="${v}"`).join(""),
+  const html = sinVineta(rellenar(BASE, Object.assign({ css: CSS, js: JS, iconos: ICONOS, robots: "index, follow", precarga: PRECARGA, anuncios: MODO_ANUNCIOS, estiloExtra: "", htmlExtra: "", anunciosJs: (ANUNCIOS_JS ? ` data-anuncios-js="/${ANUNCIOS_JS}" data-espacio-nivel="${ESPACIOS.nivel_completado || ""}" data-espacio-diario="${ESPACIOS.diario_completado || ""}"` : "") + Object.entries(MED).map(([k, v]) => ` data-${k}="${v}"`).join(""),
     canonica: d.indexar === false ? "" : `<link rel="canonical" href="${DOMINIO}${ruta}">`, social: social(ruta, d) }, d)));
   if (ruta.endsWith(".html")) fs.writeFileSync(path.join(DIST, ruta), html);
   else { const dir = path.join(DIST, ruta); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, "index.html"), html); }
@@ -192,10 +193,13 @@ niveles.forEach((l, i) => {
     siguiente: n < TOTAL ? `/nivel/${n + 1}/` : null, vinetaSiguiente: n >= 3,
     vecino: VECINOS.find(v => v.nivel === n) || null,
     postal: pos === 15 ? "dia" : pos === totalMundo ? "noche" : null };
+  // fondo del lugar según la hora (1–10 mañana, 11–20 tarde, 21–30 noche, con los colores oscuros): herramientas/lib/fondos.js
+  const hora = FONDOS.horaDe(pos), fo = FONDOS.fondo(m, hora, n);
   pagina(`/nivel/${n}/`, { titulo: `Nivel ${n} · ${m.lugar} · Enletrados`, pagina: "nivel", clase: "nivel", robots: "noindex, follow", indexar: false,
+    estiloExtra: `<style>${fo.css}</style>`, htmlExtra: ` data-hora="${hora}"`,
     descripcion: `Nivel ${n} de Enletrados: completa el crucigrama con las letras de la rueda.`,
     contenido: plantilla("nivel.html", { n, lugar: esc(m.lugar), posicion: pos, totalMundo, porcentaje: (pos / totalMundo * 100).toFixed(1),
-      escena: ESC[m.id] ? escena(m.id) : "", vecinossvg: datos.vecino ? VECINOS_SVG : "", datos: json(datos) }) });
+      fondo: fo.html, escena: ESC[m.id] ? escena(m.id) : "", vecinossvg: datos.vecino ? VECINOS_SVG : "", datos: json(datos) }) });
 });
 
 // cómo jugar, quiénes somos, contacto, créditos y páginas legales (en el índice de Google)

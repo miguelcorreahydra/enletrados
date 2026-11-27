@@ -100,6 +100,13 @@ Responder siempre en español.
   personalizado» de Tag Manager quedan bloqueadas. `npm run prueba:medicion` lo comprueba sin mandar nada.
 - **Accesibilidad y SEO revisados (27 nov 2026):** `npm run accesibilidad` (axe-core, WCAG 2.2 AA, y SEO de las 313
   páginas) en 0 problemas. **Jugar con teclado: descartado** por el usuario (la campaña es solo para celulares).
+- **Fondos de los niveles** (aprobados el 27 nov 2026): `herramientas/lib/fondos.js`. Un papel tapiz por lugar (trigo,
+  flores, adoquines, olas, montañas, rieles, notas, casas, hojas, estrellas) y la hora dentro del lugar: niveles 1–10
+  mañana, 11–20 tarde, **21–30 noche con los colores oscuros** (`data-hora="noche"`, aunque el jugador use el tema
+  claro). Movimiento suave por lugar (harina, pétalos, farolas, olas, nubes, humo, notas, ventanas, hojas y
+  luciérnagas, estrellas), solo con transform y opacity. Cada nivel lleva solo su fondo dentro de su página (~1 KB con
+  gzip). Con el tema oscuro, los fondos de mañana y tarde llevan un velo. Se apaga en Ajustes («Fondos con
+  movimiento», `enl_fondomov`) y con «reducir movimiento». `npm run prueba:fondos`. El Diario no tiene fondo propio.
 - **Vista previa al compartir:** `fuente/publico/compartir.jpg` (1200×630, JPG aprobado como excepción a la regla 6),
   se rehace con `npm run compartir`; etiquetas Open Graph en todas las páginas.
 - **Rediseño premium en curso** (aprobado el 26 nov 2026, antes de postales y vecinos):
