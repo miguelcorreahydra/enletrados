@@ -88,8 +88,8 @@ Responder siempre en español.
   (Content5 libre). Muro de ofertas bloqueado con `googlefc.controlledMessagingFunction`.
   **No se usa `rewardsv2.min.js`**: abre sola una ventana que bloquea la página al cargar (también en plena partida),
   puede redirigir, carga Poppins de Google y no le avisa al juego. La recompensa va por `verAnuncio()` con la unidad de
-  Ad Manager en `recompensa` (**pendiente: pedirle a Groone la ruta de la unidad**); vacía, el juego no ofrece anuncios
-  con recompensa. `npm run prueba:anuncios` usa `groone.js` real (copia en `datos/groone/`) con el GPT simulado y las
+  Ad Manager en `recompensa`: `/23070559321/enletrados.cosmovil.com.mx/Enletrados_Rewards_20261127` (leída de la
+  configuración de Groone el 27 nov 2026, con permiso del usuario); vacía, el juego no ofrece anuncios con recompensa. `npm run prueba:anuncios` usa `groone.js` real (copia en `datos/groone/`) con el GPT simulado y las
   API de Groone simuladas. **ads.txt:** Google lo busca en `cosmovil.com.mx/ads.txt`.
 - **Medición conectada (27 nov 2026)**, códigos del usuario en `fuente/contenido/medicion.json` (comprobado que ninguno
   es de los blogs): Tag Manager `GTM-NWZLHLTD` (Analytics lo configura el usuario dentro de Tag Manager), píxel de Meta
