@@ -33,7 +33,8 @@
           if (modo === "vacio") return emitir("slotRenderEnded", { slot: s, isEmpty: true });
           emitir("rewardedSlotReady", { slot: s, makeRewardedVisible: function () {
             reg.recompensaVisible = true;
-            setTimeout(function () { if (modo === "ok") emitir("rewardedSlotGranted", { slot: s, payload: null }); emitir("rewardedSlotClosed", { slot: s }); }, 400);
+            // "largo": un video de 12 s (más que el temporizador de 8 s del juego), para comprobar que el premio llega igual
+            setTimeout(function () { if (modo === "ok" || modo === "largo") emitir("rewardedSlotGranted", { slot: s, payload: null }); emitir("rewardedSlotClosed", { slot: s }); }, modo === "largo" ? 12000 : 400);
           } });
         }
       }, 50);

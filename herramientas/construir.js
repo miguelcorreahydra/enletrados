@@ -28,7 +28,9 @@ const sinAprobar = enUso.filter(w => !APROBADAS[w]).length;
 
 // ---------- archivos con nombre versionado ----------
 const minCss = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").replace(/\s*([{}:;,>])\s*/g, "$1").replace(/;}/g, "}").trim();
-const minJs = s => s.split("\n").map(l => l.replace(/^\s+/, "")).filter(l => l && !l.startsWith("//")).join("\n");
+// compacta el JS: quita sangría, líneas de comentario y comentarios al final de la línea (solo los que van después de un
+// espacio y no tienen comillas, para no tocar textos ni direcciones como "https://…")
+const minJs = s => s.split("\n").map(l => l.replace(/^\s+/, "").replace(/\s+\/\/ [^"'`]*$/, "")).filter(l => l && !l.startsWith("//")).join("\n");
 const huella = s => crypto.createHash("sha256").update(s).digest("hex").slice(0, 10);
 fs.rmSync(DIST, { recursive: true, force: true }); fs.mkdirSync(DIST, { recursive: true });
 // imágenes y letras con nombre versionado (caché larga): ARCHIVO["pueblo.webp"] → "/img/pueblo.1a2b3c4d5e.webp"

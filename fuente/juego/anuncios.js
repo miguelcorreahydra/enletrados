@@ -46,16 +46,19 @@
     var pub = window.googletag.pubads();
     pub.addEventListener("slotRenderEnded", function (e) { if (actual && e.slot === actual.slot && e.isEmpty) actual.fin("sin-anuncio"); });
     // el jugador ya aceptó la oferta en el juego, así que el anuncio se muestra apenas está listo
-    pub.addEventListener("rewardedSlotReady", function (e) { if (actual && e.slot === actual.slot) e.makeRewardedVisible(); });
+    // al estar listo se apaga el temporizador de «sin anuncio»: el jugador puede tardar lo que dure el video y recibe su premio
+    pub.addEventListener("rewardedSlotReady", function (e) { if (actual && e.slot === actual.slot) { clearTimeout(actual.espera); e.makeRewardedVisible(); } });
     pub.addEventListener("rewardedSlotGranted", function (e) { if (actual && e.slot === actual.slot) actual.ganado = true; });
     pub.addEventListener("rewardedSlotClosed", function (e) { if (actual && e.slot === actual.slot) actual.fin(actual.ganado ? "visto" : "cerrado"); });
   }
   window.enlAnuncios = {
     recompensa: function (listo) {
       if (actual) return listo("sin-anuncio");
-      var r = actual = { ganado: false, slot: null }, espera = setTimeout(function () { r.fin("sin-anuncio"); }, 8000);
+      // si en 8 s no llega ningún anuncio, el juego regala igual (sin-anuncio); el temporizador se apaga cuando llega
+      var r = actual = { ganado: false, slot: null };
+      r.espera = setTimeout(function () { r.fin("sin-anuncio"); }, 8000);
       r.fin = function (estado) {
-        if (r.hecho) return; r.hecho = true; clearTimeout(espera); actual = null;
+        if (r.hecho) return; r.hecho = true; clearTimeout(r.espera); actual = null;
         if (r.slot) window.googletag.cmd.push(function () { window.googletag.destroySlots([r.slot]); });
         listo(estado);
       };

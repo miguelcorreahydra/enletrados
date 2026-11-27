@@ -104,9 +104,31 @@ async function formar(p, palabra) {
         n: await p.evaluate(() => (JSON.parse(localStorage.getItem("enl_recompensas") || "null") || { n: 0 }).n), groone: (await estado()).groone };
     };
     const rv = await pedir("ok"), rc = await pedir("cerrar"), rs = await pedir("vacio");
+    const rl = await (async () => { await progreso({ hechos: [1, 2, 3, 4], monedas: 0, gratis: 0, llegada: "2026-11-01" }); await ir("/nivel/5/", 2600);
+      await p.evaluate(() => (window.__gptModo = "largo")); const antes = await p.evaluate(() => document.querySelectorAll(".celda.revelada").length);
+      await p.click("#b-letra"); await espera(500); await p.click('[data-accion="ver-letra"]'); await espera(15000);
+      return (await p.evaluate(() => document.querySelectorAll(".celda.revelada").length)) - antes; })();
+    if (rl === 2) ok("anuncio largo (12 s, más que el temporizador): el premio llega completo, 2 letras"); else mal(`anuncio largo: dio ${rl} letra(s) en vez de 2`);
     if (rv.oferta && rv.letras === 2 && rv.n === 1 && !rv.groone) ok("recompensa vista: 2 letras, cuenta en el tope diario y no carga display durante la partida"); else mal("recompensa vista: " + JSON.stringify(rv));
     if (rc.oferta && rc.letras === 0 && rc.n === 0) ok("recompensa cerrada antes: sin premio"); else mal("recompensa cerrada: " + JSON.stringify(rc));
     if (rs.oferta && rs.letras === 1 && rs.n === 0) ok("sin anuncio disponible: Tilde regala 1 letra"); else mal("sin anuncio: " + JSON.stringify(rs));
+
+    // 3a) cofre doble (nivel 5): +50 monedas y una letra gratis más
+    await progreso({ hechos: [1, 2, 3, 4], monedas: 100, gratis: 0, llegada: "2026-11-01" }); await ir("/nivel/5/", 2000);
+    await p.evaluate(() => (window.__gptModo = "ok")); await completar();
+    const c0 = await p.evaluate(() => { const d = JSON.parse(localStorage.getItem("enl_progreso")); return { m: d.monedas, g: d.gratis }; });
+    const bc = await p.$('[data-accion="doble-cofre"]'); if (bc) { await bc.click(); await espera(3000); }
+    const c1 = await p.evaluate(() => { const d = JSON.parse(localStorage.getItem("enl_progreso")); return { m: d.monedas, g: d.gratis }; });
+    if (bc && c1.m - c0.m === 50 && c1.g - c0.g === 1) ok("cofre doble: al ver el anuncio da +50 monedas y otra letra gratis"); else mal("cofre doble: " + JSON.stringify({ oferta: !!bc, c0, c1 }));
+    // 3c) otra carta del cartero: al ver el anuncio, la carta vuelve a estar lista y se puede abrir
+    await progreso({ hechos: [1, 2], monedas: 100, gratis: 0, llegada: "2026-11-01", cartero: { ultimo: 0, fecha: null, hoy: 0 } }); await ir("/", 2000);
+    await p.evaluate(() => (window.__gptModo = "ok"));
+    const carta = await p.$("#cartero:not([hidden])"); if (carta) { await carta.click(); await espera(1200); }
+    const oc = await p.$('[data-accion="otra-carta"]'); if (oc) { await oc.click(); await espera(3000); }
+    const hoy1 = await p.evaluate(() => JSON.parse(localStorage.getItem("enl_progreso")).cartero.hoy);
+    const c2 = await p.$("#cartero:not([hidden]):not(.abierta)"); if (c2) { await c2.click(); await espera(1200); }
+    const hoy2 = await p.evaluate(() => JSON.parse(localStorage.getItem("enl_progreso")).cartero.hoy);
+    if (carta && oc && c2 && hoy1 === 1 && hoy2 === 2) ok("otra carta: al ver el anuncio llega otra carta y se abre con su regalo"); else mal("otra carta: " + JSON.stringify({ carta: !!carta, oferta: !!oc, otra: !!c2, hoy1, hoy2 }));
 
     // 3b) regalo de Tilde: sale solo en el nivel 4 (no en el 5, que tiene cofre, ni en el 6); al verlo, +30 y sin viñeta
     const regalo = async (n, modo, ver) => {
