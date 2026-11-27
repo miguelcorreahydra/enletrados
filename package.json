@@ -20,6 +20,7 @@
     "prueba:anuncios": "node herramientas/pruebas/anuncios.js",
     "prueba:medicion": "node herramientas/pruebas/medicion.js",
     "accesibilidad": "node herramientas/pruebas/accesibilidad_seo.js",
+    "velocidad": "node herramientas/pruebas/velocidad.js",
     "anuncio": "node herramientas/videos/anuncio.js",
     "videos": "node herramientas/videos/guiones.js todos",
     "publicar": "sh herramientas/publicar.sh",

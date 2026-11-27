@@ -61,6 +61,12 @@ Responder siempre en español.
 - **En Cloudflare, Enletrados es un Worker con archivos estáticos (`enletrados`), no un proyecto de Pages** (comprobado
   el 27 nov 2026). Se publica con `npm run publicar` (`wrangler deploy` + `wrangler.jsonc`, token de cuenta en `.env`
   con permiso sobre Workers). `wrangler.jsonc` no incluye el dominio: está conectado en Cloudflare y queda como está.
+- **Publicado por Claude el 27 nov 2026** (versión 928c1663, `npm run publicar`): anuncios de Groone activos, medición,
+  datos legales y seguridad. `npm run seguridad -- --en-linea` sin problemas. Velocidad en 4G (`npm run velocidad`, 3
+  vueltas): LCP de la portada ~960 ms, nivel 1 ~930 ms, diario ~710 ms. Peso real transferido de la portada ~112 KB
+  propios (el cálculo de la construcción usa gzip-9 y da 98,5; Cloudflare comprime con zstd y suma cabeceras) más
+  10,7 KB de Cloudflare Web Analytics, que Cloudflare inyecta solo y no está en la política de privacidad (pendiente
+  de decidir).
 - **Cómo se publica** (27 nov 2026):
   - `npm run construir`: local, con anuncios **simulados** (para probar);
   - `npm run construir:publicado`: como lo ve el público, **sin anuncios simulados ni ofertas de recompensa** mientras
