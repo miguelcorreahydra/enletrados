@@ -1,0 +1,21 @@
+// Enletrados en Cloudflare: un Worker con archivos estáticos (la carpeta dist/ que arma construir.js).
+// Copia la configuración que el Worker «enletrados» ya tenía en Cloudflare (leída el 27 nov 2026), para que publicar
+// solo cambie los archivos. El dominio enletrados.cosmovil.com.mx NO va aquí: está conectado en Cloudflare y wrangler
+// lo deja como está (tocarlo pediría permisos sobre la zona, que el token no tiene a propósito).
+// Se publica con npm run publicar (lee el token del .env, que nunca va a GitHub).
+{
+  "name": "enletrados",
+  "compatibility_date": "2026-11-23",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  "workers_dev": true,
+  "preview_urls": true,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": true }
+  }
+}

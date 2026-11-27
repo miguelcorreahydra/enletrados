@@ -58,6 +58,9 @@ Responder siempre en español.
   - que el usuario pruebe en su celular;
   - postales y vecinos para coleccionar (no entraron en la lista de la fase 3);
   - más tandas de pistas para llegar a unas 2.500 (más variedad en los niveles).
+- **En Cloudflare, Enletrados es un Worker con archivos estáticos (`enletrados`), no un proyecto de Pages** (comprobado
+  el 27 nov 2026). Se publica con `npm run publicar` (`wrangler deploy` + `wrangler.jsonc`, token de cuenta en `.env`
+  con permiso sobre Workers). `wrangler.jsonc` no incluye el dominio: está conectado en Cloudflare y queda como está.
 - **Cómo se publica** (27 nov 2026):
   - `npm run construir`: local, con anuncios **simulados** (para probar);
   - `npm run construir:publicado`: como lo ve el público, **sin anuncios simulados ni ofertas de recompensa** mientras

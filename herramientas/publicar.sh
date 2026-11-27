@@ -1,5 +1,7 @@
 #!/bin/sh
-# Publica Enletrados en Cloudflare Pages (https://enletrados.cosmovil.com.mx). Pide confirmación antes de subir.
+# Publica Enletrados en Cloudflare (https://enletrados.cosmovil.com.mx). Pide confirmación antes de subir.
+# En Cloudflare, Enletrados es un Worker con archivos estáticos (no un proyecto de Pages): se sube con wrangler deploy
+# y la configuración de wrangler.jsonc (el dominio queda como está en Cloudflare).
 # Uso: sh herramientas/publicar.sh        (necesita el .env con el token; ver .env.ejemplo)
 # Qué hace: revisa pistas y niveles, arma en modo estricto (sin anuncios simulados y con los datos legales completos),
 # guarda un respaldo del sitio en respaldos/, sube con wrangler y anota el cambio en respaldos/cambios.jsonl.
@@ -18,14 +20,14 @@ node herramientas/construir.js --estricto | grep -E "Modo|Primera"
 
 COMMIT=$(git rev-parse --short HEAD); FECHA=$(date +%Y-%m-%d_%H%M)
 echo ""
-echo "Se va a publicar la versión $COMMIT en el proyecto «$CF_PROYECTO» de Cloudflare."
+echo "Se va a publicar la versión $COMMIT en el Worker «$CF_PROYECTO» de Cloudflare."
 printf "¿Publicar ahora? Escribe «si» para continuar: "; read RESP
 [ "$RESP" = "si" ] || { echo "No se publicó nada."; exit 0; }
 
 echo "3/4 Guardando respaldo…"
 RESPALDO="respaldos/sitio-$FECHA-$COMMIT.zip"
 (cd dist && zip -qr "../$RESPALDO" .)
-echo "4/4 Subiendo a Cloudflare Pages…"
-npx --yes wrangler@4 pages deploy dist --project-name "$CF_PROYECTO" --branch main --commit-hash "$COMMIT" --commit-message "Enletrados $COMMIT"
-printf '{"fecha":"%s","recurso":"Cloudflare Pages · %s","cambio":"publicación de la versión %s","respaldo":"%s"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$CF_PROYECTO" "$COMMIT" "$RESPALDO" >> respaldos/cambios.jsonl
-echo "Listo. Para volver atrás: en Cloudflare, Workers y Pages › $CF_PROYECTO › Implementaciones, o subiendo $RESPALDO."
+echo "4/4 Subiendo a Cloudflare…"
+npx --yes wrangler@4 deploy --name "$CF_PROYECTO" --message "Enletrados $COMMIT"
+printf '{"fecha":"%s","recurso":"Cloudflare Worker · %s","cambio":"publicación de la versión %s","respaldo":"%s"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$CF_PROYECTO" "$COMMIT" "$RESPALDO" >> respaldos/cambios.jsonl
+echo "Listo. Para volver atrás: en Cloudflare, Workers y Pages › $CF_PROYECTO › Implementaciones (Deployments), o con npx wrangler@4 rollback."
