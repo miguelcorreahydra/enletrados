@@ -23,6 +23,8 @@ const fallas = [], ok = m => console.log("✓ " + m), mal = m => { fallas.push(m
     if (e.tapiz && e.mueve && e.hora === hora) ok(`nivel ${n}: papel tapiz, movimiento y hora «${hora}»`); else mal(`nivel ${n}: ` + JSON.stringify(e));
     if (hora === "noche") { if (e.papel === "#1B1712") ok("de noche se usan los colores oscuros aunque el jugador haya elegido el tema claro"); else mal("la noche no quedó oscura: " + e.papel); }
   }
+  await p.goto(BASE + "/diario/", { waitUntil: "load" }); const ed = await estado();
+  if (ed.tapiz && ed.mueve) ok("Diario del Pueblo: papel de periódico y letras que suben"); else mal("diario: " + JSON.stringify(ed));
   await p.goto(BASE + "/ajustes/", { waitUntil: "load" }); await p.click("#a-fondos");
   await p.goto(BASE + "/nivel/104/", { waitUntil: "load" }); let e = await estado();
   if (!e.mueve && e.tapiz) ok("con «Fondos con movimiento» apagado: se queda el papel tapiz, sin movimiento"); else mal("interruptor: " + JSON.stringify(e));

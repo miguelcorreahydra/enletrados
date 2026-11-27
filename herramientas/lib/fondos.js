@@ -115,5 +115,23 @@ function fondo(mundo, hora, nivel) {
   const css = `:root{--fondo-nivel:${MOTIVOS[mundo.id](trazo)},${cielo};--pc:${tipo === "olas" ? pc + ".5)" : pc}${hoja}}\n${CSS_BASE}\n${CSS_MOV[tipo]}${oscuro}`;
   return { css, html: `<div class="fondo-mov" aria-hidden="true">${h.join("")}</div>` };
 }
+// El Diario del Pueblo: papel de periódico (titulares, columnas y recuadros de foto en sepia) y letras sueltas que
+// suben despacio, como las palabras que vuelven al pueblo. Con el tema oscuro lleva el mismo velo que los niveles.
+const PERIODICO = c => T(180, 150, `<path d="M10 16h96" stroke-width="6"/><path d="M10 28h70" stroke-width="3"/>
+  <path d="M10 42h48M10 49h48M10 56h48M10 63h40M10 74h48M10 81h48M10 88h30" stroke-width="1.5"/>
+  <rect x="68" y="40" width="40" height="28"/><path d="M68 40l40 28M108 40l-40 28" stroke-width="1"/>
+  <path d="M68 76h40M68 83h40M68 90h32" stroke-width="1.5"/>
+  <path d="M124 16h46M124 23h46M124 30h46M124 37h30M124 48h46M124 55h46M124 62h46M124 69h40M124 80h46M124 87h22" stroke-width="1.5"/>
+  <path d="M118 10v90" stroke-width="1"/><path d="M10 108h160" stroke-width="1"/>
+  <path d="M10 120h52M10 127h52M10 134h40M72 120h44M72 127h44M72 134h30M126 120h44M126 127h44M126 134h36" stroke-width="1.5"/>`, c);
+const CSS_LETRAS = `.fondo-mov .p{left:var(--x);bottom:-40px;font:600 var(--t) Georgia,serif;color:var(--pc);animation:fletra var(--d) ease-in-out var(--r) infinite}
+@keyframes fletra{0%{transform:translate(0,0) rotate(-10deg);opacity:0}15%{opacity:1}50%{transform:translate(var(--dx),-50vh) rotate(10deg)}100%{transform:translate(0,-100vh) rotate(-6deg);opacity:0}}`;
+function fondoDiario() {
+  const R = azar(2026), h = [], letras = "AEÑOSLRUTCMDPÁÉ";
+  for (let i = 0; i < 11; i++) h.push(`<i class="p" style="--x:${f0(R(3, 92))}%;--t:${f0(R(18, 30))}px;--d:${f1(R(12, 20))}s;--r:-${f1(R(0, 20))}s;--dx:${f0(R(-30, 30))}px">${letras[Math.floor(R(0, letras.length))]}</i>`);
+  const css = `:root{--fondo-nivel:${PERIODICO("rgba(74,58,40,.10)")},linear-gradient(180deg,#F8F2E4 0%,#EEE3CC 100%);--pc:rgba(74,58,40,.22)}\n${CSS_BASE}\n${CSS_LETRAS}
+:root[data-tema="oscuro"] .fondo-mov{--pc:rgba(233,223,203,.16)}@media (prefers-color-scheme:dark){:root:not([data-tema="claro"]) .fondo-mov{--pc:rgba(233,223,203,.16)}}`;
+  return { css, html: `<div class="fondo-mov" aria-hidden="true">${h.join("")}</div>` };
+}
 const horaDe = posicion => (posicion <= 10 ? "manana" : posicion <= 20 ? "tarde" : "noche");
-module.exports = { fondo, horaDe };
+module.exports = { fondo, fondoDiario, horaDe };

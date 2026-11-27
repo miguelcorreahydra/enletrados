@@ -147,9 +147,10 @@ pagina("/mundos/", { titulo: "Los lugares del pueblo · Enletrados", pagina: "mu
 
 // Diario del Pueblo: una página y un archivo por tablero (se baja solo el del día)
 const INICIO_DIARIO = "2026-01-01";
-pagina("/diario/", { titulo: "El Diario del Pueblo · Crucigrama diario · Enletrados", pagina: "diario", clase: "nivel",
+const FONDO_DIARIO = FONDOS.fondoDiario(); // papel de periódico (herramientas/lib/fondos.js)
+pagina("/diario/", { titulo: "El Diario del Pueblo · Crucigrama diario · Enletrados", pagina: "diario", clase: "nivel", estiloExtra: `<style>${FONDO_DIARIO.css}</style>`,
   descripcion: "Un crucigrama nuevo cada día, el mismo para todos. Forma las palabras con la rueda de letras y comparte tu resultado sin revelar las respuestas.",
-  contenido: plantilla("diario.html", {}) + `\n<template id="t-escena"></template>\n<script type="application/json" id="datos-diario">${json({ inicio: INICIO_DIARIO, dias: diario.length, color: "#B98A2E" })}</script>` });
+  contenido: FONDO_DIARIO.html + plantilla("diario.html", {}) + `\n<template id="t-escena"></template>\n<script type="application/json" id="datos-diario">${json({ inicio: INICIO_DIARIO, dias: diario.length, color: "#B98A2E" })}</script>` });
 fs.mkdirSync(path.join(DIST, "diario/dia"), { recursive: true });
 diario.forEach((l, i) => fs.writeFileSync(path.join(DIST, `diario/dia/${i + 1}.json`), JSON.stringify({ letras: l.letras, palabras: l.palabras, filas: l.filas,
   columnas: l.columnas, extras: l.extras, pistas: Object.fromEntries(l.palabras.map(w => [w.p, PISTAS[w.p]])) })));
