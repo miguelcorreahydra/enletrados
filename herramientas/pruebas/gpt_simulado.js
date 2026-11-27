@@ -28,7 +28,7 @@
       s.mostrado = true;
       setTimeout(function () {
         var modo = window.__gptModo || "ok";
-        if (s.tipo === "display") { if (window.__gptVacio) return emitir("slotRenderEnded", { slot: s, isEmpty: true }); var d = document.getElementById(s.div); if (d) { d.insertAdjacentHTML("beforeend", '<div class="gpt-sim" style="width:300px;height:250px;background:#ddd;display:inline-grid;place-items:center">GPT simulado</div>'); } emitir("slotRenderEnded", { slot: s, isEmpty: false }); }
+        if (s.tipo === "display") { if (window.__gptVacio) return emitir("slotRenderEnded", { slot: s, isEmpty: true }); var d = document.getElementById(s.div); if (d) { d.insertAdjacentHTML("beforeend", '<div id="google_ads_iframe_' + s.div + '__container__" style="border:0pt none"><iframe class="gpt-sim" title="GPT simulado" width="300" height="250" frameborder="0" style="border:0;vertical-align:bottom;background:#ddd"></iframe></div>'); } emitir("slotRenderEnded", { slot: s, isEmpty: false }); }
         if (s.tipo === "recompensa") {
           if (modo === "vacio") return emitir("slotRenderEnded", { slot: s, isEmpty: true });
           emitir("rewardedSlotReady", { slot: s, makeRewardedVisible: function () {

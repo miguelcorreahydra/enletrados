@@ -447,6 +447,9 @@ canvas.confeti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-e
 /* espacio real de Ad Manager (Groone): groone.js le pone su rótulo «Enlaces Patrocinados:» cuando llega un anuncio, y
    lo colapsa si no llega ninguno. Va al final de cada pantalla, así que no empuja nada al cargar. */
 .espacio-anuncio.real { border: 0; padding: 0; color: var(--tinta-2); text-align: center; }
+/* el anuncio siempre centrado: el envoltorio de groone, el div del espacio (id ContentN) y el iframe de Google */
+.espacio-anuncio.real .groone, .espacio-anuncio.real [id^="Content"], .espacio-anuncio.real [id^="google_ads_iframe"] { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.espacio-anuncio.real iframe { display: block; margin: 0 auto; max-width: 100%; }
 
 /* páginas de texto y anuncio anchor simulado */
 .legal-texto h2 { font-family: var(--serif); font-size: var(--t-xl); margin: 28px 0 6px; }

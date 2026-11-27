@@ -86,6 +86,8 @@ async function formar(p, palabra) {
     const CAP = path.join(__dirname, "capturas"); fs.mkdirSync(CAP, { recursive: true });
     await p.evaluate(() => { const d = document.querySelector(".espacio-anuncio.real"); d && d.scrollIntoView({ block: "center" }); }); await espera(400);
     await p.screenshot({ path: path.join(CAP, "anuncio-nivel-completado.png") });
+    const centro = await p.evaluate(() => [...document.querySelectorAll(".espacio-anuncio.real .gpt-sim")].map(f => { const r = f.getBoundingClientRect(), c = f.closest(".espacio-anuncio").getBoundingClientRect(); return Math.round(Math.abs((r.left - c.left) - (c.right - r.right))); }));
+    if (centro.length && centro.every(d => d <= 2)) ok("el anuncio queda centrado en su espacio"); else mal("anuncio descentrado (diferencia de márgenes en px): " + JSON.stringify(centro));
     if (fin.distancia !== null && fin.distancia >= 32) ok(`el display queda a ${fin.distancia} px de los botones`); else mal("el display quedó cerca de los botones: " + fin.distancia);
     await ir("/diario/"); const ed = await estado();
     if (!ed.groone) ok("diario mientras se juega: nada de anuncios"); else mal("diario en juego: " + JSON.stringify(ed));
