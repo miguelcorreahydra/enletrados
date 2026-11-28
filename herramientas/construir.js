@@ -197,7 +197,9 @@ niveles.forEach((l, i) => {
   // fondo del lugar según la hora (1–10 mañana, 11–20 tarde, 21–30 noche, con los colores oscuros): herramientas/lib/fondos.js
   const hora = FONDOS.horaDe(pos), fo = FONDOS.fondo(m, hora, n);
   pagina(`/nivel/${n}/`, { titulo: `Nivel ${n} · ${m.lugar} · Enletrados`, pagina: "nivel", clase: "nivel", robots: "noindex, follow", indexar: false,
-    estiloExtra: `<style>${fo.css}</style>`, htmlExtra: ` data-hora="${hora}"`,
+    // anchor arriba solo en crucigramas chicos (hasta 5 filas y 6 palabras): con el anuncio abierto, en un celular de
+    // 360 × 740, las casillas quedan en 42 px o más. En los grandes no va nunca (pedido del usuario, 28 nov 2026).
+    estiloExtra: `<style>${fo.css}</style>`, htmlExtra: ` data-hora="${hora}"` + (l.filas <= 5 && l.palabras.length <= 6 ? ' data-anchor-juego="1"' : ""),
     descripcion: `Nivel ${n} de Enletrados: completa el crucigrama con las letras de la rueda.`,
     contenido: plantilla("nivel.html", { n, lugar: esc(m.lugar), posicion: pos, totalMundo, porcentaje: (pos / totalMundo * 100).toFixed(1),
       fondo: fo.html, escena: ESC[m.id] ? escena(m.id) : "", vecinossvg: datos.vecino ? VECINOS_SVG : "", datos: json(datos) }) });

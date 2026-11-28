@@ -100,6 +100,9 @@ async function formar(p, palabra) {
     const centro = await p.evaluate(() => [...document.querySelectorAll(".espacio-anuncio.real .gpt-sim")].map(f => { const r = f.getBoundingClientRect(), c = f.closest(".espacio-anuncio").getBoundingClientRect(); return Math.round(Math.abs((r.left - c.left) - (c.right - r.right))); }));
     if (centro.length && centro.every(d => d <= 2)) ok("el anuncio queda centrado en su espacio"); else mal("anuncio descentrado (diferencia de márgenes en px): " + JSON.stringify(centro));
     if (fin.distancia !== null && fin.distancia >= 32) ok(`el display queda a ${fin.distancia} px de los botones`); else mal("el display quedó cerca de los botones: " + fin.distancia);
+    await progreso({ hechos: Array.from({ length: 290 }, (_, i) => i + 1), monedas: 100, llegada: "2026-11-01" }); await ir("/nivel/291/");
+    const eg = await estado(), pg = await p.evaluate(() => parseFloat(getComputedStyle(document.body).paddingTop));
+    if (!eg.slots.length && pg === 0) ok("nivel 291 (crucigrama grande): sin anchor ni espacio reservado"); else mal("nivel grande con anuncio: " + JSON.stringify({ eg, pg }));
     await ir("/diario/"); const ed = await estado();
     if (!ed.groone) ok("diario mientras se juega: nada de anuncios"); else mal("diario en juego: " + JSON.stringify(ed));
 

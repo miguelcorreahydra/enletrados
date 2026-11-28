@@ -350,7 +350,7 @@ Responder siempre en español.
 | Paso al nivel siguiente | Viñeta | Al navegar a `/nivel/N+1/`, desde el nivel 3 y con límite de frecuencia. Nunca al abrir el sitio. |
 | Pantalla «nivel completado» | Display | Debajo del botón «Siguiente nivel», con 32 px de margen o más. |
 | Portada, mundos, cómo jugar | Display y anchor | Fuera de la partida. |
-| Durante la partida | **Anchor arriba** (desde el 28 nov 2026, pedido por el usuario y su jefe) | Solo arriba, nunca abajo junto a la rueda. El juego baja lo que mide el anuncio y vuelve a su lugar si el jugador lo oculta (`--anuncio-arriba`, medido en `anuncios.js`). Vigilar su CTR en Groone: si pasa de ~1 %, son clics accidentales y se quita. |
+| Durante la partida | **Anchor arriba** (desde el 28 nov 2026, pedido por el usuario y su jefe) | **Solo en niveles de crucigrama chico** (hasta 5 filas y 6 palabras: 125 de 300; `data-anchor-juego`), nunca en los grandes ni abajo junto a la rueda. El juego baja lo que mide el anuncio y vuelve a su lugar si el jugador lo oculta (`--anuncio-arriba`, medido en `anuncios.js`). Vigilar su CTR en Groone: si pasa de ~1 %, son clics accidentales y se quita. |
 
 - **Muro de ofertas** (Offerwall de Google): apagado en todo el sitio. Se bloquea por código con
   `googlefc.controlledMessagingFunction`, definida antes del tag.

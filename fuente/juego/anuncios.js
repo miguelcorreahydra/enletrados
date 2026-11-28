@@ -38,11 +38,11 @@
     document.head.appendChild(s);
   }
 
-  // ---- anchor arriba durante el juego (aprobado el 28 nov 2026) ----
+  // ---- anchor arriba durante el juego (aprobado el 28 nov 2026), solo en niveles de crucigrama chico ----
   // Google lo pone fijo arriba y le agrega una flecha para ocultarlo. Aquí se mide cuánto ocupa de verdad (su borde de
   // abajo) y el juego baja eso mismo (--anuncio-arriba en el body). Si el jugador lo oculta, o no hay anuncio, vuelve a 0
   // y el juego recupera su tamaño. Al cambiar el alto, el juego vuelve a medir la rueda y el crucigrama.
-  if (pagina === "nivel" && CONF.anchorJuego) {
+  if (pagina === "nivel" && CONF.anchorJuego && document.documentElement.dataset.anchorJuego === "1") {
     var raiz = document.documentElement, altoActual = 0, slotArriba = null;
     var poner = function (px) {
       px = Math.max(0, Math.min(Math.round(px), 160)); // un anchor nunca debería pasar de ~100 px
