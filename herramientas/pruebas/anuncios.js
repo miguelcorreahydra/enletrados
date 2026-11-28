@@ -80,7 +80,7 @@ async function formar(p, palabra) {
     await p.evaluate(() => window.__gptAnchorOcultar()); await espera(1600); const l2 = await lay();
     await p.evaluate(() => window.__gptAnchorMostrar()); await espera(1600); const l3 = await lay();
     if (l1.pad >= 62 && l1.cabecera >= 62 && l1.ruedaAbajo <= l1.alto) ok(`con el anchor: el juego baja ${l1.pad} px y la rueda (${l1.rueda} px) cabe entera`); else mal("espacio del anchor: " + JSON.stringify(l1));
-    if (l2.pad <= 16 && l2.cabecera <= 16 && l2.rueda >= l1.rueda) ok(`al ocultarlo: el juego vuelve arriba (${l2.pad} px) y la rueda recupera su tamaño (${l2.rueda} px)`); else mal("al ocultar el anchor: " + JSON.stringify(l2));
+    if (l2.pad <= 30 && l2.cabecera <= 32 && l2.rueda >= l1.rueda) ok(`al ocultarlo: el juego sube y deja solo el lugar de la pestañita (${l2.pad} px); la rueda recupera su tamaño (${l2.rueda} px)`); else mal("al ocultar el anchor: " + JSON.stringify(l2));
     if (l3.pad >= 62) ok("al volver a mostrarlo: el juego deja otra vez su espacio"); else mal("al mostrar de nuevo: " + JSON.stringify(l3));
     await p.evaluate(() => { window.__gptAnchorVacio = true; }); await p.reload({ waitUntil: "load" }); await p.evaluate(() => { window.__gptAnchorVacio = true; }); await espera(3000);
     const l4 = await lay(); if (l4.pad === 0) ok("sin anuncio para mostrar: no se reserva espacio"); else mal("sin anuncio se reservó espacio: " + JSON.stringify(l4));

@@ -50,17 +50,27 @@
       altoActual = px; raiz.style.setProperty("--anuncio-arriba", px + "px");
       clearTimeout(poner.t); poner.t = setTimeout(function () { window.dispatchEvent(new Event("resize")); }, 280);
     };
-    // el contenedor fijo del anuncio: el del espacio del anchor, o el que guarda su iframe
-    var contenedor = function () {
-      var el = slotArriba && document.getElementById(slotArriba.getSlotElementId());
-      if (!el) { var f = document.querySelector('iframe[id*="' + CONF.anchorJuego.split("/").pop() + '"]'); el = f && f.parentElement; }
-      for (var x = el; x && x !== document.body; x = x.parentElement) if (getComputedStyle(x).position === "fixed") return x;
-      return el;
+    // Qué hay de verdad en la franja de arriba: se revisan puntos a lo ancho, fila por fila, y el anuncio llega hasta la
+    // última fila donde algún punto cae sobre él. No depende de cómo arme Google su anchor por dentro: abierto mide el
+    // anuncio entero; oculto, solo la pestañita con la flecha (así no tapa el botón de casa); sin anuncio, 0.
+    var nuestros = new Set([].slice.call(document.body.children)); // lo del juego ya está; el anchor llega después
+    var esAnuncio = function (el) {
+      if (!el || el === document.documentElement || el === document.body) return false;
+      var x = el; while (x.parentElement && x.parentElement !== document.body) x = x.parentElement;
+      if (nuestros.has(x)) return false;
+      return !/(^|\s)(regalo-velo|vuela|moneda-vuela|chispa|aviso|velo|sim)(\s|$)/.test(typeof x.className === "string" ? x.className : "");
     };
     var medir = function () {
-      var c = contenedor(); if (!c) return poner(0);
-      var r = c.getBoundingClientRect(), visible = r.height > 0 && r.top < 8 && getComputedStyle(c).visibility !== "hidden" && getComputedStyle(c).display !== "none";
-      poner(visible ? r.bottom : 0);
+      if (document.hidden) return;
+      var velo = document.getElementById("velo"); if (velo && velo.classList.contains("ver")) return; // con una hoja abierta no se toca nada
+      var w = innerWidth, xs = [6, 20, 40, w / 4, w / 2, 3 * w / 4, w - 40, w - 20, w - 6], fondo = 0;
+      for (var y = 1; y < 220; y += 3) {
+        var hay = false;
+        for (var k = 0; k < xs.length && !hay; k++) hay = esAnuncio(document.elementFromPoint(xs[k], y));
+        if (!hay) break;
+        fondo = y + 3;
+      }
+      poner(fondo ? fondo + 2 : 0);
     };
     cargarGpt();
     window.googletag.cmd.push(function () {
@@ -68,17 +78,9 @@
       slotArriba = g.defineOutOfPageSlot(CONF.anchorJuego, g.enums.OutOfPageFormat.TOP_ANCHOR);
       if (!slotArriba) return; // el navegador o la página no admiten anchor: el juego queda como siempre
       slotArriba.addService(g.pubads());
-      g.pubads().addEventListener("slotRenderEnded", function (e) {
-        if (e.slot !== slotArriba) return;
-        if (e.isEmpty) return poner(0);
-        medir();
-        // Google mueve o encoge el contenedor al ocultarlo: se vuelve a medir con cada cambio y cada medio segundo
-        var c = contenedor();
-        if (c && window.ResizeObserver) new ResizeObserver(medir).observe(c);
-        if (c) new MutationObserver(medir).observe(c, { attributes: true, subtree: true, attributeFilter: ["style", "class", "hidden"] });
-        setInterval(function () { if (!document.hidden) medir(); }, 500);
-      });
+      g.pubads().addEventListener("slotRenderEnded", function (e) { if (e.slot === slotArriba) { if (e.isEmpty) poner(0); else medir(); } });
       g.enableServices(); g.display(slotArriba);
+      setInterval(medir, 400); // se vuelve a mirar seguido: Google lo muestra, lo oculta o lo cambia cuando quiere
     });
   }
 

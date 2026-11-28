@@ -653,3 +653,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
   color: var(--letra-texto, #2E241B); background: linear-gradient(180deg, var(--letra-a, #FFFFFF), var(--letra-b, var(--ficha))); border: 1px solid var(--letra-borde, var(--ficha-borde)); }
 .muestra i.sel { color: var(--sel-texto, #FFF8EE); background: linear-gradient(180deg, var(--sel-a, #E8BE63), var(--sel-b, var(--dorado))); border-color: var(--sel-borde, #A97B27); }
 .nota-tienda { color: var(--tinta-2); font-size: var(--t-s); }
+
+/* nivel más compacto (28 nov 2026): la pista queda junto a la rueda y el crucigrama gana alto.
+   - la burbuja de la palabra que se forma aparece SOBRE la pista mientras se desliza el dedo (y se va al soltar);
+   - la línea de ayuda (nivel 1, Tilde, frasco) va en una franja angosta al pie del crucigrama. */
+.zona-grilla { position: relative; padding: 4px 0 26px; }
+.zona-grilla .guia { position: absolute; left: 0; right: 0; bottom: 2px; margin: 0; min-height: 0; line-height: 22px; }
+.pista { position: relative; }
+.pista .actual { position: absolute; inset: 0; height: auto; margin: 0; pointer-events: none; z-index: 2; }
+.pista .actual .burbuja { box-shadow: var(--s-2); }
+.abajo { margin-top: var(--e-3); }
+.pista-texto { transition: opacity .12s; }
+.pista:has(.actual .burbuja) .pista-texto { opacity: 0; } /* mientras se forma la palabra, la pista se oculta detrás de la burbuja */

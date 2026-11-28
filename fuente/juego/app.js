@@ -635,7 +635,7 @@
     function medir() {
       var z = $("zona-grilla"), hueco = D.columnas > 6 || D.filas > 6 ? 4 : 5;
       $("grilla").innerHTML = ""; // se mide el espacio libre, sin el crucigrama anterior adentro
-      tam = Math.max(18, Math.min(54, Math.floor((Math.min(z.clientWidth, 520) - hueco * (D.columnas - 1)) / D.columnas), Math.floor((z.clientHeight - 16 - hueco * (D.filas - 1)) / D.filas)));
+      tam = Math.max(18, Math.min(70, Math.floor((Math.min(z.clientWidth, 520) - hueco * (D.columnas - 1)) / D.columnas), Math.floor((z.clientHeight - 30 - hueco * (D.filas - 1)) / D.filas)));
       $("grilla").style.setProperty("--hueco", hueco + "px");
     }
     function dibujarGrilla(op) {
