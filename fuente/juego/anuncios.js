@@ -42,6 +42,31 @@
   // Por decisión del usuario sale normal, encima del juego, y el juego no se mueve: si alguien necesita ver lo que tapa,
   // lo oculta con la flecha del propio anuncio. Vigilar su CTR en Groone (clics accidentales sobre la cabecera).
   if (pagina === "nivel" && CONF.anchorJuego && document.documentElement.dataset.anchorJuego === "1") {
+    // Algunos anchors de Google corren la página para no taparla (margen arriba, un espacio en blanco o el anuncio dentro
+    // de la página). Aquí no: si pasa, se deshace y el anuncio queda encima, fijo arriba. El juego no se mueve nunca.
+    var raiz = document.documentElement, cuerpoJ = document.body, cab = document.querySelector(".cabecera");
+    var propios = new Set([].slice.call(cuerpoJ.children)), PROP = ["padding-top", "margin-top", "top", "border-top-width"];
+    var base = [raiz, cuerpoJ].map(function (el) { var cs = getComputedStyle(el); return PROP.map(function (p) { return cs.getPropertyValue(p); }); });
+    var sujetar = function () {
+      [raiz, cuerpoJ].forEach(function (el, i) {
+        var cs = getComputedStyle(el);
+        PROP.forEach(function (p, k) { if (cs.getPropertyValue(p) !== base[i][k]) el.style.setProperty(p, base[i][k], "important"); });
+        if (cs.transform !== "none") el.style.setProperty("transform", "none", "important");
+      });
+      if (!cab) return;
+      [].forEach.call(cuerpoJ.children, function (x) {
+        if (propios.has(x) || x.dataset.enlSujeto) return;
+        var pos = getComputedStyle(x).position;
+        if (pos === "fixed" || pos === "absolute") return; // ya va encima: así debe ser
+        if (!(x.compareDocumentPosition(cab) & Node.DOCUMENT_POSITION_FOLLOWING)) return; // solo lo que queda antes del juego
+        x.dataset.enlSujeto = "1";
+        if (x.querySelector("iframe")) ["position:fixed", "top:0", "left:0", "right:0", "z-index:2147483000"].forEach(function (d) { var kv = d.split(":"); x.style.setProperty(kv[0], kv[1], "important"); });
+        else x.style.setProperty("display", "none", "important"); // un espacio en blanco para empujar: fuera
+      });
+    };
+    new MutationObserver(sujetar).observe(raiz, { attributes: true, attributeFilter: ["style", "class"] });
+    new MutationObserver(sujetar).observe(cuerpoJ, { attributes: true, attributeFilter: ["style", "class"], childList: true });
+    setInterval(sujetar, 500);
     cargarGpt();
     window.googletag.cmd.push(function () {
       var g = window.googletag, s = g.defineOutOfPageSlot(CONF.anchorJuego, g.enums.OutOfPageFormat.TOP_ANCHOR);

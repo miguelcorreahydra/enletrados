@@ -37,9 +37,15 @@
           var caja = document.createElement("div"); caja.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:2147483000;transition:transform .2s";
           // como el real: la pestañita con la flecha cuelga debajo del anuncio, arriba a la izquierda; al ocultarlo el anuncio
           // sube y solo queda la pestañita (40 × 22 px) en la esquina
-          caja.innerHTML = '<div id="' + s.div + '" style="height:64px;background:#ccc;display:grid;place-items:center">Anchor simulado</div>' +
+          caja.innerHTML = '<div id="' + s.div + '" style="height:64px;background:#ccc;position:relative"><iframe title="Anchor simulado" style="border:0;width:100%;height:64px;display:block;background:#ccc"></iframe></div>' +
             '<div style="position:absolute;left:0;top:64px;width:40px;height:22px;background:#eee;border-radius:0 0 8px 0;text-align:center">v</div>';
-          document.body.appendChild(caja);
+          // window.__gptAnchorEmpuja imita a los anchors que corren la página: "relleno" (padding en body),
+          // "espacio" (un bloque en blanco antes del contenido) o "en-flujo" (el anuncio dentro de la página, arriba)
+          var modoE = window.__gptAnchorEmpuja;
+          if (modoE === "en-flujo") { caja.style.position = "relative"; document.body.insertBefore(caja, document.body.firstChild); }
+          else document.body.appendChild(caja);
+          if (modoE === "relleno") document.body.style.paddingTop = "86px";
+          if (modoE === "espacio") { var esp = document.createElement("div"); esp.style.height = "86px"; document.body.insertBefore(esp, document.body.firstChild); }
           window.__gptAnchorOcultar = function () { caja.style.transform = "translateY(-64px)"; };
           window.__gptAnchorMostrar = function () { caja.style.transform = "none"; };
           emitir("slotRenderEnded", { slot: s, isEmpty: false });

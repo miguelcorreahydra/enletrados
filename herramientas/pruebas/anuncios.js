@@ -78,6 +78,14 @@ async function formar(p, palabra) {
     const antes = await pos(); await p.evaluate(() => window.__gptAnchorOcultar()); await espera(800); const despues = await pos();
     const anc = await p.evaluate(() => !!document.querySelector('[id^="fuera-"]'));
     if (anc && antes === despues) ok("el anchor sale encima y el juego no se mueve (ni al ocultarlo)"); else mal("el juego se movió o no hubo anchor: " + JSON.stringify({ anc, antes, despues }));
+    // aunque Google intente correr la página, el juego queda quieto y el anuncio visible encima
+    for (const modo of ["relleno", "espacio", "en-flujo"]) {
+      await p.evaluate(m => { window.__gptAnchorEmpuja = m; }, modo); await p.reload({ waitUntil: "load" }); await p.evaluate(m => { window.__gptAnchorEmpuja = m; }, modo);
+      const p0 = await pos(); await espera(3200); const p1 = await pos();
+      const visible = await p.evaluate(() => { const a = document.querySelector('[id^="fuera-"]'); if (!a) return false; const r = a.getBoundingClientRect(); return r.top <= 1 && r.height > 0 && document.elementFromPoint(r.left + 60, r.top + 20) && document.elementFromPoint(r.left + 60, r.top + 20).closest('[id^="fuera-"]') !== null; });
+      if (p0 === p1 && visible) ok(`si Google corre la página («${modo}»), se deshace: el juego no se mueve y el anuncio queda encima`); else mal(`modo ${modo}: ` + JSON.stringify({ p0, p1, visible }));
+    }
+    await p.evaluate(() => { delete window.__gptAnchorEmpuja; });
     await completar(); const e1b = await estado();
     if (e1b.slots.some(s => /^display:Enletrados_Content3_/.test(s)) && !e1b.vineta && !e1b.anchor) ok("nivel 1 completado: Content3, sin viñeta ni anchor"); else mal("nivel 1 completado: " + JSON.stringify(e1b));
     await ir("/nivel/2/", 1500);
