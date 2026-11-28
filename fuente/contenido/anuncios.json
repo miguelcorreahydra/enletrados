@@ -1,5 +1,5 @@
 {
-  "nota": "Anuncios de Google Ad Manager a través de Groone (códigos entregados el 27 nov 2026). Con «activo» en false el sitio publicado no muestra anuncios ni ofertas de recompensa (en local se simulan). groone.js se carga fuera de la partida: en portada y páginas de texto al terminar de cargar; en niveles y diario solo cuando aparece la pantalla de completado. «recompensa» es la ruta de la unidad de Ad Manager del anuncio con recompensa (/red/dominio/unidad); vacía, el juego no ofrece anuncios con recompensa. No se usa rewardsv2.min.js de Groone: abre solo una ventana que bloquea la página. La unidad de recompensa se leyó de la configuración de Groone para el sitio (27 nov 2026, bloque Enletrados_Rewards_20261127).",
+  "nota": "Anuncios de Google Ad Manager a través de Groone (códigos entregados el 27 nov 2026). Con «activo» en false el sitio publicado no muestra anuncios ni ofertas de recompensa (en local se simulan). groone.js se carga fuera de la partida: en portada y páginas de texto al terminar de cargar; en niveles y diario solo cuando aparece la pantalla de completado. «recompensa» es la ruta de la unidad de Ad Manager del anuncio con recompensa (/red/dominio/unidad); vacía, el juego no ofrece anuncios con recompensa. No se usa rewardsv2.min.js de Groone: abre solo una ventana que bloquea la página. La unidad de recompensa se leyó de la configuración de Groone para el sitio (27 nov 2026, bloque Enletrados_Rewards_20261127). «anchor_juego»: anchor arriba en los niveles desde el nivel 1 (aprobado por el usuario y su jefe el 28 nov 2026), con su espacio propio; vacío = sin anchor durante el juego.",
   "activo": true,
   "groone": {
     "network": "23070559321",
@@ -16,5 +16,6 @@
     "diario_completado": "Content4"
   },
   "recompensa": "/23070559321/enletrados.cosmovil.com.mx/Enletrados_Rewards_20261127",
-  "ads_txt": "google.com, pub-5119245763044424, DIRECT, f08c47fec0942fa0"
+  "ads_txt": "google.com, pub-5119245763044424, DIRECT, f08c47fec0942fa0",
+  "anchor_juego": "/23070559321/enletrados.cosmovil.com.mx/Enletrados_Anchor_20261127"
 }

@@ -31,16 +31,61 @@
   else if (document.querySelector("[groone]")) cargarGroone();
   else new MutationObserver(function (c, o) { if (document.querySelector("[groone]")) { o.disconnect(); cargarGroone(); } }).observe(cuerpo, { childList: true, subtree: true });
 
-  // ---- recompensa: la pide el jugador desde la tarjeta «Anuncio» del juego ----
-  // app.js llama a recompensa(listo) y espera «visto», «cerrado» o «sin-anuncio».
-  if (!CONF.recompensa) return; // sin unidad de recompensa, el juego no ofrece anuncios con recompensa
-  var oyentes = false, actual = null;
   function cargarGpt() {
     if (document.querySelector('script[src*="securepubads.g.doubleclick.net/tag/js/gpt.js"]')) return;
     var s = document.createElement("script"); s.async = true; s.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
     s.onerror = function () { window.enlAnuncios = null; }; // bloqueador de anuncios: el juego sigue igual, sin ofertas
     document.head.appendChild(s);
   }
+
+  // ---- anchor arriba durante el juego (aprobado el 28 nov 2026) ----
+  // Google lo pone fijo arriba y le agrega una flecha para ocultarlo. Aquí se mide cuánto ocupa de verdad (su borde de
+  // abajo) y el juego baja eso mismo (--anuncio-arriba en el body). Si el jugador lo oculta, o no hay anuncio, vuelve a 0
+  // y el juego recupera su tamaño. Al cambiar el alto, el juego vuelve a medir la rueda y el crucigrama.
+  if (pagina === "nivel" && CONF.anchorJuego) {
+    var raiz = document.documentElement, altoActual = 0, slotArriba = null;
+    var poner = function (px) {
+      px = Math.max(0, Math.min(Math.round(px), 160)); // un anchor nunca debería pasar de ~100 px
+      if (Math.abs(px - altoActual) < 2) return;
+      altoActual = px; raiz.style.setProperty("--anuncio-arriba", px + "px");
+      clearTimeout(poner.t); poner.t = setTimeout(function () { window.dispatchEvent(new Event("resize")); }, 280);
+    };
+    // el contenedor fijo del anuncio: el del espacio del anchor, o el que guarda su iframe
+    var contenedor = function () {
+      var el = slotArriba && document.getElementById(slotArriba.getSlotElementId());
+      if (!el) { var f = document.querySelector('iframe[id*="' + CONF.anchorJuego.split("/").pop() + '"]'); el = f && f.parentElement; }
+      for (var x = el; x && x !== document.body; x = x.parentElement) if (getComputedStyle(x).position === "fixed") return x;
+      return el;
+    };
+    var medir = function () {
+      var c = contenedor(); if (!c) return poner(0);
+      var r = c.getBoundingClientRect(), visible = r.height > 0 && r.top < 8 && getComputedStyle(c).visibility !== "hidden" && getComputedStyle(c).display !== "none";
+      poner(visible ? r.bottom : 0);
+    };
+    cargarGpt();
+    window.googletag.cmd.push(function () {
+      var g = window.googletag;
+      slotArriba = g.defineOutOfPageSlot(CONF.anchorJuego, g.enums.OutOfPageFormat.TOP_ANCHOR);
+      if (!slotArriba) return; // el navegador o la página no admiten anchor: el juego queda como siempre
+      slotArriba.addService(g.pubads());
+      g.pubads().addEventListener("slotRenderEnded", function (e) {
+        if (e.slot !== slotArriba) return;
+        if (e.isEmpty) return poner(0);
+        medir();
+        // Google mueve o encoge el contenedor al ocultarlo: se vuelve a medir con cada cambio y cada medio segundo
+        var c = contenedor();
+        if (c && window.ResizeObserver) new ResizeObserver(medir).observe(c);
+        if (c) new MutationObserver(medir).observe(c, { attributes: true, subtree: true, attributeFilter: ["style", "class", "hidden"] });
+        setInterval(function () { if (!document.hidden) medir(); }, 500);
+      });
+      g.enableServices(); g.display(slotArriba);
+    });
+  }
+
+  // ---- recompensa: la pide el jugador desde la tarjeta «Anuncio» del juego ----
+  // app.js llama a recompensa(listo) y espera «visto», «cerrado» o «sin-anuncio».
+  if (!CONF.recompensa) return; // sin unidad de recompensa, el juego no ofrece anuncios con recompensa
+  var oyentes = false, actual = null;
   function escuchar() {
     if (oyentes) return; oyentes = true;
     var pub = window.googletag.pubads();

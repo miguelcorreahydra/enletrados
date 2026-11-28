@@ -2,6 +2,8 @@
 // nunca se piden anuncios reales ni se generan impresiones (regla 8). Anota todo en window.__gpt para revisarlo.
 // window.__gptModo: "ok" (la recompensa se ve completa), "cerrar" (se cierra antes) o "vacio" (no hay anuncio).
 (function () {
+  // como el GPT real: si ya está cargado, una segunda copia no reinicia nada (solo corre lo que esté en la cola)
+  if (window.__gpt && window.googletag && window.googletag.apiReady) return;
   var previo = window.googletag || {}, cola = previo.cmd || [], oyentes = {}, n = 0;
   var reg = window.__gpt = { slots: [], servicios: false, eventos: [] };
   function emitir(tipo, e) { e.type = tipo; reg.eventos.push(tipo); (oyentes[tipo] || []).forEach(function (f) { f(e); }); }
@@ -29,6 +31,16 @@
       setTimeout(function () {
         var modo = window.__gptModo || "ok";
         if (s.tipo === "display") { if (window.__gptVacio) return emitir("slotRenderEnded", { slot: s, isEmpty: true }); var d = document.getElementById(s.div); if (d) { d.insertAdjacentHTML("beforeend", '<div id="google_ads_iframe_' + s.div + '__container__" style="border:0pt none"><iframe class="gpt-sim" title="GPT simulado" width="300" height="250" frameborder="0" style="border:0;vertical-align:bottom;background:#ddd"></iframe></div>'); } emitir("slotRenderEnded", { slot: s, isEmpty: false }); }
+        if (s.tipo === "anchor") {
+          // como el anchor de Google: fijo arriba, 64 px, con una flecha que lo oculta dejando una pestaña de 14 px
+          if (window.__gptAnchorVacio) return emitir("slotRenderEnded", { slot: s, isEmpty: true });
+          var caja = document.createElement("div"); caja.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:2147483000;transition:transform .2s";
+          caja.innerHTML = '<div id="' + s.div + '" style="height:64px;background:#ccc;display:grid;place-items:center">Anchor simulado</div>';
+          document.body.appendChild(caja);
+          window.__gptAnchorOcultar = function () { caja.style.transform = "translateY(-50px)"; };
+          window.__gptAnchorMostrar = function () { caja.style.transform = "none"; };
+          emitir("slotRenderEnded", { slot: s, isEmpty: false });
+        }
         if (s.tipo === "recompensa") {
           if (modo === "vacio") return emitir("slotRenderEnded", { slot: s, isEmpty: true });
           emitir("rewardedSlotReady", { slot: s, makeRewardedVisible: function () {

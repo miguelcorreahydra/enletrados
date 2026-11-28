@@ -686,7 +686,8 @@
     // ---- rueda ----
     var rueda = $("rueda"), trazo = $("trazo"), ancho = 240;
     function dibujarRueda(entrada) {
-      var n = orden.length, alto = window.innerHeight;
+      // alto disponible: la ventana menos el anuncio de arriba, si se ve (anuncios.js lo mide en --anuncio-arriba)
+      var n = orden.length, alto = window.innerHeight - (parseFloat(getComputedStyle(document.body).paddingTop) || 0);
       ancho = Math.round(Math.max(176, Math.min(256, window.innerWidth - 150, alto * 0.33)));
       var ficha = Math.round((n <= 4 ? 64 : n <= 5 ? 60 : n <= 6 ? 56 : n <= 7 ? 52 : 48) * Math.min(1, ancho / 240)), r = ancho / 2 - ficha / 2 - 12;
       rueda.style.width = rueda.style.height = ancho + "px"; rueda.style.setProperty("--tam-ficha", ficha + "px");

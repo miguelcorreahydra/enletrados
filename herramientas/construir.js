@@ -104,7 +104,7 @@ ${Object.entries(GEO.lugares).map(([id, l]) => `<image class="luz-lugar" data-mu
 // anuncio anchor SIMULADO: solo fuera de la partida (portada, lugares y cómo jugar); nunca en niveles ni en el diario
 // --anuncios-prueba usa los mismos datos de Groone, pero con una unidad de recompensa falsa y el GPT simulado
 const CONF_LEIDA = fs.existsSync(F("contenido/anuncios.json")) ? JSON.parse(leer("contenido/anuncios.json")) : { activo: false };
-const CONF_ANUNCIOS = PRUEBA_ANUNCIOS ? Object.assign({}, CONF_LEIDA, { activo: true, recompensa: "/0000000/enletrados.prueba/enl_prueba_recompensa", ads_txt: "" }) : CONF_LEIDA;
+const CONF_ANUNCIOS = PRUEBA_ANUNCIOS ? Object.assign({}, CONF_LEIDA, { activo: true, recompensa: "/0000000/enletrados.prueba/enl_prueba_recompensa", anchor_juego: "/0000000/enletrados.prueba/enl_prueba_anchor_juego", ads_txt: "" }) : CONF_LEIDA;
 if (ESTRICTO && PRUEBA_ANUNCIOS) { console.error("✗ --anuncios-prueba es solo para pruebas: no se puede publicar así."); process.exit(1); }
 const MODO_ANUNCIOS = !PUBLICADO ? "simulados" : CONF_ANUNCIOS.activo ? "activos" : "no";
 const SIMULADOS = MODO_ANUNCIOS === "simulados", ACTIVOS = MODO_ANUNCIOS === "activos";
@@ -126,7 +126,7 @@ const GTM = MED.gtm || "";
 // anuncios.js (carga groone.js y la recompensa): solo existe en el sitio cuando los anuncios están activos
 let ANUNCIOS_JS = "";
 if (ACTIVOS) {
-  const conf = { groone: GROONE, recompensa: CONF_ANUNCIOS.recompensa || "" };
+  const conf = { groone: GROONE, recompensa: CONF_ANUNCIOS.recompensa || "", anchorJuego: CONF_ANUNCIOS.anchor_juego || "" };
   const codigo = minJs(leer("juego/anuncios.js").replace("__CONF__", JSON.stringify(conf)));
   ANUNCIOS_JS = `anuncios.${huella(codigo)}.js`; fs.writeFileSync(path.join(DIST, ANUNCIOS_JS), codigo);
 }
