@@ -1,0 +1,252 @@
+<meta name="dash-one-writer">
+<meta name="dash-form" content="dashboard">
+<style>
+.enl { display: grid; gap: var(--cds-gap-xl); font-variant-numeric: tabular-nums; }
+.enl-lead { font-size: var(--cds-font-size-heading); line-height: 1.45; max-width: 68ch; margin: 0; }
+.enl-lead b { font-weight: var(--cds-font-weight-medium); }
+.enl-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--cds-gap-md); }
+.enl-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-xs); align-content: start; min-width: 0; }
+.enl-tile h3 { margin: 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.enl-big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.1; }
+.enl-sub { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.enl-ok { color: var(--color-ok); } .enl-warn { color: var(--color-warn); } .enl-bad { color: var(--color-bad); }
+.enl-sec { display: grid; gap: var(--cds-gap-md); min-width: 0; }
+.enl-sec > h2 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.enl-sec > p { margin: 0; color: var(--color-fg-muted); max-width: 70ch; }
+.enl-semaforo { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--cds-gap-md); }
+.enl-luz { border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: grid; gap: var(--cds-gap-xs); }
+.enl-luz b { font-size: var(--cds-font-size-body); }
+.enl-pill { justify-self: start; border-radius: 999px; padding: 2px 10px; font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); border: 1px solid currentColor; }
+.enl-chart { position: relative; min-height: 240px; }
+.enl-chart svg { display: block; width: 100%; }
+.enl-chart .tick text, .enl-chart .eje text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); }
+.enl-chart .tick line, .enl-chart .domain { stroke: var(--cds-chart-axis); }
+.enl-chart .grid line { stroke: var(--cds-chart-grid); }
+.enl-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; }
+.enl-leyenda { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.enl-leyenda i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.enl-tabla { overflow-x: auto; }
+.enl-tabla table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-body); }
+.enl-tabla th, .enl-tabla td { padding: var(--cds-pad-xs) var(--cds-pad-sm); text-align: right; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.enl-tabla th:first-child, .enl-tabla td:first-child { text-align: left; }
+.enl-tabla th { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.enl-dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--cds-gap-xl); }
+.enl-notas summary { cursor: pointer; color: var(--color-fg-muted); }
+.enl-notas ul { margin: var(--cds-gap-sm) 0 0; padding-left: 1.2em; color: var(--color-fg-muted); display: grid; gap: var(--cds-gap-xs); max-width: 72ch; }
+</style>
+
+<div class="enl">
+  <p class="enl-lead" id="resumen">El <b data-draw="fecha-hoy" data-source="hoy" data-field="fecha" data-row="0">—</b>, cada jugador que llegó al nivel 3 costó <b data-draw="costo-hoy" data-source="hoy" data-field="costo_n3_cop" data-row="0">—</b> y los anuncios del juego devolvieron <b data-draw="retorno-hoy" data-source="hoy" data-field="retorno_pct" data-row="0">—</b> de lo gastado en Meta. Lo que decide la prueba es cuántos vuelven al día siguiente.</p>
+
+  <div class="enl-tiles" id="cifras">
+    <div class="enl-tile" id="t-gasto"><h3>Gasto en Meta · último día</h3><div class="enl-big dash-skeleton" data-draw="k-gasto" data-source="hoy" data-field="gasto_cop" data-row="0"></div><div class="enl-sub">Total de la prueba: <span data-draw="k-gasto-total" data-source="total" data-field="gasto_cop" data-row="0">—</span></div></div>
+    <div class="enl-tile" id="t-jugadores"><h3>Jugadores reales · último día</h3><div class="enl-big dash-skeleton" data-draw="k-jugadores" data-source="hoy" data-field="jugadores" data-row="0"></div><div class="enl-sub">Colombia, México, Chile y Argentina</div></div>
+    <div class="enl-tile" id="t-n3"><h3>Llegaron al nivel 3</h3><div class="enl-big dash-skeleton" data-draw="k-n3" data-source="hoy" data-field="jugadores_n3" data-row="0"></div><div class="enl-sub">a <span data-draw="k-costo" data-source="hoy" data-field="costo_n3_cop" data-row="0">—</span> cada uno</div></div>
+    <div class="enl-tile" id="t-tiempo"><h3>Tiempo de juego por jugador</h3><div class="enl-big dash-skeleton" data-draw="k-tiempo" data-source="hoy" data-field="minutos_por_jugador" data-row="0"></div><div class="enl-sub">minutos con el juego activo</div></div>
+    <div class="enl-tile" id="t-ingreso"><h3>Ingreso de anuncios · último día</h3><div class="enl-big dash-skeleton" data-draw="k-ingreso" data-source="hoy" data-field="ingreso_cop" data-row="0"></div><div class="enl-sub">eCPM <span data-draw="k-ecpm" data-source="hoy" data-field="ecpm_usd" data-row="0">—</span> · relleno <span data-draw="k-relleno" data-source="hoy" data-field="relleno_pct" data-row="0">—</span></div></div>
+    <div class="enl-tile" id="t-retorno"><h3>Retorno de la primera visita</h3><div class="enl-big dash-skeleton" data-draw="k-retorno" data-source="total" data-field="retorno_pct" data-row="0"></div><div class="enl-sub">ingreso ÷ gasto, acumulado</div></div>
+  </div>
+
+  <section class="enl-sec" id="decision">
+    <h2>Semáforo de la decisión (día 7)</h2>
+    <p>Los criterios del plan: seguir si al día siguiente vuelve el 25 % o más; ajustar una vez entre 15 % y 25 %; parar si vuelve menos del 15 % y la primera visita deja menos del 30 % de su costo.</p>
+    <div class="enl-semaforo">
+      <div class="enl-luz" id="luz-regreso"><b>Regreso al día siguiente</b><span class="enl-big" data-draw="l-regreso" data-source="total" data-field="regreso_d1_pct" data-row="0">—</span><span data-draw="l-regreso-estado"></span></div>
+      <div class="enl-luz" id="luz-retorno"><b>Primera visita: ingreso ÷ costo</b><span class="enl-big" data-draw="l-retorno" data-source="total" data-field="retorno_pct" data-row="0">—</span><span data-draw="l-retorno-estado"></span></div>
+      <div class="enl-luz" id="luz-ctr"><b>CTR de los anuncios del juego</b><span class="enl-big" data-draw="l-ctr" data-source="hoy" data-field="ctr_groone_pct" data-row="0">—</span><span data-draw="l-ctr-estado"></span></div>
+    </div>
+  </section>
+
+  <section class="enl-sec" id="gasto-ingreso">
+    <h2>Gasto en Meta frente a ingreso de anuncios, por día</h2>
+    <div class="enl-leyenda"><span><i data-draw="ley-gasto"></i>Gasto en Meta (COP)</span><span><i data-draw="ley-ingreso"></i>Ingreso de anuncios (COP)</span></div>
+    <div class="enl-chart" data-draw="g-dias" data-source="dias"></div>
+  </section>
+
+  <section class="enl-sec" id="embudo">
+    <h2>Hasta dónde juegan: jugadores por nivel, último día</h2>
+    <p>Cuántos jugadores reales abrieron cada nivel de la panadería. Las caídas grandes marcan dónde se van.</p>
+    <div class="enl-chart" data-draw="g-embudo" data-source="embudo"></div>
+  </section>
+
+  <div class="enl-dos">
+    <section class="enl-sec" id="anuncios-meta">
+      <h2>Anuncios de Meta · último día</h2>
+      <div class="enl-tabla"><table data-source="anuncios" data-row-key="fecha,anuncio">
+        <thead><tr><th data-field="anuncio">Anuncio</th><th data-field="gasto_cop">Gasto</th><th data-field="ctr_pct">CTR</th><th data-field="resultados_n3">Nivel 3</th><th data-field="costo_resultado_cop">Costo c/u</th></tr></thead>
+        <tbody data-draw="t-anuncios"></tbody></table></div>
+    </section>
+    <section class="enl-sec" id="bloques-groone">
+      <h2>Anuncios del juego (Groone) · último día</h2>
+      <div class="enl-tabla"><table data-source="bloques" data-row-key="fecha,bloque">
+        <thead><tr><th data-field="bloque">Bloque</th><th data-field="impresiones">Impr.</th><th data-field="relleno_pct">Relleno</th><th data-field="ctr_pct">CTR</th><th data-field="ecpm_usd">eCPM</th><th data-field="ingreso_usd">Ingreso</th></tr></thead>
+        <tbody data-draw="t-bloques"></tbody></table></div>
+    </section>
+    <section class="enl-sec" id="paises">
+      <h2>Por país · último día</h2>
+      <div class="enl-tabla"><table data-source="paises" data-row-key="fecha,pais">
+        <thead><tr><th data-field="pais">País</th><th data-field="jugadores">Jugadores</th><th data-field="sesiones">Sesiones</th><th data-field="minutos_por_jugador">Min. por jugador</th></tr></thead>
+        <tbody data-draw="t-paises"></tbody></table></div>
+    </section>
+    <section class="enl-sec" id="recompensas">
+      <h2>Anuncios con recompensa · último día</h2>
+      <div class="enl-tabla"><table data-source="recompensas" data-row-key="fecha,oferta">
+        <thead><tr><th data-field="oferta">Oferta</th><th data-field="ofrecidos">Ofrecida</th><th data-field="aceptados">Aceptada</th><th data-field="vistos">Vista</th><th data-field="sin_anuncio">Sin anuncio</th></tr></thead>
+        <tbody data-draw="t-recompensas"></tbody></table></div>
+    </section>
+  </div>
+
+  <details class="enl-notas" id="notas"><summary>Cómo se calculan estos números</summary><ul>
+    <li>Jugadores reales: usuarios de GA4 en Colombia, México, Chile y Argentina. Las visitas de EE. UU., Irlanda o Suecia son revisores automáticos de Meta y no cuentan.</li>
+    <li>Nivel 3: el resultado de la campaña en Meta («Cliente potencial»), que el juego envía al completar el nivel 3.</li>
+    <li>Ingreso de anuncios: lo que reporta Groone en USD, pasado a pesos a 3.000 COP por dólar, como su propio panel. Ad Manager completa el ingreso con algunas horas de atraso.</li>
+    <li>Meta y Groone se transcriben de las capturas diarias; GA4 se lee directamente. Los datos del día se cargan a la mañana siguiente.</li>
+  </ul></details>
+</div>
+
+<script>
+// ---- formato en español (Colombia) ----
+window.enlFmt = (() => {
+  const L = d3.formatLocale({ decimal: ",", thousands: ".", grouping: [3], currency: ["$", ""] });
+  const fechaL = d3.utcFormat("%-d %b"), MES = { Jan: "ene", Feb: "feb", Mar: "mar", Apr: "abr", May: "may", Jun: "jun", Jul: "jul", Aug: "ago", Sep: "sep", Oct: "oct", Nov: "nov", Dec: "dic" };
+  return {
+    cop: (v) => v == null ? "—" : L.format(",.0f")(v) + " COP",
+    num: (v) => v == null ? "—" : L.format(",.0f")(v),
+    dec: (v) => v == null ? "—" : L.format(",.1f")(v),
+    pct: (v) => v == null ? "—" : L.format(",.1f")(v) + " %",
+    usd: (v) => v == null ? "—" : "US$ " + L.format(",.2f")(v),
+    fecha: (s) => s ? fechaL(new Date(s + "T00:00:00Z")).replace(/[A-Z][a-z]{2}/, (m) => MES[m] || m) : "—"
+  };
+})();
+</script>
+<script>
+// ---- cada conjunto toma su parte del archivo de datos ----
+for (const k of ["dias", "paises", "embudo", "anuncios", "bloques", "recompensas"]) {
+  dash.loader(k, { description: "Toma la lista «" + k + "» del archivo de datos de la campaña.", fn: ({ answer }) => {
+    if (!answer || !Array.isArray(answer[k])) throw new Error("El archivo no trae la lista " + k);
+    return answer[k];
+  } });
+}
+dash.calc("hoy", { title: "Último día", description: "La fila del último día con datos.", inputs: ["dias"],
+  fn: (dias) => { const d = dias.slice().sort((a, b) => a.fecha < b.fecha ? -1 : 1); return d.length ? [d[d.length - 1]] : []; } });
+dash.calc("total", { title: "Acumulado de la prueba", description: "Sumas de todos los días; el retorno es ingreso ÷ gasto acumulados. El regreso es el del último día que lo tiene.", inputs: ["dias"],
+  fn: (dias) => {
+    if (!dias.length) return [];
+    const s = (k) => dias.reduce((t, d) => t + (+d[k] || 0), 0);
+    const conRegreso = dias.filter((d) => d.regreso_d1_pct != null).sort((a, b) => a.fecha < b.fecha ? -1 : 1);
+    return [{ gasto_cop: s("gasto_cop"), ingreso_cop: s("ingreso_cop"), jugadores_n3: s("jugadores_n3"),
+      retorno_pct: Math.round(s("ingreso_cop") / Math.max(1, s("gasto_cop")) * 1000) / 10,
+      regreso_d1_pct: conRegreso.length ? conRegreso[conRegreso.length - 1].regreso_d1_pct : null }];
+  } });
+</script>
+<script>
+// ---- cifras y frases ----
+(() => {
+  const F = window.enlFmt;
+  const cifra = (name, src, campo, fmt) => dash.draw(name, (el) => {
+    const r = dash.data(src);
+    if (r.status === "loading") return;
+    el.classList.remove("dash-skeleton");
+    el.textContent = r.status === "ok" && r.data.length ? fmt(r.data[0][campo]) : "—";
+  });
+  cifra("fecha-hoy", "hoy", "fecha", F.fecha); cifra("costo-hoy", "hoy", "costo_n3_cop", F.cop); cifra("retorno-hoy", "hoy", "retorno_pct", F.pct);
+  cifra("k-gasto", "hoy", "gasto_cop", F.cop); cifra("k-gasto-total", "total", "gasto_cop", F.cop);
+  cifra("k-jugadores", "hoy", "jugadores", F.num); cifra("k-n3", "hoy", "jugadores_n3", F.num); cifra("k-costo", "hoy", "costo_n3_cop", F.cop);
+  cifra("k-tiempo", "hoy", "minutos_por_jugador", F.dec); cifra("k-ingreso", "hoy", "ingreso_cop", F.cop);
+  cifra("k-ecpm", "hoy", "ecpm_usd", F.usd); cifra("k-relleno", "hoy", "relleno_pct", F.pct); cifra("k-retorno", "total", "retorno_pct", F.pct);
+  cifra("l-regreso", "total", "regreso_d1_pct", (v) => v == null ? "Se mide desde el día 2" : F.pct(v));
+  cifra("l-retorno", "total", "retorno_pct", F.pct); cifra("l-ctr", "hoy", "ctr_groone_pct", F.pct);
+
+  // estado de cada luz, con los límites del plan (constantes elegidas en el plan de la campaña)
+  const LIM = { regresoSeguir: 25, regresoParar: 15, retornoParar: 30, ctrAlarma: 10 };
+  const pill = (el, clase, texto) => { el.replaceChildren(); const s = document.createElement("span"); s.className = "enl-pill " + clase; s.textContent = texto; el.append(s); };
+  dash.draw("l-regreso-estado", (el) => { const t = dash.data("total"); const v = t.status === "ok" && t.data.length ? t.data[0].regreso_d1_pct : null;
+    if (v == null) return pill(el, "", "Pendiente");
+    pill(el, v >= LIM.regresoSeguir ? "enl-ok" : v >= LIM.regresoParar ? "enl-warn" : "enl-bad", v >= LIM.regresoSeguir ? "Seguir" : v >= LIM.regresoParar ? "Ajustar una vez" : "Bajo el mínimo"); });
+  dash.draw("l-retorno-estado", (el) => { const t = dash.data("total"); const v = t.status === "ok" && t.data.length ? t.data[0].retorno_pct : null;
+    if (v == null) return pill(el, "", "Pendiente");
+    pill(el, v >= LIM.retornoParar ? "enl-ok" : "enl-warn", v >= LIM.retornoParar ? "Sobre el 30 %" : "Bajo el 30 %: depende del regreso"); });
+  dash.draw("l-ctr-estado", (el) => { const t = dash.data("hoy"); const v = t.status === "ok" && t.data.length ? t.data[0].ctr_groone_pct : null;
+    if (v == null) return pill(el, "", "Pendiente");
+    pill(el, v > LIM.ctrAlarma ? "enl-bad" : "enl-ok", v > LIM.ctrAlarma ? "Alarma: pausar y revisar" : "Normal"); });
+  dash.draw("ley-gasto", (el) => { el.style.background = dash.colors[0]; });
+  dash.draw("ley-ingreso", (el) => { el.style.background = dash.colors[1]; });
+})();
+</script>
+<script>
+// ---- gráficos ----
+(() => {
+  const F = window.enlFmt;
+  const tip = (box) => { let t = box.querySelector(".enl-tip"); if (!t) { t = document.createElement("div"); t.className = "enl-tip"; t.hidden = true; box.append(t); } return t; };
+  const vacio = (el, r, msg) => { el.replaceChildren(); const p = document.createElement("p"); p.className = "enl-sub"; p.textContent = r.status === "error" ? "No se pudieron cargar los datos de este gráfico." : r.status === "loading" ? "Cargando…" : msg; el.append(p); };
+
+  dash.draw("g-dias", (el) => {
+    const r = dash.data("dias");
+    if (r.status !== "ok" || !r.data.length) return vacio(el, r, "Sin días todavía.");
+    const dias = r.data.slice().sort((a, b) => a.fecha < b.fecha ? -1 : 1);
+    const W = el.clientWidth || 600, H = 240, m = { t: 12, r: 8, b: 28, l: 8 };
+    el.replaceChildren();
+    const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "Gasto en Meta e ingreso de anuncios por día, en pesos");
+    const y = d3.scaleLinear().domain([0, d3.max(dias, (d) => Math.max(d.gasto_cop, d.ingreso_cop)) * 1.1]).nice().range([H - m.b, m.t]);
+    const g = svg.append("g"); const ticks = y.ticks(4);
+    const etiquetas = g.selectAll("text.y").data(ticks).join("text").attr("class", "eje").attr("x", 0).attr("y", (d) => y(d) - 3).text((d) => F.num(d));
+    const mL = Math.max(...etiquetas.nodes().map((n) => n.getComputedTextLength())) + 10; etiquetas.remove();
+    m.l = mL;
+    const x = d3.scaleBand().domain(dias.map((d) => d.fecha)).range([m.l, W - m.r]).padding(0.3);
+    const x2 = d3.scaleBand().domain(["gasto_cop", "ingreso_cop"]).range([0, x.bandwidth()]).padding(0.1);
+    svg.append("g").attr("class", "grid").selectAll("line").data(ticks).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+    svg.append("g").attr("class", "eje").selectAll("text").data(ticks).join("text").attr("x", m.l - 6).attr("y", y).attr("dy", "0.32em").attr("text-anchor", "end").text((d) => F.num(d));
+    svg.append("g").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickFormat(F.fecha).tickSizeOuter(0));
+    const t = tip(el);
+    const gr = svg.append("g").selectAll("g").data(dias).join("g").attr("transform", (d) => `translate(${x(d.fecha)},0)`);
+    gr.selectAll("rect").data((d) => ["gasto_cop", "ingreso_cop"].map((k, i) => ({ k, i, v: d[k], d }))).join("rect")
+      .attr("x", (o) => x2(o.k)).attr("width", x2.bandwidth()).attr("y", (o) => y(o.v)).attr("height", (o) => y(0) - y(o.v)).attr("rx", 2)
+      .style("fill", (o) => dash.colors[o.i])
+      .on("pointermove", (ev, o) => { const [px, py] = d3.pointer(ev, el); t.hidden = false; t.textContent = F.fecha(o.d.fecha) + " · " + (o.k === "gasto_cop" ? "Gasto " : "Ingreso ") + F.cop(o.v);
+        t.style.left = Math.min(px + 12, el.clientWidth - t.offsetWidth) + "px"; t.style.top = Math.max(0, py - 30) + "px"; })
+      .on("pointerleave", () => { t.hidden = true; });
+    el.append(t);
+  });
+
+  dash.draw("g-embudo", (el) => {
+    const r = dash.data("embudo");
+    if (r.status !== "ok" || !r.data.length) return vacio(el, r, "Sin datos de niveles todavía.");
+    const ult = d3.max(r.data, (d) => d.fecha), filas = r.data.filter((d) => d.fecha === ult).sort((a, b) => a.nivel - b.nivel);
+    const W = el.clientWidth || 600, H = 240, m = { t: 22, r: 8, b: 28, l: 34 };
+    el.replaceChildren();
+    const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "Jugadores que abrieron cada nivel del 1 al 30 el último día");
+    const x = d3.scaleBand().domain(d3.range(1, 31)).range([m.l, W - m.r]).padding(0.15);
+    const y = d3.scaleLinear().domain([0, d3.max(filas, (d) => d.jugadores)]).nice().range([H - m.b, m.t]);
+    svg.append("g").attr("class", "grid").selectAll("line").data(y.ticks(4)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+    svg.append("g").attr("class", "eje").selectAll("text").data(y.ticks(4)).join("text").attr("x", m.l - 6).attr("y", y).attr("dy", "0.32em").attr("text-anchor", "end").text((d) => F.num(d));
+    svg.append("g").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickValues(W < 480 ? [1, 5, 10, 15, 20, 25, 30] : [1, 3, 5, 10, 15, 20, 25, 30]).tickSizeOuter(0));
+    const t = tip(el), marcados = new Set([1, 3, 10, 20, 30]);
+    svg.append("g").selectAll("rect").data(filas).join("rect").attr("x", (d) => x(d.nivel)).attr("width", x.bandwidth())
+      .attr("y", (d) => y(d.jugadores)).attr("height", (d) => y(0) - y(d.jugadores)).attr("rx", 2).style("fill", (d) => marcados.has(d.nivel) ? dash.colors[0] : "var(--cds-chart-muted)")
+      .on("pointermove", (ev, d) => { const [px, py] = d3.pointer(ev, el); t.hidden = false; t.textContent = "Nivel " + d.nivel + ": " + F.num(d.jugadores) + " jugadores";
+        t.style.left = Math.min(px + 12, el.clientWidth - t.offsetWidth) + "px"; t.style.top = Math.max(0, py - 30) + "px"; })
+      .on("pointerleave", () => { t.hidden = true; });
+    svg.append("g").selectAll("text").data(filas.filter((d) => marcados.has(d.nivel))).join("text").attr("class", "eje")
+      .attr("x", (d) => x(d.nivel) + x.bandwidth() / 2).attr("y", (d) => y(d.jugadores) - 5).attr("text-anchor", "middle").text((d) => F.num(d.jugadores));
+    el.append(t);
+  });
+})();
+</script>
+<script>
+// ---- tablas del último día ----
+(() => {
+  const F = window.enlFmt;
+  const tabla = (name, src, cols, orden) => dash.draw(name, (tb) => {
+    const r = dash.data(src); tb.replaceChildren();
+    if (r.status !== "ok") { const tr = tb.insertRow(); const td = tr.insertCell(); td.colSpan = cols.length; td.textContent = r.status === "error" ? "No se pudieron cargar." : "Cargando…"; return; }
+    const ult = d3.max(r.data, (d) => d.fecha), filas = r.data.filter((d) => d.fecha === ult).sort(orden);
+    for (const d of filas) { const tr = tb.insertRow(); tr.dataset.key = encodeURIComponent(d.fecha) + "," + encodeURIComponent(cols[0][0] === "anuncio" ? d.anuncio : d[cols[0][0]]);
+      for (const [k, f] of cols) tr.insertCell().textContent = f(d[k]); }
+  });
+  const txt = (v) => v ?? "—";
+  tabla("t-anuncios", "anuncios", [["anuncio", txt], ["gasto_cop", F.cop], ["ctr_pct", F.pct], ["resultados_n3", F.num], ["costo_resultado_cop", F.cop]], (a, b) => b.resultados_n3 - a.resultados_n3);
+  tabla("t-bloques", "bloques", [["bloque", txt], ["impresiones", F.num], ["relleno_pct", F.pct], ["ctr_pct", F.pct], ["ecpm_usd", F.usd], ["ingreso_usd", F.usd]], (a, b) => b.impresiones - a.impresiones);
+  tabla("t-paises", "paises", [["pais", txt], ["jugadores", F.num], ["sesiones", F.num], ["minutos_por_jugador", F.dec]], (a, b) => b.jugadores - a.jugadores);
+  tabla("t-recompensas", "recompensas", [["oferta", txt], ["ofrecidos", F.num], ["aceptados", F.num], ["vistos", F.num], ["sin_anuncio", F.num]], (a, b) => b.ofrecidos - a.ofrecidos);
+})();
+</script>

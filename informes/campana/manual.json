@@ -1,0 +1,22 @@
+{
+  "nota": "Datos de Meta y Groone transcritos de las capturas del usuario, día completo (columna «Ayer»). Moneda de Meta: COP. Groone: USD, convertido a COP a 3.000 como lo hace su panel.",
+  "cop_por_usd": 3000,
+  "dias": {
+    "2026-11-27": {
+      "meta": { "gasto_cop": 12524, "impresiones": 1850, "clics": 78, "ctr_pct": 4.22, "visitas": 55, "resultados_n3": 22, "costo_resultado_cop": 569,
+        "anuncios": [
+          { "anuncio": "Anuncio 1", "gasto_cop": 2221, "impresiones": 301, "clics": 15, "ctr_pct": 4.98, "visitas": 13, "resultados_n3": 7, "costo_resultado_cop": 317 },
+          { "anuncio": "Anuncio 2", "gasto_cop": 395, "impresiones": 59, "clics": 2, "ctr_pct": 3.39, "visitas": 1, "resultados_n3": 0, "costo_resultado_cop": null },
+          { "anuncio": "Anuncio 3", "gasto_cop": 6458, "impresiones": 1027, "clics": 46, "ctr_pct": 4.48, "visitas": 29, "resultados_n3": 12, "costo_resultado_cop": 538 },
+          { "anuncio": "Anuncio 4", "gasto_cop": 3450, "impresiones": 463, "clics": 15, "ctr_pct": 3.24, "visitas": 12, "resultados_n3": 3, "costo_resultado_cop": 1150 } ] },
+      "groone": { "solicitudes": 650, "impresiones": 319, "relleno_pct": 49.08, "clics": 7, "ctr_pct": 2.19, "ecpm_usd": 0.88, "ingreso_usd": 0.28,
+        "bloques": [
+          { "bloque": "Viñeta (Interstitial)", "solicitudes": 315, "impresiones": 143, "relleno_pct": 45.40, "clics": 6, "ctr_pct": 4.20, "ecpm_usd": 1.54, "ingreso_usd": 0.22 },
+          { "bloque": "Nivel completado (Content3)", "solicitudes": 271, "impresiones": 144, "relleno_pct": 53.14, "clics": 0, "ctr_pct": 0, "ecpm_usd": 0.35, "ingreso_usd": 0.05 },
+          { "bloque": "Anchor", "solicitudes": 44, "impresiones": 21, "relleno_pct": 47.73, "clics": 0, "ctr_pct": 0, "ecpm_usd": 0.48, "ingreso_usd": 0.01 },
+          { "bloque": "Portada (Content1)", "solicitudes": 14, "impresiones": 8, "relleno_pct": 57.14, "clics": 1, "ctr_pct": 12.50, "ecpm_usd": 0, "ingreso_usd": 0 },
+          { "bloque": "Recompensa (Rewards)", "solicitudes": 5, "impresiones": 3, "relleno_pct": 60.00, "clics": 0, "ctr_pct": 0, "ecpm_usd": 0, "ingreso_usd": 0 },
+          { "bloque": "Diario completado (Content4)", "solicitudes": 1, "impresiones": 0, "relleno_pct": 0, "clics": 0, "ctr_pct": 0, "ecpm_usd": 0, "ingreso_usd": 0 } ] }
+    }
+  }
+}

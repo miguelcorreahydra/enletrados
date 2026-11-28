@@ -30,3 +30,6 @@ respaldos/*.zip
 
 # llaves privadas (cuenta de servicio de Google): nunca a GitHub ni al sitio
 .secretos/
+
+# copias temporales para escribir el tablero
+informes/campana/tablero/doc-*.json
