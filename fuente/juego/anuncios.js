@@ -38,49 +38,15 @@
     document.head.appendChild(s);
   }
 
-  // ---- anchor arriba durante el juego (aprobado el 28 nov 2026), solo en niveles de crucigrama chico ----
-  // Google lo pone fijo arriba y le agrega una flecha para ocultarlo. Aquí se mide cuánto ocupa de verdad (su borde de
-  // abajo) y el juego baja eso mismo (--anuncio-arriba en el body). Si el jugador lo oculta, o no hay anuncio, vuelve a 0
-  // y el juego recupera su tamaño. Al cambiar el alto, el juego vuelve a medir la rueda y el crucigrama.
+  // ---- anchor arriba durante el juego (28 nov 2026), solo en niveles de crucigrama chico ----
+  // Por decisión del usuario sale normal, encima del juego, y el juego no se mueve: si alguien necesita ver lo que tapa,
+  // lo oculta con la flecha del propio anuncio. Vigilar su CTR en Groone (clics accidentales sobre la cabecera).
   if (pagina === "nivel" && CONF.anchorJuego && document.documentElement.dataset.anchorJuego === "1") {
-    var raiz = document.documentElement, altoActual = 0, slotArriba = null;
-    var poner = function (px) {
-      px = Math.max(0, Math.min(Math.round(px), 160)); // un anchor nunca debería pasar de ~100 px
-      if (Math.abs(px - altoActual) < 2) return;
-      altoActual = px; raiz.style.setProperty("--anuncio-arriba", px + "px");
-      clearTimeout(poner.t); poner.t = setTimeout(function () { window.dispatchEvent(new Event("resize")); }, 280);
-    };
-    // Qué hay de verdad en la franja de arriba: se revisan puntos a lo ancho, fila por fila, y el anuncio llega hasta la
-    // última fila donde algún punto cae sobre él. No depende de cómo arme Google su anchor por dentro: abierto mide el
-    // anuncio entero; oculto, solo la pestañita con la flecha (así no tapa el botón de casa); sin anuncio, 0.
-    var nuestros = new Set([].slice.call(document.body.children)); // lo del juego ya está; el anchor llega después
-    var esAnuncio = function (el) {
-      if (!el || el === document.documentElement || el === document.body) return false;
-      var x = el; while (x.parentElement && x.parentElement !== document.body) x = x.parentElement;
-      if (nuestros.has(x)) return false;
-      return !/(^|\s)(regalo-velo|vuela|moneda-vuela|chispa|aviso|velo|sim)(\s|$)/.test(typeof x.className === "string" ? x.className : "");
-    };
-    var medir = function () {
-      if (document.hidden) return;
-      var velo = document.getElementById("velo"); if (velo && velo.classList.contains("ver")) return; // con una hoja abierta no se toca nada
-      var w = innerWidth, xs = [6, 20, 40, w / 4, w / 2, 3 * w / 4, w - 40, w - 20, w - 6], fondo = 0;
-      for (var y = 1; y < 220; y += 3) {
-        var hay = false;
-        for (var k = 0; k < xs.length && !hay; k++) hay = esAnuncio(document.elementFromPoint(xs[k], y));
-        if (!hay) break;
-        fondo = y + 3;
-      }
-      poner(fondo ? fondo + 2 : 0);
-    };
     cargarGpt();
     window.googletag.cmd.push(function () {
-      var g = window.googletag;
-      slotArriba = g.defineOutOfPageSlot(CONF.anchorJuego, g.enums.OutOfPageFormat.TOP_ANCHOR);
-      if (!slotArriba) return; // el navegador o la página no admiten anchor: el juego queda como siempre
-      slotArriba.addService(g.pubads());
-      g.pubads().addEventListener("slotRenderEnded", function (e) { if (e.slot === slotArriba) { if (e.isEmpty) poner(0); else medir(); } });
-      g.enableServices(); g.display(slotArriba);
-      setInterval(medir, 400); // se vuelve a mirar seguido: Google lo muestra, lo oculta o lo cambia cuando quiere
+      var g = window.googletag, s = g.defineOutOfPageSlot(CONF.anchorJuego, g.enums.OutOfPageFormat.TOP_ANCHOR);
+      if (!s) return; // el navegador o la página no admiten anchor
+      s.addService(g.pubads()); g.enableServices(); g.display(s);
     });
   }
 
